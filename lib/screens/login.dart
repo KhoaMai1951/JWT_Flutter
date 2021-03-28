@@ -4,7 +4,7 @@ import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/register.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'logout.dart';
+import 'home.dart';
 
 class Login extends StatefulWidget {
   @override

@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_login_test_2/helpers/upload_image.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
+import 'package:flutter_login_test_2/screens/submit_post.dart';
+import 'package:flutter_login_test_2/screens/upload_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'login.dart';
@@ -56,6 +59,30 @@ class _HomeState extends State<Home> {
                 child: Text('Logout'),
               ),
             ),
+            Center(
+              child: RaisedButton(
+                elevation: 10,
+                onPressed: () {
+                  submitPostScreen();
+                },
+                color: Colors.lightBlue,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: Text('Submit Post'),
+              ),
+            ),
+            Center(
+              child: RaisedButton(
+                elevation: 10,
+                onPressed: () {
+                  uploadImageScreen();
+                },
+                color: Colors.yellowAccent,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: Text('Upload Image'),
+              ),
+            ),
           ],
         ),
       ),
@@ -71,5 +98,23 @@ class _HomeState extends State<Home> {
       localStorage.remove('token');
       Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
     }
+  }
+
+  void submitPostScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SubmitPost(),
+      ),
+    );
+  }
+
+  void uploadImageScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UploadImage(),
+      ),
+    );
   }
 }

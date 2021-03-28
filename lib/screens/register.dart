@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'home.dart';
 import 'login.dart';
-import 'logout.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -222,7 +222,9 @@ class _RegisterState extends State<Register> {
       localStorage.setString('user', json.encode(body['user']));
       Navigator.push(
         context,
-        new MaterialPageRoute(builder: (context) => Home()),
+        new MaterialPageRoute(
+          builder: (context) => Home(),
+        ),
       );
     }
 

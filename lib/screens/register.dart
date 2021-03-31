@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
+import 'package:flutter_login_test_2/screens/confirm_email.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'home.dart';
@@ -208,26 +210,36 @@ class _RegisterState extends State<Register> {
       _isLoading = true;
     });
     var data = {
+      'username': username,
+      'name': name,
       'email': email,
       'password': password,
-      'username': username,
-      'name': name
     };
 
+    //var res = await Network().authData(data, kApiRegister);
     var res = await Network().authData(data, '/register');
     var body = json.decode(res.body);
     if (body['success']) {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
-      localStorage.setString('token', json.encode(body['token']));
-      localStorage.setString('user', json.encode(body['user']));
+      // localStorage.setString('token', json.encode(body['token']));
+      // localStorage.setString('user', json.encode(body['user']));
+      // Navigator.push(
+      //   context,
+      //   new MaterialPageRoute(
+      //     builder: (context) => Home(),
+      //   ),
+      // );
       Navigator.push(
         context,
         new MaterialPageRoute(
-          builder: (context) => Home(),
+          builder: (context) => ConfirmEmail(
+            email: this.email,
+          ),
         ),
       );
+    } else {
+      print('failed');
     }
-
     setState(() {
       _isLoading = false;
     });

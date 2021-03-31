@@ -92,6 +92,7 @@ class _HomeState extends State<Home> {
   void logout() async {
     var res = await Network().getData('/logout');
     var body = json.decode(res.body);
+    print(body);
     if (body['success']) {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       localStorage.remove('user');

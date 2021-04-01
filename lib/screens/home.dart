@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/helpers/upload_image.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/submit_post.dart';
@@ -90,9 +91,8 @@ class _HomeState extends State<Home> {
   }
 
   void logout() async {
-    var res = await Network().getData('/logout');
+    var res = await Network().getData(kApiLogout);
     var body = json.decode(res.body);
-    print(body);
     if (body['success']) {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       localStorage.remove('user');

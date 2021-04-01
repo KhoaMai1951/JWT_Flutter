@@ -6,14 +6,14 @@ class MultiSelectChip extends StatefulWidget {
   // constructor
   //MultiSelectChip({this.reportList, this.onSelectionChanged});
   MultiSelectChip({this.list, this.onSelectionChanged});
-  final List<TagModel> list;
-  final Function(List<TagModel>, int) onSelectionChanged;
+  final List list;
+  final Function(List, int) onSelectionChanged;
   @override
   _MultiSelectChipState createState() => _MultiSelectChipState();
 }
 
 class _MultiSelectChipState extends State<MultiSelectChip> {
-  List<TagModel> selectedChoices = [];
+  List selectedChoices = [];
   int maxCounter = 0;
   // this function will build and return the choice list
   _buildChoiceList() {
@@ -22,12 +22,12 @@ class _MultiSelectChipState extends State<MultiSelectChip> {
       choices.add(Container(
         padding: const EdgeInsets.all(2.0),
         child: ChoiceChip(
-          label: Text(item.tagName),
+          label: Text(item['name']),
           selected: selectedChoices.contains(item),
           onSelected: (selected) {
             setState(() {
               // if array of choices < 3 parameters, then allow add more or delete already existing ones
-              if (selectedChoices.length < 3) {
+              if (selectedChoices.length < 2) {
                 selectedChoices.contains(item)
                     ? selectedChoices.remove(item)
                     : selectedChoices.add(item);

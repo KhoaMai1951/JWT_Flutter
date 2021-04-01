@@ -5,6 +5,7 @@ import 'package:flutter_login_test_2/helpers/upload_image.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/submit_post.dart';
 import 'package:flutter_login_test_2/screens/upload_image.dart';
+import 'package:flutter_login_test_2/services/TagService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'login.dart';
@@ -63,7 +64,7 @@ class _HomeState extends State<Home> {
             Center(
               child: RaisedButton(
                 elevation: 10,
-                onPressed: () {
+                onPressed: () async {
                   submitPostScreen();
                 },
                 color: Colors.lightBlue,
@@ -101,11 +102,12 @@ class _HomeState extends State<Home> {
     }
   }
 
-  void submitPostScreen() {
+  Future<void> submitPostScreen() async {
+    var plantTagList = await TagService.getTagsByTypeId(1);
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SubmitPost(),
+        builder: (context) => SubmitPost(plantTagList: plantTagList),
       ),
     );
   }

@@ -8,6 +8,7 @@ import 'package:flutter_login_test_2/screens/upload_image.dart';
 import 'package:flutter_login_test_2/services/TagService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'submit_post.dart';
 import 'login.dart';
 
 class Home extends StatefulWidget {
@@ -104,10 +105,14 @@ class _HomeState extends State<Home> {
 
   Future<void> submitPostScreen() async {
     var plantTagList = await TagService.getTagsByTypeId(1);
+    var contentTagList = await TagService.getTagsByTypeId(2);
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SubmitPost(plantTagList: plantTagList),
+        builder: (context) => SubmitPostScreen(
+          plantTagList: plantTagList,
+          contentTagList: contentTagList,
+        ),
       ),
     );
   }

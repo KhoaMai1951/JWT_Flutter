@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_login_test_2/models/TagModel.dart';
 
 class MultiSelectChip extends StatefulWidget {
   // constructor

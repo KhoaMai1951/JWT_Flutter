@@ -18,18 +18,6 @@ class _LoginState extends State<Login> {
   var email;
   var password;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-  _showMsg(msg) {
-    final snackBar = SnackBar(
-      content: Text(msg),
-      action: SnackBarAction(
-        label: 'Close',
-        onPressed: () {
-          // Some code to undo the change!
-        },
-      ),
-    );
-    _scaffoldKey.currentState.showSnackBar(snackBar);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +64,7 @@ class _LoginState extends State<Login> {
                                 ),
                                 validator: (emailValue) {
                                   if (emailValue.isEmpty) {
-                                    return 'Please enter email';
+                                    return 'Hãy nhập email';
                                   }
                                   email = emailValue;
                                   return null;
@@ -92,7 +80,7 @@ class _LoginState extends State<Login> {
                                     Icons.vpn_key,
                                     color: Colors.grey,
                                   ),
-                                  hintText: "Password",
+                                  hintText: "Mật khẩu",
                                   hintStyle: TextStyle(
                                       color: Color(0xFF9b9b9b),
                                       fontSize: 15,
@@ -100,7 +88,7 @@ class _LoginState extends State<Login> {
                                 ),
                                 validator: (passwordValue) {
                                   if (passwordValue.isEmpty) {
-                                    return 'Please enter some text';
+                                    return 'Hãy nhập mật khẩu';
                                   }
                                   password = passwordValue;
                                   return null;
@@ -113,7 +101,9 @@ class _LoginState extends State<Login> {
                                     padding: EdgeInsets.only(
                                         top: 8, bottom: 8, left: 10, right: 10),
                                     child: Text(
-                                      _isLoading ? 'Proccessing...' : 'Login',
+                                      _isLoading
+                                          ? 'Đang xử lý...'
+                                          : 'Đăng nhập',
                                       textDirection: TextDirection.ltr,
                                       style: TextStyle(
                                         color: Colors.white,
@@ -150,7 +140,7 @@ class _LoginState extends State<Login> {
                                   builder: (context) => Register()));
                         },
                         child: Text(
-                          'Create new Account',
+                          'Tạo tài khoản mới',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 15.0,
@@ -178,6 +168,7 @@ class _LoginState extends State<Login> {
 
     var res = await Network().authData(data, kApiLogin);
     var body = json.decode(res.body);
+    //if success
     if (body['success']) {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       localStorage.setString('token', json.encode(body['token']));
@@ -189,9 +180,21 @@ class _LoginState extends State<Login> {
     } else {
       _showMsg(body['message']);
     }
-
     setState(() {
       _isLoading = false;
     });
+  }
+
+  _showMsg(msg) {
+    final snackBar = SnackBar(
+      content: Text(msg),
+      action: SnackBarAction(
+        label: 'Close',
+        onPressed: () {
+          // Some code to undo the change!
+        },
+      ),
+    );
+    _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 }

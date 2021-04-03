@@ -27,6 +27,7 @@ class _HomeState extends State<Home> {
   _loadUserData() async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var user = jsonDecode(localStorage.getString('user'));
+
     if (user != null) {
       setState(() {
         name = user['name'];

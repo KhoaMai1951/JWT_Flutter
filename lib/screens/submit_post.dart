@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/components/MultiSelectChip.dart';
 import 'package:flutter_login_test_2/constants/validate_name_constant.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
+import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:flutter_login_test_2/widgets/text_form_field/text_form_field_universal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -62,6 +63,8 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
       home: Scaffold(
         appBar: AppBar(title: Text('Đăng bài')),
         body: bodyLayout(),
+        bottomNavigationBar:
+            buildBottomNavigationBar(context: context, index: 2),
       ),
     );
   }

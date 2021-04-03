@@ -18,6 +18,8 @@ class _LoginState extends State<Login> {
   var email;
   var password;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  String emailValidator;
+  String passwordValidator;
 
   @override
   Widget build(BuildContext context) {

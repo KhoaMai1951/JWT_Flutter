@@ -6,6 +6,7 @@ import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/submit_post.dart';
 import 'package:flutter_login_test_2/screens/upload_image.dart';
 import 'package:flutter_login_test_2/services/TagService.dart';
+import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'submit_post.dart';
@@ -32,6 +33,22 @@ class _HomeState extends State<Home> {
       setState(() {
         name = user['name'];
       });
+    }
+  }
+
+  void _onItemTapped(int index) {
+    switch (index) {
+      case 2:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UploadImage(),
+          ),
+        );
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/second');
+        break;
     }
   }
 
@@ -90,12 +107,14 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
+      bottomNavigationBar: buildBottomNavigationBar(context: context, index: 1),
     );
   }
 
   void logout() async {
     var res = await Network().getData(kApiLogout);
     var body = json.decode(res.body);
+    //print(body);
     if (body['success']) {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       localStorage.remove('user');

@@ -4,7 +4,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/api_constant.dart';
+import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/helpers/upload_image.dart';
+import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 
 class UploadImage extends StatefulWidget {
@@ -16,69 +18,72 @@ class UploadImage extends StatefulWidget {
 
 class _UploadImageState extends State<UploadImage> {
   bool _isUploading = false;
+  List<MultipartFile> files = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Upload Image"),
-        ),
-        body: Column(
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: RaisedButton(
-                    onPressed: () {
-                      getImage();
-                    },
-                    color: Colors.white,
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(7.0)),
-                    child: SizedBox(
-                      width: 90,
-                      height: 90,
-                      child: Center(
-                        child: Icon(
-                          Icons.add,
-                          color: Colors.deepOrange,
-                          size: 30.0,
-                        ),
+      appBar: AppBar(
+        title: Text("Upload Image"),
+      ),
+      body: Column(
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(
+                width: 100,
+                height: 100,
+                child: RaisedButton(
+                  onPressed: () {
+                    getImage();
+                  },
+                  color: Colors.white,
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(7.0)),
+                  child: SizedBox(
+                    width: 90,
+                    height: 90,
+                    child: Center(
+                      child: Icon(
+                        Icons.add,
+                        color: Colors.deepOrange,
+                        size: 30.0,
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
-            SizedBox(
-              height: 40,
-            ),
-            SizedBox(
-              width: 500,
-              height: 500,
-              child: _isUploading == true
-                  ? FutureBuilder(
-                      future: uploadImage(),
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        switch (snapshot.connectionState) {
-                          case ConnectionState.none:
-                          case ConnectionState.waiting:
-                            return new Text('loading...');
-                          default:
-                            if (snapshot.hasError)
-                              return new Text('${snapshot.error}');
-                            else
-                              return createListView(context, snapshot);
-                        }
-                      },
-                    )
-                  : Text(""),
-            ),
-          ],
-        ));
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 40,
+          ),
+          SizedBox(
+            width: 500,
+            height: 500,
+            child: _isUploading == true
+                ? FutureBuilder(
+                    future: uploadImage(),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.none:
+                        case ConnectionState.waiting:
+                          return new Text('loading...');
+                        default:
+                          if (snapshot.hasError)
+                            return new Text('${snapshot.error}');
+                          else
+                            return createListView(context, snapshot);
+                      }
+                    },
+                  )
+                : Text(""),
+          ),
+        ],
+      ),
+      bottomNavigationBar: buildBottomNavigationBar(context: context, index: 3),
+    );
   }
 
   Future getImage() async {
@@ -109,8 +114,6 @@ class _UploadImageState extends State<UploadImage> {
       _isUploading = true;
     });
   }
-
-  List<MultipartFile> files = [];
 
   Future<List<String>> uploadImage() async {
     FormData formData = new FormData.fromMap({"files": files, "test": "test"});

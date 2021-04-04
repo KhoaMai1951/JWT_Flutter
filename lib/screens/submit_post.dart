@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/components/MultiSelectChip.dart';
+import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/validate_name_constant.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
@@ -63,8 +64,8 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
       home: Scaffold(
         appBar: AppBar(title: Text('Đăng bài')),
         body: bodyLayout(),
-        bottomNavigationBar:
-            buildBottomNavigationBar(context: context, index: 2),
+        bottomNavigationBar: buildBottomNavigationBar(
+            context: context, index: kBottomBarIndexSubmitPost),
       ),
     );
   }
@@ -95,7 +96,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
                       hintText: 'Nhập tiêu đề',
                       textEditingController: titleController),
                   SizedBox(
-                    height: 70.0,
+                    height: 30.0,
                   ),
                   Align(
                     alignment: Alignment.centerLeft,
@@ -252,7 +253,6 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
   }
 
   void _postSubmit() async {
-    print(userId);
     setState(() {
       _isLoading = true;
     });

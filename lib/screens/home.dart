@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/api_constant.dart';
-import 'package:flutter_login_test_2/helpers/upload_image.dart';
+import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/submit_post.dart';
 import 'package:flutter_login_test_2/screens/upload_image.dart';
 import 'package:flutter_login_test_2/services/TagService.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'submit_post.dart';
@@ -104,10 +105,19 @@ class _HomeState extends State<Home> {
                 child: Text('Upload Image'),
               ),
             ),
+            Container(
+              child: 1 == 2
+                  ? SpinKitThreeBounce(
+                      color: Colors.grey,
+                      size: 30.0,
+                    )
+                  : null,
+            )
           ],
         ),
       ),
-      bottomNavigationBar: buildBottomNavigationBar(context: context, index: 1),
+      bottomNavigationBar: buildBottomNavigationBar(
+          context: context, index: kBottomBarIndexTest),
     );
   }
 

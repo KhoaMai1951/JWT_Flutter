@@ -115,7 +115,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
                   // TIÊU ĐỀ BÀI VIẾT
                   TextFormFieldMethod(
                       validateOption: kValidatePostContentInput,
-                      maxLines: 5,
+                      maxLines: 1,
                       hintText: 'Nhập tiêu đề',
                       textEditingController: titleController),
                   SizedBox(
@@ -210,27 +210,6 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
     selectedPlantTagList.forEach((element) => {tagIds.add(element['id'])});
     selectedContentTagList.forEach((element) => {tagIds.add(element['id'])});
 
-    var data = {
-      'title': titleController.text,
-      'content': contentController.text,
-      'user_id': userId,
-      'tag_ids': tagIds,
-    };
-
-    // var res = await Network().authData(data, '/post/submit_post');
-    // var body = json.decode(res.body);
-    // int status = res.statusCode;
-    // print(status);
-    // print(body);
-    // if (status == 200) {
-    //   Navigator.push(
-    //     context,
-    //     new MaterialPageRoute(
-    //       builder: (context) => Home(),
-    //     ),
-    //   );
-    // }
-
     // DIO
     List<MultipartFile> listFiles = await assetToFile() as List<MultipartFile>;
     print(listFiles);
@@ -249,18 +228,30 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
     if (token == null) {
       token = 1;
     }
-    var response = await dio.post(
-      kApiUrl + "/post/submit_post",
-      data: formData,
-      // options: Options(
-      //   headers: {
-      //     'Content-type': 'application/json',
-      //     'Accept': 'application/json',
-      //     'Authorization': 'Bearer $token',
-      //   },
-      // ),
-    );
-    print(response);
+    try {
+      var response = await dio.post(
+        kApiUrl + "/post/submit_post",
+        data: formData,
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+      print(response.toString());
+      print('status: ' + response.statusCode.toString());
+      var jsonData = json.decode(response.toString());
+      if (jsonData['error'] == '0') {
+        print('ok');
+      } else {
+        print('failed');
+      }
+    } catch (e) {
+      print('exception: ' + e.toString());
+      Future.error(e.toString());
+    }
+
     setState(() {
       _isLoading = false;
     });
@@ -276,8 +267,9 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
     }
   }
 
+  // BUILD CHIP PLANT
   BuildPlantTagChip() {
-    if (_plantTagListIsLoading) return Text('loading...');
+    if (_plantTagListIsLoading) return Text('đang tải...');
     return MultiSelectChip(
         list: this.plantTagList,
         onSelectionChanged: (selectedList, maxCounter) {
@@ -288,8 +280,9 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
         });
   }
 
+  // BUILD CHIP CONTENT
   BuildContentTagChip() {
-    if (_contentTagListIsLoading) return Text('loading...');
+    if (_contentTagListIsLoading) return Text('đang tải...');
     return MultiSelectChip(
         list: this.contentTagList,
         onSelectionChanged: (selectedList, maxCounter) {

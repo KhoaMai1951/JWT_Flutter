@@ -202,7 +202,8 @@ class _UploadImage3State extends State<UploadImage3> {
   Future<dynamic> assetToFile() async {
     files.clear();
 
-    images.forEach((asset) async {
+    // images.forEach((asset) async {
+    for (var asset in images) {
       int MAX_WIDTH = 500; //keep ratio
       int height = ((500 * asset.originalHeight) / asset.originalWidth).round();
 
@@ -214,12 +215,12 @@ class _UploadImage3State extends State<UploadImage3> {
         MultipartFile u =
             await MultipartFile.fromBytes(imageData, filename: asset.name);
 
-        setState(() {
-          this.files.add(u);
-        });
+        //setState(() {
+        this.files.add(u);
+        //});
         print(this.files);
       }
-    });
+    }
 
     return files;
   }
@@ -227,13 +228,15 @@ class _UploadImage3State extends State<UploadImage3> {
   // UPLOAD HÌNH LÊN S3
   Future<void> uploadImage() async {
     List<MultipartFile> listFiles = await assetToFile() as List<MultipartFile>;
+    print('list final');
     print(listFiles);
 
-    FormData formData = new FormData.fromMap({"files": files, "test": "test"});
+    FormData formData =
+        new FormData.fromMap({"files": listFiles, "test": "test"});
 
-    Dio dio = new Dio();
-    var response = await dio.post(kApiUrl + "/post/test_dio", data: formData);
-    print(response);
+    // Dio dio = new Dio();
+    // var response = await dio.post(kApiUrl + "/post/test_dio", data: formData);
+    // print(response);
   }
 
   // XUẤT HÌNH TỪ LIST ASSET RA ĐỂ REVIEW

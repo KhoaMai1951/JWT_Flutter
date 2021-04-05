@@ -34,7 +34,7 @@ class _CheckAuthState extends State<CheckAuth> {
   void _checkIfLoggedIn() async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var token = localStorage.getString('token');
-    //localStorage.remove('token');
+    localStorage.remove('token');
     if (token != null) {
       setState(() {
         isAuth = true;
@@ -48,7 +48,8 @@ class _CheckAuthState extends State<CheckAuth> {
     if (isAuth) {
       child = Home();
     } else {
-      child = Login();
+      //child = Login();
+      child = Home();
     }
     return Scaffold(
       body: child,

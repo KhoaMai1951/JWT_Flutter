@@ -2,7 +2,8 @@
 //if you are using android studio emulator, change localhost to 10.0.2.2
 
 //const String kApiUrl = 'http://192.168.43.165:8000/api/v1';
-const String kApiUrl = 'http://192.168.1.2:8000/api/v1';
+//const String kApiUrl = 'http://192.168.1.2:8000/api/v1';
+const String kApiUrl = 'http://172.16.16.63/api/v1';
 
 // AUTHENTICATION SYSTEM
 const String kApiRegister = '/register';

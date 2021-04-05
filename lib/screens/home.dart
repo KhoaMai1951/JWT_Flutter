@@ -134,15 +134,15 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> submitPostScreen() async {
-    var plantTagList = await TagService.getTagsByTypeId(1);
-    var contentTagList = await TagService.getTagsByTypeId(2);
+    // var plantTagList = await TagService.getTagsByTypeId(1);
+    // var contentTagList = await TagService.getTagsByTypeId(2);
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => SubmitPostScreen(
-          plantTagList: plantTagList,
-          contentTagList: contentTagList,
-        ),
+            // plantTagList: plantTagList,
+            // contentTagList: contentTagList,
+            ),
       ),
     );
   }

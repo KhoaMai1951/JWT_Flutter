@@ -202,7 +202,8 @@ class _UploadImage3State extends State<UploadImage3> {
   Future<dynamic> assetToFile() async {
     files.clear();
 
-    images.forEach((asset) async {
+    //images.forEach((asset) async {
+    for (var asset in images) {
       int MAX_WIDTH = 500; //keep ratio
       int height = ((500 * asset.originalHeight) / asset.originalWidth).round();
 
@@ -219,7 +220,8 @@ class _UploadImage3State extends State<UploadImage3> {
         });
         print(this.files);
       }
-    });
+    }
+    ;
 
     return files;
   }
@@ -229,7 +231,8 @@ class _UploadImage3State extends State<UploadImage3> {
     List<MultipartFile> listFiles = await assetToFile() as List<MultipartFile>;
     print(listFiles);
 
-    FormData formData = new FormData.fromMap({"files": files, "test": "test"});
+    FormData formData =
+        new FormData.fromMap({"files": listFiles, "test": "test"});
 
     Dio dio = new Dio();
     var response = await dio.post(kApiUrl + "/post/test_dio", data: formData);

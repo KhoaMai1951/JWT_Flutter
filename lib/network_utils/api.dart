@@ -17,6 +17,14 @@ class Network {
   authData(data, apiUrl) async {
     //print(kApiUrl + apiUrl);
     var fullUrl = kApiUrl + apiUrl;
+    //await _getToken();
+    return await http.post(fullUrl,
+        body: jsonEncode(data), headers: _setHeaders());
+  }
+
+  postData(data, apiUrl) async {
+    //print(kApiUrl + apiUrl);
+    var fullUrl = kApiUrl + apiUrl;
     await _getToken();
     return await http.post(fullUrl,
         body: jsonEncode(data), headers: _setHeaders());

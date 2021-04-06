@@ -138,12 +138,19 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
                   SizedBox(
                     height: 40.0,
                   ),
+                  // CHỌN ẢNH
                   SizedBox(
                     child: ElevatedButton(
                       child: Text("Chọn ảnh"),
                       onPressed: loadAssets,
                     ),
                   ),
+                  // VÙNG REVIEW ẢNH ĐÃ CHỌN
+                  buildGridView(),
+                  SizedBox(
+                    height: 30.0,
+                  ),
+                  // TÊN TAG LOẠI CÂY CẢNH
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Container(
@@ -154,11 +161,12 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
                   ),
                   // DANH SÁCH CHIP LOẠI CÂY CẢNH
                   BuildPlantTagChip(),
+                  //TÊN TAG NỘI DUNG
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Container(
                       child: Text(
-                        "Tag loại cây cảnh ($maxContentTagCounter/2)",
+                        "Tag nội dung bài viết ($maxContentTagCounter/2)",
                       ),
                     ),
                   ),
@@ -301,7 +309,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
 
     try {
       resultList = await MultiImagePicker.pickImages(
-        maxImages: 300,
+        maxImages: 9,
         enableCamera: true,
         selectedAssets: images,
         cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
@@ -354,7 +362,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
     return files;
   }
 
-  // UPLOAD HÌNH LÊN S3
+  // UPLOAD HÌNH LÊN SERVER
   Future<void> uploadImage() async {
     List<MultipartFile> listFiles = await assetToFile() as List<MultipartFile>;
     //print(listFiles);
@@ -369,6 +377,8 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
   // XUẤT HÌNH TỪ LIST ASSET RA ĐỂ REVIEW
   Widget buildGridView() {
     return GridView.count(
+      physics: NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
       crossAxisCount: 3,
       children: List.generate(images.length, (index) {
         Asset asset = images[index];

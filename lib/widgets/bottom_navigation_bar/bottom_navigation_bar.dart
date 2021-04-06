@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/screens/home.dart';
+import 'package:flutter_login_test_2/screens/post_detail.dart';
 import 'package:flutter_login_test_2/screens/submit_post.dart';
 import 'package:flutter_login_test_2/screens/upload_image.dart';
-import 'package:flutter_login_test_2/screens/upload_image_2.dart';
 import 'package:flutter_login_test_2/screens/upload_image_3.dart';
 import 'package:flutter_login_test_2/services/TagService.dart';
 
@@ -27,7 +27,7 @@ BottomNavigationBar buildBottomNavigationBar(
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.add_photo_alternate_outlined),
-        label: 'Test upload \n hình',
+        label: 'Test chi tiết \n bài viết',
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.person_pin),
@@ -48,22 +48,19 @@ BottomNavigationBar buildBottomNavigationBar(
           );
           break;
         case kBottomBarIndexSubmitPost:
-          var plantTagList = await TagService.getTagsByTypeId(1);
-          var contentTagList = await TagService.getTagsByTypeId(2);
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => SubmitPostScreen(
-                  plantTagList: plantTagList, contentTagList: contentTagList),
+              builder: (context) => SubmitPostScreen(),
             ),
           );
           break;
-        case kBottomBarIndexTestUploadImage:
+        case kBottomBarIndexTestPostDetail:
           Navigator.push(
             context,
             MaterialPageRoute(
               //builder: (context) => UploadImage(),
-              builder: (context) => UploadImage3(),
+              builder: (context) => PostDetail(),
             ),
           );
           break;

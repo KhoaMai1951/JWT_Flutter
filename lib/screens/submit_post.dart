@@ -60,20 +60,20 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
     _loadUserData();
     super.initState();
     // Load plant tag list
-    TagService.getTagsByTypeId(1).then((data) {
-      setState(() {
-        _plantTagListIsLoading = false;
-        plantTagList = data;
-      });
-    });
-
-    // Load content tag list
-    TagService.getTagsByTypeId(2).then((data) {
-      setState(() {
-        _contentTagListIsLoading = false;
-        contentTagList = data;
-      });
-    });
+    // TagService.getTagsByTypeId(1).then((data) {
+    //   setState(() {
+    //     _plantTagListIsLoading = false;
+    //     plantTagList = data;
+    //   });
+    // });
+    //
+    // // Load content tag list
+    // TagService.getTagsByTypeId(2).then((data) {
+    //   setState(() {
+    //     _contentTagListIsLoading = false;
+    //     contentTagList = data;
+    //   });
+    // });
   }
 
   @override
@@ -94,10 +94,8 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
   }
 
   bodyLayout() {
-    return ListView(
-      padding: EdgeInsets.all(20.0),
-      children: <Widget>[
-        Column(
+    return SingleChildScrollView(
+        child: Column(
           children: [
             Form(
               key: _formKey,
@@ -144,6 +142,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
                       onPressed: loadAssets,
                     ),
                   ),
+                  buildGridView(),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Container(
@@ -153,7 +152,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
                     ),
                   ),
                   // DANH SÁCH CHIP LOẠI CÂY CẢNH
-                  BuildPlantTagChip(),
+                  //BuildPlantTagChip(),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Container(
@@ -163,7 +162,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
                     ),
                   ),
                   // DANH SÁCH CHIP NỘI DUNG BÀI VIẾT
-                  BuildContentTagChip(),
+                  //BuildContentTagChip(),
                   // SUBMIT POST BUTTON
                   Padding(
                     padding: const EdgeInsets.all(10.0),
@@ -198,8 +197,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
             ),
           ],
         ),
-      ],
-    );
+        padding: EdgeInsets.all(20.0));
   }
 
   void _postSubmit() async {
@@ -369,6 +367,8 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
   // XUẤT HÌNH TỪ LIST ASSET RA ĐỂ REVIEW
   Widget buildGridView() {
     return GridView.count(
+      physics: NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
       crossAxisCount: 3,
       children: List.generate(images.length, (index) {
         Asset asset = images[index];

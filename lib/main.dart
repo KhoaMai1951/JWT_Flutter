@@ -48,7 +48,8 @@ class _CheckAuthState extends State<CheckAuth> {
     if (isAuth) {
       child = Home();
     } else {
-      child = Login();
+      //child = Login();
+      child = Home();
     }
     return Scaffold(
       body: child,

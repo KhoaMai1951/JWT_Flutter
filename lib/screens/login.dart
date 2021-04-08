@@ -174,7 +174,7 @@ class _LoginState extends State<Login> {
     if (body['success']) {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       localStorage.setString('token', json.encode(body['token']));
-      print(body['token']);
+
       localStorage.setString('user', json.encode(body['user']));
       Navigator.push(
         context,

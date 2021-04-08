@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="maidangkhoa.flutter_login_test_2">
     <uses-permission android:name="android.permission.INTERNET" /> <!-- This Line -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- This Line -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />

@@ -1,8 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/screens/home.dart';
+import 'file:///C:/Users/Khoa/AndroidStudioProjects/flutter_login_test_2/lib/screens/loading/loading_main.dart';
 import 'package:flutter_login_test_2/screens/login.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'constants/api_constant.dart';
+import 'network_utils/api.dart';
 
 void main() => runApp(MyApp());
 
@@ -27,31 +33,46 @@ class _CheckAuthState extends State<CheckAuth> {
   bool isAuth = false;
   @override
   void initState() {
-    _checkIfLoggedIn();
+    //_checkIfLoggedIn();
     super.initState();
   }
 
-  void _checkIfLoggedIn() async {
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
-    var token = localStorage.getString('token');
-    //localStorage.remove('token');
-    if (token != null) {
-      setState(() {
-        isAuth = true;
-      });
-    }
-  }
+  // void _checkIfLoggedIn() async {
+  //   SharedPreferences localStorage = await SharedPreferences.getInstance();
+  //   var token = localStorage.getString('token');
+  //
+  //   //if there is token
+  //   if (token != null) {
+  //     // check if token is still valid
+  //     var response = await Network().getData(kApiGetDataWithToken);
+  //     // token still valid
+  //     if (response.statusCode == 200) {
+  //       setState(() {
+  //         isAuth = true;
+  //       });
+  //     }
+  //     // token invalid
+  //     else {
+  //       localStorage.remove('token');
+  //       setState(() {
+  //         isAuth = false;
+  //       });
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
-    Widget child;
-    if (isAuth) {
-      child = Home();
-    } else {
-      child = Login();
-    }
-    return Scaffold(
-      body: child,
-    );
+    // Widget child;
+    // if (isAuth) {
+    //   child = Home();
+    // } else {
+    //   child = Login();
+    // }
+    // return Scaffold(
+    //   body: child,
+    // );
+
+    return LoadingScreen();
   }
 }

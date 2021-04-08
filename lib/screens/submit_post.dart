@@ -16,22 +16,12 @@ import 'package:flutter_login_test_2/widgets/text_form_field/text_form_field_uni
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'home.dart';
-
 class SubmitPostScreen extends StatefulWidget {
-  var plantTagList;
-  var contentTagList;
-
-  SubmitPostScreen({this.plantTagList, this.contentTagList});
-
   @override
-  _SubmitPostScreenState createState() => _SubmitPostScreenState(
-      plantTagList: plantTagList, contentTagList: contentTagList);
+  _SubmitPostScreenState createState() => _SubmitPostScreenState();
 }
 
 class _SubmitPostScreenState extends State<SubmitPostScreen> {
-  _SubmitPostScreenState({this.plantTagList, this.contentTagList});
-
   List<Asset> images = <Asset>[];
   List<MultipartFile> files = [];
 
@@ -45,8 +35,10 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
   int maxPlantTagCounter = 0;
   int maxContentTagCounter = 0;
 
+  //var plantTagList;
   var plantTagList;
   var selectedPlantTagList = [];
+  //var contentTagList;
   var contentTagList;
   var selectedContentTagList = [];
   var tagIds = [];
@@ -247,8 +239,8 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
           },
         ),
       );
-      print(response.toString());
-      print('status: ' + response.statusCode.toString());
+      // print(response.toString());
+
       var jsonData = json.decode(response.toString());
       if (jsonData['error'] == '0') {
         print('ok');

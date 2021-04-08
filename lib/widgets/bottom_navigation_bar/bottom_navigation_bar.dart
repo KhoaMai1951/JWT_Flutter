@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/screens/home.dart';
+import 'package:flutter_login_test_2/screens/loading/loading_post_detail.dart';
 import 'package:flutter_login_test_2/screens/post_detail.dart';
 import 'package:flutter_login_test_2/screens/submit_post.dart';
-import 'package:flutter_login_test_2/screens/upload_image.dart';
-import 'package:flutter_login_test_2/screens/upload_image_3.dart';
-import 'package:flutter_login_test_2/services/TagService.dart';
 
 BottomNavigationBar buildBottomNavigationBar(
     {int index, BuildContext context}) {
@@ -59,8 +57,10 @@ BottomNavigationBar buildBottomNavigationBar(
           Navigator.push(
             context,
             MaterialPageRoute(
-              //builder: (context) => UploadImage(),
-              builder: (context) => PostDetail(),
+              builder: (context) => LoadingPostDetailScreen(
+                id: 8,
+              ),
+              //builder: (context) => PostDetail(),
             ),
           );
           break;

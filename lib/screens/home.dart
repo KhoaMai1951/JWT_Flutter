@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
-import 'package:flutter_login_test_2/screens/submit_post.dart';
 import 'package:flutter_login_test_2/screens/upload_image.dart';
 import 'package:flutter_login_test_2/services/TagService.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';

@@ -2,6 +2,8 @@
 //if you are using android studio emulator, change localhost to 10.0.2.2
 
 //const String kApiUrl = 'http://192.168.43.165:8000/api/v1';
+import 'package:flutter_login_test_2/screens/post_detail.dart';
+
 const String kApiUrl = 'http://192.168.1.2:8000/api/v1';
 //// DIGITAL OCEAN
 //const String kApiUrl = 'http://143.198.200.30/api/v1';
@@ -17,3 +19,5 @@ const String kApiGetDataWithToken = '/get_data_with_token';
 // TAG
 const String kApiGetAllTagsByTagTypeId =
     '/tag/get_all_tags_by_type_id?tag_type_id=';
+
+// POST

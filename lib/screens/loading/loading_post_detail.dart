@@ -40,7 +40,7 @@ class _LoadingPostDetailScreenState extends State<LoadingPostDetailScreen> {
   getPost({int searchId}) async {
     var res = await Network().getData('/post/get_post?id=$searchId');
     var body = json.decode(res.body);
-    //print(body);
+
     // tags model
     List<TagModel> tags = [];
     for (var tag in body['tags']) {
@@ -52,6 +52,7 @@ class _LoadingPostDetailScreenState extends State<LoadingPostDetailScreen> {
     String title = body['post']['title'];
     String content = body['post']['content'];
     int like = body['post']['like'];
+    int commentsNumber = body['comments_number'];
     List<String> imagesForPost = [];
     var createdAt = body['post']['created_at'];
     for (var image in body['images_for_post']) {
@@ -61,6 +62,7 @@ class _LoadingPostDetailScreenState extends State<LoadingPostDetailScreen> {
     PostDetailModel postDetail = new PostDetailModel(
         id: id,
         like: like,
+        commentsNumber: commentsNumber,
         title: title,
         content: content,
         imagesForPost: imagesForPost,

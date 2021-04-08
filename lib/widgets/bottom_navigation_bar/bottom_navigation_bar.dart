@@ -58,7 +58,7 @@ BottomNavigationBar buildBottomNavigationBar(
             context,
             MaterialPageRoute(
               builder: (context) => LoadingPostDetailScreen(
-                id: 8,
+                id: 9,
               ),
               //builder: (context) => PostDetail(),
             ),

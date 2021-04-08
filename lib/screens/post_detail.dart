@@ -23,6 +23,7 @@ class PostDetail extends StatefulWidget {
 }
 
 class _PostDetailState extends State<PostDetail> {
+  final _formKey = GlobalKey<FormState>();
   var currentUser;
   int _current = 0;
   bool isLiked = false;
@@ -47,7 +48,7 @@ class _PostDetailState extends State<PostDetail> {
         primarySwatch: Colors.teal,
       ),
       home: Scaffold(
-        appBar: AppBar(title: Text('Nội dung bài viếthá ha')),
+        appBar: AppBar(title: Text('Nội dung bài viết')),
         body: bodyLayout(),
         bottomNavigationBar: buildBottomNavigationBar(
             context: context, index: kBottomBarIndexTestPostDetail),
@@ -145,26 +146,123 @@ class _PostDetailState extends State<PostDetail> {
                   ],
                 ),
               ),
+              SizedBox(height: 10.0),
               // IMAGES CAROUSEL
               ImageCarouselBuilder(),
               // CAROUSEL INDICATOR
               CarouselIndicator(),
               // LIKE + COMMENT ICON
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // LIKE ICON
                   IconButton(
+                    iconSize: 30.0,
                     color: this.isLiked == true ? Colors.teal : Colors.grey,
                     icon: const Icon(Icons.thumb_up),
                     onPressed: () {
                       likePost();
                     },
                   ),
-                  Text(like.toString()),
+                  // LIKE NUMBER
+                  Text(
+                    like.toString(),
+                    style: TextStyle(
+                      fontSize: 20.0,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 40.0,
+                  ),
+                  // COMMENT ICON
+                  Icon(
+                    Icons.chat,
+                    size: 27.0,
+                  ),
+                  SizedBox(
+                    width: 7.0,
+                  ),
+                  // COMMENT NUMBER
+                  Text(
+                    widget.post.commentsNumber.toString(),
+                    style: TextStyle(
+                      fontSize: 20.0,
+                    ),
+                  ),
                 ],
               ),
+              // FORM NHẬP BÌNH LUẬN
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Form(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          style: TextStyle(
+                            color: Color(0xFF000000),
+                            fontSize: 20.0,
+                          ),
+                          maxLines: 2,
+                          cursorColor: Color(0xFF9b9b9b),
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            hintText: 'Nhập bình luận',
+                            hintStyle: TextStyle(
+                                color: Color(0xFF9b9b9b),
+                                fontSize: 15.0,
+                                fontWeight: FontWeight.normal),
+                          ),
+                          validator: (value) {
+                            return null;
+                          },
+                        ),
+                      ),
+                      IconButton(
+                        iconSize: 30.0,
+                        color: this.isLiked == true ? Colors.teal : Colors.grey,
+                        icon: const Icon(Icons.send),
+                        onPressed: () {
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               // BÌNH LUẬN
-              CommentBubble(),
-              CommentBubble(),
+              FutureBuilder<dynamic>(
+                future: getCommentList(), // async work
+                builder:
+                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return Text('Loading....');
+                    default:
+                      if (snapshot.hasError)
+                        return Text('Error: ${snapshot.error}');
+                      else {
+                        var result = snapshot.data;
+
+                        return Container(
+                          child: ListView.builder(
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: result['comments'].length,
+                            itemBuilder: (context, index) {
+                              //return Text(result['comments'][index]['content']);
+                              return CommentBubble(
+                                  content: result['comments'][index]['content'],
+                                  username: result['comments'][index]
+                                      ['username']);
+                            },
+                          ),
+                        );
+                        //return Text(result['comments'][0]['content']);
+                      }
+                  }
+                },
+              ),
             ],
           ),
         )
@@ -173,7 +271,7 @@ class _PostDetailState extends State<PostDetail> {
   }
 
   // COMMENT
-  CommentBubble() {
+  CommentBubble({String content, String username}) {
     return Padding(
       padding: EdgeInsets.all(10.0),
       child: Column(
@@ -188,15 +286,16 @@ class _PostDetailState extends State<PostDetail> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'username',
+                    username,
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 15.0,
+                      fontSize: 19.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  SizedBox(height: 2.0),
                   Text(
-                    'This method will save memory by building items once it becomes necessary. This way they wont be built if theyre not currently meant to be visible on screen. It can be used to build different child item widgets related to content or by item index.',
+                    content,
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 15.0,
@@ -218,8 +317,8 @@ class _PostDetailState extends State<PostDetail> {
         Expanded(
           child: CarouselSlider(
             options: CarouselOptions(
-              height: 200,
-              aspectRatio: 16 / 9,
+              height: 300,
+              //aspectRatio: 4 / 3,
               viewportFraction: 1,
               initialPage: 0,
               enableInfiniteScroll: true,
@@ -289,7 +388,6 @@ class _PostDetailState extends State<PostDetail> {
         user['id'].toString());
 
     var body = json.decode(res.body);
-    print(body);
     if (body['result'] == false) {
       setState(() {
         isLiked = false;
@@ -327,5 +425,14 @@ class _PostDetailState extends State<PostDetail> {
         this.isLiked = true;
       });
     }
+  }
+
+  // GET COMMENTS LIST
+  getCommentList() async {
+    var res = await Network().getData(
+        '/comment/get_all_comments_by_post_id?post_id=' +
+            widget.post.id.toString());
+    var body = json.decode(res.body);
+    return body;
   }
 }

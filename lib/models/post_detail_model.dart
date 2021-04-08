@@ -7,6 +7,7 @@ class PostDetailModel {
       this.title,
       this.content,
       this.createdAt,
+      this.commentsNumber,
       this.like,
       this.imagesForPost,
       this.tags});
@@ -16,6 +17,7 @@ class PostDetailModel {
   String content;
   var createdAt;
   int like;
+  int commentsNumber;
   List<String> imagesForPost;
   List<TagModel> tags;
 }

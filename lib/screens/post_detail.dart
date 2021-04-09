@@ -4,13 +4,17 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
+import 'package:flutter_login_test_2/constants/validate_name_constant.dart';
 import 'package:flutter_login_test_2/models/post_detail_model.dart';
 import 'package:flutter_login_test_2/models/tag_model.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
+import 'package:flutter_login_test_2/widgets/text_form_field/text_form_field_universal.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class PostDetail extends StatefulWidget {
   PostDetail({Key key, this.post, this.userOfPost}) : super(key: key);
@@ -25,10 +29,28 @@ class PostDetail extends StatefulWidget {
 class _PostDetailState extends State<PostDetail> {
   final _formKey = GlobalKey<FormState>();
   var currentUser;
-  int _current = 0;
+  int _currentImageIndicator = 0;
   bool isLiked = false;
   int like;
+  String numberOfComments;
   PostDetailModel post;
+  // Controller cho comment
+  TextEditingController commentController = TextEditingController();
+
+  // Hàm future lấy list comment
+  Future<dynamic> _getComments;
+
+  // Hàm set state cho list comment sau khi gọi hàm lấy list comment
+  void _loadComments() {
+    setState(() {
+      _getComments = getCommentList();
+      getNumberOfComment().then((value) {
+        setState(() {
+          numberOfComments = value.toString();
+        });
+      });
+    });
+  }
 
   @override
   initState() {
@@ -37,6 +59,7 @@ class _PostDetailState extends State<PostDetail> {
     like = widget.post.like;
     _loadUserData();
     checkLikePost();
+    _loadComments();
   }
 
   @override
@@ -85,7 +108,7 @@ class _PostDetailState extends State<PostDetail> {
         content: content,
         imagesForPost: imagesForPost,
         tags: tags,
-        createdAt: DateTime.parse(createdAt));
+        createdAt: createdAt);
 
     return postDetail;
   }
@@ -99,7 +122,6 @@ class _PostDetailState extends State<PostDetail> {
         currentUser = user;
       });
     }
-    print(currentUser['id']);
   }
 
   bodyLayout() {
@@ -109,6 +131,7 @@ class _PostDetailState extends State<PostDetail> {
           margin: const EdgeInsets.only(top: 20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               // BÀI VIẾT
               Container(
@@ -122,6 +145,16 @@ class _PostDetailState extends State<PostDetail> {
                         Text('Bởi '),
                         Text(
                           widget.userOfPost.username,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    // NGÀY
+                    Row(
+                      children: [
+                        // NGÀY
+                        Text(
+                          timeAgoSinceDate(dateString: widget.post.createdAt),
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -184,7 +217,8 @@ class _PostDetailState extends State<PostDetail> {
                   ),
                   // COMMENT NUMBER
                   Text(
-                    widget.post.commentsNumber.toString(),
+                    //widget.post.commentsNumber.toString(),
+                    numberOfComments != null ? numberOfComments : 'loading',
                     style: TextStyle(
                       fontSize: 20.0,
                     ),
@@ -195,35 +229,30 @@ class _PostDetailState extends State<PostDetail> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Form(
+                  key: _formKey,
                   child: Row(
                     children: [
+                      // Ô NHẬP BÌNH LUẬN
                       Expanded(
-                        child: TextFormField(
-                          style: TextStyle(
-                            color: Color(0xFF000000),
-                            fontSize: 20.0,
-                          ),
-                          maxLines: 2,
-                          cursorColor: Color(0xFF9b9b9b),
-                          keyboardType: TextInputType.text,
-                          decoration: InputDecoration(
-                            hintText: 'Nhập bình luận',
-                            hintStyle: TextStyle(
-                                color: Color(0xFF9b9b9b),
-                                fontSize: 15.0,
-                                fontWeight: FontWeight.normal),
-                          ),
-                          validator: (value) {
-                            return null;
-                          },
-                        ),
-                      ),
+                          child: TextFormFieldMethod(
+                              validateOption: kValidateCommentInput,
+                              hintText: 'Nhập bình luận',
+                              textEditingController: commentController,
+                              maxLines: 2)),
+                      // NÚT ĐĂNG BÌNH LUẬN
                       IconButton(
                         iconSize: 30.0,
                         color: this.isLiked == true ? Colors.teal : Colors.grey,
                         icon: const Icon(Icons.send),
                         onPressed: () {
-                          return null;
+                          if (_formKey.currentState.validate()) {
+                            // submit bài post
+                            commentSubmit();
+                            // clear field nhập comment
+                            commentController.clear();
+                            // load lại cmt
+                            _loadComments();
+                          }
                         },
                       ),
                     ],
@@ -231,38 +260,7 @@ class _PostDetailState extends State<PostDetail> {
                 ),
               ),
               // BÌNH LUẬN
-              FutureBuilder<dynamic>(
-                future: getCommentList(), // async work
-                builder:
-                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting:
-                      return Text('Loading....');
-                    default:
-                      if (snapshot.hasError)
-                        return Text('Error: ${snapshot.error}');
-                      else {
-                        var result = snapshot.data;
-
-                        return Container(
-                          child: ListView.builder(
-                            physics: NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: result['comments'].length,
-                            itemBuilder: (context, index) {
-                              //return Text(result['comments'][index]['content']);
-                              return CommentBubble(
-                                  content: result['comments'][index]['content'],
-                                  username: result['comments'][index]
-                                      ['username']);
-                            },
-                          ),
-                        );
-                        //return Text(result['comments'][0]['content']);
-                      }
-                  }
-                },
-              ),
+              CommentList(),
             ],
           ),
         )
@@ -270,8 +268,62 @@ class _PostDetailState extends State<PostDetail> {
     );
   }
 
+  // SUBMIT COMMENT
+  commentSubmit() async {
+    var data = {
+      'post_id': widget.post.id,
+      'user_id': currentUser['id'],
+      'content': commentController.text,
+    };
+    var res = await Network().postData(data, '/comment/submit_comment');
+    var body = json.decode(res.body);
+    print(body);
+  }
+
+  // COMMENT LIST
+  CommentList() {
+    return FutureBuilder<dynamic>(
+      //future: getCommentList(), // async work
+      future: _getComments, // async work
+      // async work
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (!snapshot.hasData) {
+          return Text('Loading....');
+        }
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return Text('Loading....');
+          default:
+            if (snapshot.hasError)
+              return Text('Error: ${snapshot.error}');
+            else {
+              var result = snapshot.data;
+              return Container(
+                child: ListView.builder(
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: result['comments'].length,
+                  itemBuilder: (context, index) {
+                    //return Text(result['comments'][index]['content']);
+                    return Align(
+                      alignment: Alignment.topLeft,
+                      child: CommentBubble(
+                          content: result['comments'][index]['content'],
+                          username: result['comments'][index]['username'],
+                          createdDate: result['comments'][index]['created_at']),
+                    );
+                  },
+                ),
+              );
+              //return Text(result['comments'][0]['content']);
+            }
+        }
+      },
+    );
+  }
+
   // COMMENT
-  CommentBubble({String content, String username}) {
+  CommentBubble({String content, String username, String createdDate}) {
     return Padding(
       padding: EdgeInsets.all(10.0),
       child: Column(
@@ -285,6 +337,7 @@ class _PostDetailState extends State<PostDetail> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // USERNAME
                   Text(
                     username,
                     style: TextStyle(
@@ -293,14 +346,28 @@ class _PostDetailState extends State<PostDetail> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 2.0),
+                  SizedBox(height: 5.0),
+                  // CONTENT
                   Text(
                     content,
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 15.0,
                     ),
-                  )
+                  ),
+                  SizedBox(height: 5.0),
+                  const Divider(
+                    color: Colors.grey,
+                  ),
+                  // TIME AGO
+                  Text(
+                    timeAgoSinceDate(dateString: createdDate),
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 12.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -329,7 +396,7 @@ class _PostDetailState extends State<PostDetail> {
               enlargeCenterPage: true,
               onPageChanged: (index, reason) {
                 setState(() {
-                  _current = index;
+                  _currentImageIndicator = index;
                 });
               },
               scrollDirection: Axis.horizontal,
@@ -362,7 +429,7 @@ class _PostDetailState extends State<PostDetail> {
           margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: _current == index ? Colors.green : Colors.grey,
+            color: _currentImageIndicator == index ? Colors.green : Colors.grey,
           ),
         );
       }),
@@ -434,5 +501,47 @@ class _PostDetailState extends State<PostDetail> {
             widget.post.id.toString());
     var body = json.decode(res.body);
     return body;
+  }
+
+  // GET COMMENTS LIST
+  Future<int> getNumberOfComment() async {
+    var res = await Network().getData(
+        '/comment/get_number_of_comments_by_post_id?post_id=' +
+            widget.post.id.toString());
+    var body = json.decode(res.body);
+    var num = body['comments'];
+
+    return num;
+  }
+
+  // GET TIME AGO
+  static String timeAgoSinceDate(
+      {String dateString, bool numericDates = true}) {
+    DateTime notificationDate = DateTime.parse(dateString);
+    final date2 = DateTime.now();
+    final difference = date2.difference(notificationDate);
+
+    if (difference.inDays > 8) {
+      //return dateString.toString();
+      return DateFormat('dd-MM-yyyy').format(DateTime.parse(dateString));
+    } else if ((difference.inDays / 7).floor() >= 1) {
+      return (numericDates) ? '1 tuần trước' : 'Tuần trước';
+    } else if (difference.inDays >= 2) {
+      return '${difference.inDays} ngày trước';
+    } else if (difference.inDays >= 1) {
+      return (numericDates) ? '1 ngày trước' : 'Hôm qua';
+    } else if (difference.inHours >= 2) {
+      return '${difference.inHours} giờ trước';
+    } else if (difference.inHours >= 1) {
+      return (numericDates) ? '1 giờ trước' : 'Một giờ trước';
+    } else if (difference.inMinutes >= 2) {
+      return '${difference.inMinutes} phút trước';
+    } else if (difference.inMinutes >= 1) {
+      return (numericDates) ? '1 phút trước' : 'Một phút trước';
+    } else if (difference.inSeconds >= 3) {
+      return '${difference.inSeconds} giây trước';
+    } else {
+      return 'Vừa đây';
+    }
   }
 }

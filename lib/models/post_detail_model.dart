@@ -15,7 +15,7 @@ class PostDetailModel {
   int id;
   String title;
   String content;
-  var createdAt;
+  String createdAt;
   int like;
   int commentsNumber;
   List<String> imagesForPost;

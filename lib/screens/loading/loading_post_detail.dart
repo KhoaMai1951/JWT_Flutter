@@ -54,7 +54,7 @@ class _LoadingPostDetailScreenState extends State<LoadingPostDetailScreen> {
     int like = body['post']['like'];
     int commentsNumber = body['comments_number'];
     List<String> imagesForPost = [];
-    var createdAt = body['post']['created_at'];
+    String createdAt = body['post']['created_at'];
     for (var image in body['images_for_post']) {
       imagesForPost.add(image['dynamic_url']);
     }
@@ -67,7 +67,7 @@ class _LoadingPostDetailScreenState extends State<LoadingPostDetailScreen> {
         content: content,
         imagesForPost: imagesForPost,
         tags: tags,
-        createdAt: DateTime.parse(createdAt));
+        createdAt: createdAt);
 
     // user model
     int userId = body['user']['id'];

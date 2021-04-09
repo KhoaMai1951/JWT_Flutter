@@ -10,6 +10,9 @@ class ValidateService {
       case kValidatePostContentInput:
         return validatePostContentInput(value: value);
         break;
+      case kValidateCommentInput:
+        return validateCommentInput(value: value);
+        break;
     }
   }
 
@@ -26,6 +29,17 @@ class ValidateService {
 
   // validate post content input
   validatePostContentInput({@required var value}) {
+    if (value.isEmpty) {
+      return 'Không được bỏ trống';
+    }
+    if (value.length > 200) {
+      return 'Không được quá 200 kí tự';
+    }
+    return null;
+  }
+
+  // validate comment input
+  validateCommentInput({@required var value}) {
     if (value.isEmpty) {
       return 'Không được bỏ trống';
     }

@@ -3,6 +3,7 @@ import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/screens/home.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_post_detail.dart';
 import 'package:flutter_login_test_2/screens/post_detail.dart';
+import 'package:flutter_login_test_2/screens/profile.dart';
 import 'package:flutter_login_test_2/screens/submit_post.dart';
 
 BottomNavigationBar buildBottomNavigationBar(
@@ -61,6 +62,14 @@ BottomNavigationBar buildBottomNavigationBar(
                 id: 9,
               ),
               //builder: (context) => PostDetail(),
+            ),
+          );
+          break;
+        case kBottomBarIndexProfile:
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProfileScreen(),
             ),
           );
           break;

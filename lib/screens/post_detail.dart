@@ -242,7 +242,7 @@ class _PostDetailState extends State<PostDetail> {
                       // NÚT ĐĂNG BÌNH LUẬN
                       IconButton(
                         iconSize: 30.0,
-                        color: this.isLiked == true ? Colors.teal : Colors.grey,
+                        color: Colors.teal,
                         icon: const Icon(Icons.send),
                         onPressed: () {
                           if (_formKey.currentState.validate()) {
@@ -523,7 +523,9 @@ class _PostDetailState extends State<PostDetail> {
 
     if (difference.inDays > 8) {
       //return dateString.toString();
-      return DateFormat('dd-MM-yyyy').format(DateTime.parse(dateString));
+      return DateFormat('dd-MM-yyyy').format(DateTime.parse(dateString)) +
+          ' lúc ' +
+          DateFormat('HH:mm').format(DateTime.parse(dateString));
     } else if ((difference.inDays / 7).floor() >= 1) {
       return (numericDates) ? '1 tuần trước' : 'Tuần trước';
     } else if (difference.inDays >= 2) {

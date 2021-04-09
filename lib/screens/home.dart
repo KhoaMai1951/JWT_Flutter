@@ -104,6 +104,18 @@ class _HomeState extends State<Home> {
                 child: Text('Upload Image'),
               ),
             ),
+            Center(
+              child: RaisedButton(
+                elevation: 10,
+                onPressed: () {
+                  uploadImageScreen();
+                },
+                color: Colors.orange,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: Text('Profile'),
+              ),
+            ),
             Container(
               child: 1 == 2
                   ? SpinKitThreeBounce(
@@ -147,6 +159,15 @@ class _HomeState extends State<Home> {
   }
 
   void uploadImageScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UploadImage(),
+      ),
+    );
+  }
+
+  void profileScreen() {
     Navigator.push(
       context,
       MaterialPageRoute(

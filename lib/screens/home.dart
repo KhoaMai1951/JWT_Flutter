@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
+import 'package:flutter_login_test_2/screens/testing/comment_infinite_list_view.dart';
 import 'package:flutter_login_test_2/screens/upload_image.dart';
 import 'package:flutter_login_test_2/services/TagService.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'loading/loading_test.dart';
 import 'submit_post.dart';
 import 'login.dart';
 
@@ -116,6 +118,35 @@ class _HomeState extends State<Home> {
                 child: Text('Profile'),
               ),
             ),
+            Center(
+              child: RaisedButton(
+                elevation: 10,
+                onPressed: () {
+                  loadingScreenTest();
+                },
+                color: Colors.grey,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: Text('Test Loading template'),
+              ),
+            ),
+            Center(
+              child: RaisedButton(
+                elevation: 10,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CommentInfinite(),
+                    ),
+                  );
+                },
+                color: Colors.lightGreen,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: Text('Test infinite comment'),
+              ),
+            ),
             Container(
               child: 1 == 2
                   ? SpinKitThreeBounce(
@@ -172,6 +203,15 @@ class _HomeState extends State<Home> {
       context,
       MaterialPageRoute(
         builder: (context) => UploadImage(),
+      ),
+    );
+  }
+
+  void loadingScreenTest() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LoadingTest(),
       ),
     );
   }

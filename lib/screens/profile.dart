@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
+import 'package:flutter_login_test_2/helpers/account_manage.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -56,6 +57,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // COLUMN INFO
                   Column(
                     children: [
+                      // NAME + SETTING BUTTON
                       Row(
                         children: [
                           // NAME
@@ -70,40 +72,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             width: 60.0,
                           ),
                           // SETTING BUTTON
-                          Align(
-                            child: IconButton(
-                              color: Colors.teal,
-                              icon: Icon(Icons.settings),
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  builder: (context) {
-                                    return Container(
-                                      height: 100.0,
-                                      color: Colors.white,
-                                      child: Column(
-                                        children: [
-                                          Material(
-                                            color:
-                                                Colors.white.withOpacity(0.0),
-                                            child: InkWell(
-                                              splashColor: Colors.orange,
-                                              child: Text(
-                                                  'Hello'), // actually here it's a Container wrapping an image
-                                              onTap: () {
-                                                print('Click');
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                            alignment: Alignment.bottomRight,
-                          ),
+                          GearButtonBuild(),
                         ],
                       ),
                       SizedBox(
@@ -168,6 +137,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  // NÚT GEAR
+  Align GearButtonBuild() {
+    return Align(
+      child: IconButton(
+        color: Colors.teal,
+        icon: Icon(Icons.settings),
+        onPressed: () {
+          showModalBottomSheet(
+            backgroundColor: Colors.white,
+            isScrollControlled: true,
+            context: context,
+            builder: (context) {
+              return Container(
+                height: MediaQuery.of(context).size.height * 0.4,
+                decoration: new BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: new BorderRadius.only(
+                    topLeft: const Radius.circular(25.0),
+                    topRight: const Radius.circular(25.0),
+                  ),
+                ),
+                child: ListView(
+                  children: [
+                    // EDIT INFO BUTTON
+                    Ink(
+                      color: Colors.white,
+                      child: ListTile(
+                        leading: Icon(Icons.edit),
+                        title: Text('Chỉnh sửa thông tin'),
+                        onTap: () {},
+                      ),
+                    ),
+                    // LOGOUT BUTTON
+                    Ink(
+                      color: Colors.white,
+                      child: ListTile(
+                        leading: Icon(Icons.logout),
+                        title: Text('Đăng xuất'),
+                        onTap: () {
+                          AccountManage.logout(context: this.context);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      ),
+      alignment: Alignment.bottomRight,
     );
   }
 }

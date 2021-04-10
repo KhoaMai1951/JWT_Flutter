@@ -16,6 +16,8 @@ import 'package:flutter_login_test_2/widgets/text_form_field/text_form_field_uni
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'loading/loading_post_detail.dart';
+
 class SubmitPostScreen extends StatefulWidget {
   @override
   _SubmitPostScreenState createState() => _SubmitPostScreenState();
@@ -239,14 +241,20 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
           },
         ),
       );
-      // print(response.toString());
 
       var jsonData = json.decode(response.toString());
-      if (jsonData['error'] == '0') {
-        print('ok');
-      } else {
-        print('failed');
-      }
+      if (jsonData['status'] == true) {
+        // Redirect to post detail
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LoadingPostDetailScreen(
+              id: jsonData['post_id'],
+            ),
+          ),
+        );
+      } else
+        print('Failed');
     } catch (e) {
       print('exception: ' + e.toString());
       Future.error(e.toString());
@@ -363,7 +371,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
 
     Dio dio = new Dio();
     var response = await dio.post(kApiUrl + "/post/test_dio", data: formData);
-    //print(response);
+    print(response);
   }
 
   // XUẤT HÌNH TỪ LIST ASSET RA ĐỂ REVIEW

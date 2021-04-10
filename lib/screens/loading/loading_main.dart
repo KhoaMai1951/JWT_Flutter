@@ -32,6 +32,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       var response = await Network().getData(kApiGetDataWithToken);
       // token still valid
       if (response.statusCode == 200) {
+        print('token valid');
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) {
@@ -66,11 +67,24 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: SpinKitRing(
-          color: Colors.teal,
-          size: 100.0,
-        ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: Container(
+              height: 50.0,
+              child: Image.asset('images/logo.png'),
+            ),
+          ),
+          SizedBox(
+            height: 60.0,
+          ),
+          SpinKitRing(
+            color: Colors.teal,
+            lineWidth: 3.0,
+            size: 40.0,
+          ),
+        ],
       ),
     );
   }

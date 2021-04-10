@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/validate_name_constant.dart';
+import 'package:flutter_login_test_2/models/comment_model.dart';
 import 'package:flutter_login_test_2/models/post_detail_model.dart';
 import 'package:flutter_login_test_2/models/tag_model.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
@@ -36,6 +37,13 @@ class _PostDetailState extends State<PostDetail> {
   PostDetailModel post;
   // Controller cho comment
   TextEditingController commentController = TextEditingController();
+  // Biến phục vụ cho comment infinite scroll
+  int skip = 0;
+  int take = 6;
+  bool isLoading = false;
+  bool stillSendApi = true;
+  List<CommentModel> comments = [];
+  ScrollController _scrollController = new ScrollController();
 
   // Hàm future lấy list comment
   Future<dynamic> _getComments;
@@ -52,6 +60,74 @@ class _PostDetailState extends State<PostDetail> {
     });
   }
 
+  // Hàm lấy comment theo cụm
+  fetchComments() async {
+    setState(() {
+      isLoading = true;
+    });
+    var data = {
+      'post_id': widget.post.id,
+      'skip': this.skip,
+      'take': take,
+    };
+    var res = await Network()
+        .postData(data, '/comment/get_comments_by_chunk_by_post_id');
+    var body = json.decode(res.body);
+    // Nếu có kết quả trả về
+    if (body['comments'].isEmpty == false) {
+      List<CommentModel> fetchedComments = [];
+      for (var comment in body['comments']) {
+        CommentModel cmt = new CommentModel(
+          username: comment['username'],
+          content: comment['content'],
+          id: comment['id'],
+          createdAt: comment['created_at'],
+          postId: comment['post_id'],
+          userId: comment['user_id'],
+        );
+
+        fetchedComments.add(cmt);
+      }
+      setState(() {
+        this.skip += take;
+        this.comments.addAll(fetchedComments);
+        isLoading = false;
+        print(skip);
+        // print(comments.length);
+      });
+    }
+    // Nếu kết trả không còn
+    else {
+      setState(() {
+        stillSendApi = false;
+      });
+    }
+  }
+
+  // Hàm listview builder theo cụm
+  listViewCommentsBuild() {
+    return Container(
+      child: ListView.builder(
+        controller: this._scrollController,
+        //physics: NeverScrollableScrollPhysics(),
+        //physics: AlwaysScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: comments.length,
+        itemBuilder: (context, index) {
+          //return Text(result['comments'][index]['content']);
+          return Align(
+            alignment: Alignment.topLeft,
+            child: CommentBubble(
+              content: comments[index].content,
+              username: comments[index].username,
+              createdDate: comments[index].createdAt,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   initState() {
     // TODO: implement initState
@@ -60,6 +136,24 @@ class _PostDetailState extends State<PostDetail> {
     _loadUserData();
     checkLikePost();
     _loadComments();
+
+    // xử lý infinite scroll cho comment
+    fetchComments();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent + 90.0) {
+        if (isLoading == false) {
+          if (stillSendApi == true) {
+            fetchComments();
+          }
+        }
+      }
+    });
+  }
+
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
   }
 
   @override
@@ -260,7 +354,8 @@ class _PostDetailState extends State<PostDetail> {
                 ),
               ),
               // BÌNH LUẬN
-              CommentList(),
+              //CommentList(),
+              listViewCommentsBuild(),
             ],
           ),
         )

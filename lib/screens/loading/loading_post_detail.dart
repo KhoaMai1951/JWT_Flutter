@@ -24,7 +24,8 @@ class _LoadingPostDetailScreenState extends State<LoadingPostDetailScreen> {
       body: Center(
         child: SpinKitRing(
           color: Colors.teal,
-          size: 100.0,
+          lineWidth: 3.0,
+          size: 40.0,
         ),
       ),
     );

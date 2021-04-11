@@ -92,8 +92,6 @@ class _PostDetailState extends State<PostDetail> {
         this.skip += take;
         this.comments.addAll(fetchedComments);
         isLoading = false;
-        print(skip);
-        // print(comments.length);
       });
     }
     // Nếu kết trả không còn
@@ -106,120 +104,31 @@ class _PostDetailState extends State<PostDetail> {
 
   // Hàm listview builder theo cụm
   listViewCommentsBuild() {
-    return Container(
-      child: ListView.builder(
-        controller: this._scrollController,
-        //physics: NeverScrollableScrollPhysics(),
-        //physics: AlwaysScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: comments.length,
-        itemBuilder: (context, index) {
-          //return Text(result['comments'][index]['content']);
-          return Align(
-            alignment: Alignment.topLeft,
-            child: CommentBubble(
-              content: comments[index].content,
-              username: comments[index].username,
-              createdDate: comments[index].createdAt,
-            ),
-          );
-        },
-      ),
+    return ListView.builder(
+      //controller: this._scrollController,
+      physics: NeverScrollableScrollPhysics(),
+      //physics: AlwaysScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: comments.length,
+      itemBuilder: (context, index) {
+        //return Text(result['comments'][index]['content']);
+        return Align(
+          alignment: Alignment.topLeft,
+          child: CommentBubble(
+            content: comments[index].content,
+            username: comments[index].username,
+            createdDate: comments[index].createdAt,
+          ),
+        );
+      },
     );
   }
 
-  @override
-  initState() {
-    // TODO: implement initState
-    super.initState();
-    like = widget.post.like;
-    _loadUserData();
-    checkLikePost();
-    _loadComments();
-
-    // xử lý infinite scroll cho comment
-    fetchComments();
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent + 90.0) {
-        if (isLoading == false) {
-          if (stillSendApi == true) {
-            fetchComments();
-          }
-        }
-      }
-    });
-  }
-
-  void dispose() {
-    super.dispose();
-    _scrollController.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'ListViews',
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
-      ),
-      home: Scaffold(
-        appBar: AppBar(title: Text('Nội dung bài viết')),
-        body: bodyLayout(),
-        bottomNavigationBar: buildBottomNavigationBar(
-            context: context, index: kBottomBarIndexTestPostDetail),
-      ),
-    );
-  }
-
-  // GET POST
-  Future<PostDetailModel> getPost(int searchId) async {
-    var res = await Network().getData('/post/get_post?id=$searchId');
-    var body = json.decode(res.body);
-
-    // tags model
-    List<TagModel> tags = [];
-    for (var tag in body['tags']) {
-      TagModel tagModel = new TagModel(id: tag['id'], name: tag['name']);
-      tags.add(tagModel);
-    }
-    // post model
-    int id = body['post']['id'];
-    String title = body['post']['title'];
-    String content = body['post']['content'];
-    int like = body['post']['like'];
-    List<String> imagesForPost = [];
-    var createdAt = body['post']['created_at'];
-    for (var image in body['images_for_post']) {
-      imagesForPost.add(image['dynamic_url']);
-    }
-
-    PostDetailModel postDetail = new PostDetailModel(
-        id: id,
-        like: like,
-        title: title,
-        content: content,
-        imagesForPost: imagesForPost,
-        tags: tags,
-        createdAt: createdAt);
-
-    return postDetail;
-  }
-
-  _loadUserData() async {
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
-    var user = jsonDecode(localStorage.getString('user'));
-
-    if (user != null) {
-      setState(() {
-        currentUser = user;
-      });
-    }
-  }
-
-  bodyLayout() {
+  // Hàm listview lấy nội dung bài viết
+  listViewPostContentBuild() {
     return ListView(
+      physics: NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
       children: [
         Container(
           margin: const EdgeInsets.only(top: 20.0),
@@ -355,11 +264,126 @@ class _PostDetailState extends State<PostDetail> {
               ),
               // BÌNH LUẬN
               //CommentList(),
-              listViewCommentsBuild(),
             ],
           ),
         )
       ],
+    );
+  }
+
+  @override
+  initState() {
+    // TODO: implement initState
+    super.initState();
+    like = widget.post.like;
+    _loadUserData();
+    checkLikePost();
+    _loadComments();
+
+    // xử lý infinite scroll cho comment
+    fetchComments();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        if (isLoading == false) {
+          if (stillSendApi == true) {
+            fetchComments();
+          }
+        }
+      }
+    });
+  }
+
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'ListViews',
+      theme: ThemeData(
+        primarySwatch: Colors.teal,
+      ),
+      home: Scaffold(
+        appBar: AppBar(title: Text('Nội dung bài viết')),
+        body: bodyLayout(),
+        bottomNavigationBar: buildBottomNavigationBar(
+            context: context, index: kBottomBarIndexTestPostDetail),
+      ),
+    );
+  }
+
+  // GET POST
+  Future<PostDetailModel> getPost(int searchId) async {
+    var res = await Network().getData('/post/get_post?id=$searchId');
+    var body = json.decode(res.body);
+
+    // tags model
+    List<TagModel> tags = [];
+    for (var tag in body['tags']) {
+      TagModel tagModel = new TagModel(id: tag['id'], name: tag['name']);
+      tags.add(tagModel);
+    }
+    // post model
+    int id = body['post']['id'];
+    String title = body['post']['title'];
+    String content = body['post']['content'];
+    int like = body['post']['like'];
+    List<String> imagesForPost = [];
+    var createdAt = body['post']['created_at'];
+    for (var image in body['images_for_post']) {
+      imagesForPost.add(image['dynamic_url']);
+    }
+
+    PostDetailModel postDetail = new PostDetailModel(
+        id: id,
+        like: like,
+        title: title,
+        content: content,
+        imagesForPost: imagesForPost,
+        tags: tags,
+        createdAt: createdAt);
+
+    return postDetail;
+  }
+
+  _loadUserData() async {
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    var user = jsonDecode(localStorage.getString('user'));
+
+    if (user != null) {
+      setState(() {
+        currentUser = user;
+      });
+    }
+  }
+
+  bodyLayout() {
+    return Container(
+      child: CustomScrollView(
+        controller: this._scrollController,
+        slivers: [
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                // listview content bài viết
+                listViewPostContentBuild(),
+              ],
+            ),
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                // listview bình luận
+                listViewCommentsBuild(),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 

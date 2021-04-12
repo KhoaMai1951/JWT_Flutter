@@ -628,7 +628,7 @@ class _PostDetailState extends State<PostDetail> {
         this.currentUser['id'].toString());
 
     var body = json.decode(res.body);
-    print(body);
+
     // handle number of likes
     setState(() {
       like = body['likes']['like'];

@@ -35,6 +35,8 @@ class _ProfileScreenState extends State<ProfileScreen>
   bool isLoading = false;
   bool stillSendApi = true;
   List<PostDetailModel> posts = [];
+  //theo dõi user
+  bool isFollow;
 
   // 1. HÀM GỌI API LẤY DS POST CỦA USER
   fetchPosts() async {
@@ -86,6 +88,9 @@ class _ProfileScreenState extends State<ProfileScreen>
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
 
+    // check follow
+    checkFollow();
+    // get post
     fetchPosts();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
@@ -153,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                 SizedBox(height: 20.0),
                 // USER INFO
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // AVATAR
@@ -181,12 +186,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                         Row(
                           children: [
                             // NAME
-                            Align(
-                              child: Text(
-                                widget.user.name,
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                              alignment: Alignment.bottomLeft,
+                            Text(
+                              //widget.user.name,
+                              'MAI ĐĂNG Khoa',
+                              style: TextStyle(fontSize: 18.0),
                             ),
 
                             // SETTING BUTTON
@@ -198,7 +201,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                         SizedBox(
                           height: 5.0,
                         ),
-
                         SizedBox(
                           height: 10.0,
                         ),
@@ -248,8 +250,26 @@ class _ProfileScreenState extends State<ProfileScreen>
                 // BIO
                 Text(widget.user.bio),
                 SizedBox(
-                  height: 20.0,
+                  height: 12,
                 ),
+                // FOLLOW BUTTON
+                widget.currentUserId != widget.user.id
+                    ? ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: isFollow == true ? Colors.grey : Colors.teal,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
+                          textStyle: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.bold),
+                        ),
+                        onPressed: () {
+                          followOrUnfollow();
+                        },
+                        child: isFollow == true
+                            ? Text('Đang theo dõi')
+                            : Text('Theo dõi'),
+                      )
+                    : SizedBox(),
               ],
             ),
           ),
@@ -560,5 +580,48 @@ class _ProfileScreenState extends State<ProfileScreen>
         );
       },
     );
+  }
+
+  // CHECK FOLLOW FUNCTION
+  Future<void> checkFollow() async {
+    var data = {
+      'user_id': widget.user.id,
+      'current_user_id': widget.currentUserId
+    };
+    print(data);
+    var res = await Network().postData(data, '/user/check_follow');
+
+    var body = json.decode(res.body);
+    print(body);
+    if (body['result'] == false) {
+      setState(() {
+        isFollow = false;
+      });
+    } else {
+      setState(() {
+        isFollow = true;
+      });
+    }
+  }
+
+  // UNFOLLOW / FOLLOW FUNCTION
+  Future<void> followOrUnfollow() async {
+    var data = {
+      'user_id': widget.user.id,
+      'current_user_id': widget.currentUserId
+    };
+    var res = await Network().postData(data, '/user/follow_user');
+
+    var body = json.decode(res.body);
+    print(body);
+    if (body['follow'] == false) {
+      setState(() {
+        isFollow = false;
+      });
+    } else {
+      setState(() {
+        isFollow = true;
+      });
+    }
   }
 }

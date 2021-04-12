@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../login.dart';
 
 class LoadingScreen extends StatefulWidget {
+  static const String id = 'loading_main_screen';
   @override
   _LoadingScreenState createState() => _LoadingScreenState();
 }
@@ -54,7 +55,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
     //if there isn't any token
     else {
       print('doesnt have token');
-
+      // pop trang loading ra khỏi stack
+      Navigator.pop(context);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) {

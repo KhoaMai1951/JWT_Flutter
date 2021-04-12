@@ -71,7 +71,9 @@ BottomNavigationBar buildBottomNavigationBar(
             context,
             MaterialPageRoute(
               // builder: (context) => ProfileScreen(),
-              builder: (context) => LoadingProfileScreen(),
+              builder: (context) => LoadingProfileScreen(
+                userId: -1,
+              ),
             ),
           );
           break;

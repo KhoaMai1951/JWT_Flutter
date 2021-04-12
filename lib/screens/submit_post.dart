@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'loading/loading_post_detail.dart';
 
 class SubmitPostScreen extends StatefulWidget {
+  static const String id = 'submit_post_screen';
   @override
   _SubmitPostScreenState createState() => _SubmitPostScreenState();
 }
@@ -79,7 +80,10 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
         primarySwatch: Colors.teal,
       ),
       home: Scaffold(
-        appBar: AppBar(title: Text('Đăng bài')),
+        appBar: AppBar(
+          title: Text('Đăng bài'),
+          centerTitle: true,
+        ),
         body: bodyLayout(),
         bottomNavigationBar: buildBottomNavigationBar(
             context: context, index: kBottomBarIndexSubmitPost),

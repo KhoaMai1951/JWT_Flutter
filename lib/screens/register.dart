@@ -9,6 +9,8 @@ import 'home.dart';
 import 'login.dart';
 
 class Register extends StatefulWidget {
+  static const String id = 'register_screen';
+
   @override
   _RegisterState createState() => _RegisterState();
 }

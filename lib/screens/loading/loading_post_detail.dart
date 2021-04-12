@@ -75,7 +75,9 @@ class _LoadingPostDetailScreenState extends State<LoadingPostDetailScreen> {
     String username = body['user']['username'];
 
     UserModel user = new UserModel(id: userId, username: username);
-
+    // pop trang loading ra khỏi stack
+    Navigator.pop(context);
+    // push vào stack trang post detail
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) {

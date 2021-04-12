@@ -9,6 +9,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoadingProfileScreen extends StatefulWidget {
+  int userId;
+  LoadingProfileScreen({Key key, @required this.userId}) : super(key: key);
   @override
   _LoadingProfileScreenState createState() => _LoadingProfileScreenState();
 }
@@ -37,9 +39,14 @@ class _LoadingProfileScreenState extends State<LoadingProfileScreen> {
   fetchUser() async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var user = jsonDecode(localStorage.getString('user'));
-    var userId = user['id'];
+    // NẾU LÀ CHỦ TÀI KHOẢN
+    if (widget.userId == -1) {
+      // lấy user id từ trong điện thoại
+      widget.userId = user['id'];
+    }
 
-    var res = await Network().getData('/user/get_user_info_by_id?id=$userId');
+    var idToSend = widget.userId;
+    var res = await Network().getData('/user/get_user_info_by_id?id=$idToSend');
     var body = json.decode(res.body);
 
     // user model
@@ -48,7 +55,7 @@ class _LoadingProfileScreenState extends State<LoadingProfileScreen> {
     String name = body['user'][0]['name'];
     String email = body['user'][0]['email'];
     String bio = body['user'][0]['bio'];
-    String avatarUrl = body['avatar_link'][0]['url'];
+    String avatarUrl = body['avatar_link'];
     int numberOfFollowers = body['number_of_followers'];
     int numberOfFollowing = body['number_of_following'];
 
@@ -62,12 +69,14 @@ class _LoadingProfileScreenState extends State<LoadingProfileScreen> {
       followersNumber: numberOfFollowers,
       followingNumber: numberOfFollowing,
     );
-
+    // pop trang loading ra khỏi stack
+    Navigator.pop(context);
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) {
         return ProfileScreen(
           user: userModel,
+          currentUserId: user['id'],
         );
       }),
     );

@@ -8,6 +8,8 @@ import 'home.dart';
 import 'login.dart';
 
 class ConfirmEmail extends StatefulWidget {
+  static const String id = 'confirm_email_screen';
+
   String email;
   ConfirmEmail({@required this.email});
   @override

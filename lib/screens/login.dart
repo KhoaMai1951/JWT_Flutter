@@ -8,6 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'home.dart';
 
 class Login extends StatefulWidget {
+  static const String id = 'login_screen';
+
   @override
   _LoginState createState() => _LoginState();
 }

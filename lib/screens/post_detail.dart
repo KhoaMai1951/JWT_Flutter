@@ -17,9 +17,13 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import 'loading/loading_user_profile.dart';
+
 class PostDetail extends StatefulWidget {
+  static const String id = 'post_detail_screen';
+
   PostDetail({Key key, this.post, this.userOfPost}) : super(key: key);
-  int id;
+  //int id;
   PostDetailModel post;
   UserModel userOfPost;
 
@@ -48,10 +52,13 @@ class _PostDetailState extends State<PostDetail> {
   // Hàm future lấy list comment
   Future<dynamic> _getComments;
 
-  // Hàm set state cho list comment sau khi gọi hàm lấy list comment
+  // Hàm clear toàn bộ mảng comments + lấy cụm comments mới + lấy lấy số lượng comment
   void _loadComments() {
     setState(() {
-      _getComments = getCommentList();
+      //_getComments = getCommentList();
+      comments.clear();
+      skip = 0;
+      fetchComments();
       getNumberOfComment().then((value) {
         setState(() {
           numberOfComments = value.toString();
@@ -118,6 +125,7 @@ class _PostDetailState extends State<PostDetail> {
             content: comments[index].content,
             username: comments[index].username,
             createdDate: comments[index].createdAt,
+            userId: comments[index].userId,
           ),
         );
       },
@@ -146,9 +154,14 @@ class _PostDetailState extends State<PostDetail> {
                       children: [
                         // USERNAME
                         Text('Bởi '),
-                        Text(
-                          widget.userOfPost.username,
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        InkWell(
+                          child: Text(
+                            widget.userOfPost.username,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          onTap: () {
+                            navigateToUserProfile(userId: widget.userOfPost.id);
+                          },
                         ),
                       ],
                     ),
@@ -278,10 +291,11 @@ class _PostDetailState extends State<PostDetail> {
     like = widget.post.like;
     _loadUserData();
     checkLikePost();
+    // Hàm clear toàn bộ mảng comments + lấy cụm comments mới + lấy lấy số lượng comment
     _loadComments();
 
     // xử lý infinite scroll cho comment
-    fetchComments();
+    //fetchComments();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
@@ -301,18 +315,31 @@ class _PostDetailState extends State<PostDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'ListViews',
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
+    // return MaterialApp(
+    //   debugShowCheckedModeBanner: false,
+    //   title: 'ListViews',
+    //   theme: ThemeData(
+    //     primarySwatch: Colors.teal,
+    //   ),
+    //   home: Scaffold(
+    //     appBar: AppBar(title: Text('Nội dung bài viết')),
+    //     body: bodyLayout(),
+    //     bottomNavigationBar: buildBottomNavigationBar(
+    //         context: context, index: kBottomBarIndexTestPostDetail),
+    //   ),
+    // );
+
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(
+          'Nội dung bài viết',
+        ),
+        backgroundColor: Colors.teal,
       ),
-      home: Scaffold(
-        appBar: AppBar(title: Text('Nội dung bài viết')),
-        body: bodyLayout(),
-        bottomNavigationBar: buildBottomNavigationBar(
-            context: context, index: kBottomBarIndexTestPostDetail),
-      ),
+      body: bodyLayout(),
+      bottomNavigationBar: buildBottomNavigationBar(
+          context: context, index: kBottomBarIndexTestPostDetail),
     );
   }
 
@@ -366,6 +393,7 @@ class _PostDetailState extends State<PostDetail> {
       child: CustomScrollView(
         controller: this._scrollController,
         slivers: [
+          // NỘI DUNG BÀI VIẾT
           SliverList(
             delegate: SliverChildListDelegate(
               [
@@ -374,6 +402,7 @@ class _PostDetailState extends State<PostDetail> {
               ],
             ),
           ),
+          // DS BÌNH LUẬN
           SliverList(
             delegate: SliverChildListDelegate(
               [
@@ -442,7 +471,8 @@ class _PostDetailState extends State<PostDetail> {
   }
 
   // COMMENT
-  CommentBubble({String content, String username, String createdDate}) {
+  CommentBubble(
+      {String content, String username, String createdDate, int userId}) {
     return Padding(
       padding: EdgeInsets.all(10.0),
       child: Column(
@@ -457,13 +487,18 @@ class _PostDetailState extends State<PostDetail> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // USERNAME
-                  Text(
-                    username,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 19.0,
-                      fontWeight: FontWeight.bold,
+                  InkWell(
+                    child: Text(
+                      username,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 19.0,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
+                    onTap: () {
+                      navigateToUserProfile(userId: userId);
+                    },
                   ),
                   SizedBox(height: 5.0),
                   // CONTENT
@@ -664,5 +699,18 @@ class _PostDetailState extends State<PostDetail> {
     } else {
       return 'Vừa đây';
     }
+  }
+
+  //NAVIGATE TO PROFILE SCREEN
+  navigateToUserProfile({int userId}) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        // builder: (context) => ProfileScreen(),
+        builder: (context) => LoadingProfileScreen(
+          userId: userId,
+        ),
+      ),
+    );
   }
 }

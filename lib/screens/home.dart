@@ -15,6 +15,8 @@ import 'submit_post.dart';
 import 'login.dart';
 
 class Home extends StatefulWidget {
+  static const String id = 'test_screen';
+
   @override
   _HomeState createState() => _HomeState();
 }

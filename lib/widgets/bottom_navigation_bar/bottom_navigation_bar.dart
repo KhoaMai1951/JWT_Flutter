@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/screens/home.dart';
+import 'package:flutter_login_test_2/screens/loading/loading_news_feed.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_post_detail.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
+import 'package:flutter_login_test_2/screens/news_feed.dart';
 import 'package:flutter_login_test_2/screens/post_detail.dart';
 import 'package:flutter_login_test_2/screens/profile.dart';
 import 'package:flutter_login_test_2/screens/submit_post.dart';
@@ -39,11 +41,11 @@ BottomNavigationBar buildBottomNavigationBar(
     unselectedItemColor: Colors.white60,
     onTap: (navigationIndex) async {
       switch (navigationIndex) {
-        case kBottomBarIndexTest:
+        case kBottomBarIndexNewsFeed:
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => Home(),
+              builder: (context) => LoadingNewsFeedScreen(),
             ),
           );
           break;

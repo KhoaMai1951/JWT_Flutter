@@ -1,17 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_login_test_2/models/tag_model.dart';
+import 'package:flutter_login_test_2/models/user_model.dart';
 
 class PostDetailModel {
-  PostDetailModel(
-      {this.id,
-      this.title,
-      this.content,
-      this.createdAt,
-      this.thumbNailUrl,
-      this.commentsNumber,
-      this.like,
-      this.imagesForPost,
-      this.tags});
+  PostDetailModel({
+    this.id,
+    this.title,
+    this.content,
+    this.createdAt,
+    this.thumbNailUrl,
+    this.commentsNumber,
+    this.like,
+    this.imagesForPost,
+    this.tags,
+    this.user,
+  });
 
   int id;
   String title;
@@ -22,4 +25,5 @@ class PostDetailModel {
   int commentsNumber;
   List<String> imagesForPost;
   List<TagModel> tags;
+  UserModel user;
 }

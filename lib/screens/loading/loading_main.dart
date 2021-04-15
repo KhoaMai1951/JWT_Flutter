@@ -6,7 +6,7 @@ import 'package:flutter_login_test_2/screens/home.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../login.dart';
+import '../authentication/login.dart';
 
 class LoadingScreen extends StatefulWidget {
   static const String id = 'loading_main_screen';

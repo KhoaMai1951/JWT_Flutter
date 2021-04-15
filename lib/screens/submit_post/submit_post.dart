@@ -16,7 +16,7 @@ import 'package:flutter_login_test_2/widgets/text_form_field/text_form_field_uni
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'loading/loading_post_detail.dart';
+import '../loading/loading_post_detail.dart';
 
 class SubmitPostScreen extends StatefulWidget {
   static const String id = 'submit_post_screen';

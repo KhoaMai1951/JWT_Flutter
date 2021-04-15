@@ -11,8 +11,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'loading/loading_test.dart';
-import 'submit_post.dart';
-import 'login.dart';
+import 'submit_post/submit_post.dart';
+import 'authentication/login.dart';
 
 class Home extends StatefulWidget {
   static const String id = 'test_screen';

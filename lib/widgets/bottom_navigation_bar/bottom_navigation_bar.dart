@@ -4,10 +4,8 @@ import 'package:flutter_login_test_2/screens/home.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_news_feed.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_post_detail.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
-import 'package:flutter_login_test_2/screens/news_feed.dart';
-import 'package:flutter_login_test_2/screens/post_detail.dart';
-import 'package:flutter_login_test_2/screens/profile.dart';
-import 'package:flutter_login_test_2/screens/submit_post.dart';
+
+import 'file:///C:/Users/Khoa/AndroidStudioProjects/flutter_login_test_2/lib/screens/submit_post/submit_post.dart';
 
 BottomNavigationBar buildBottomNavigationBar(
     {int index, BuildContext context}) {
@@ -46,6 +44,14 @@ BottomNavigationBar buildBottomNavigationBar(
             context,
             MaterialPageRoute(
               builder: (context) => LoadingNewsFeedScreen(),
+            ),
+          );
+          break;
+        case kBottomBarIndexTest:
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Home(),
             ),
           );
           break;

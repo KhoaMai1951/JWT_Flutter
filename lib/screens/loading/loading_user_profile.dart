@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
-import 'package:flutter_login_test_2/screens/profile.dart';
+import 'file:///C:/Users/Khoa/AndroidStudioProjects/flutter_login_test_2/lib/screens/account/profile.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

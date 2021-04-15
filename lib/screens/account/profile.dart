@@ -1,18 +1,26 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/helpers/account_manage.dart';
+import 'package:flutter_login_test_2/helpers/multi_image_picker_helper.dart';
 import 'package:flutter_login_test_2/models/post_detail_model.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
+import 'package:flutter_login_test_2/screens/account/avatar_preview.dart';
 import 'package:flutter_login_test_2/screens/post_detail.dart';
-import 'package:flutter_login_test_2/screens/submit_post.dart';
+import '../home.dart';
+import 'file:///C:/Users/Khoa/AndroidStudioProjects/flutter_login_test_2/lib/screens/account/profile_edit.dart';
+import 'file:///C:/Users/Khoa/AndroidStudioProjects/flutter_login_test_2/lib/screens/submit_post/submit_post.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:flutter_login_test_2/widgets/user_post_infinite_list/user_post_infinite_list.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:multi_image_picker/multi_image_picker.dart';
 
-import 'loading/loading_post_detail.dart';
+import '../loading/loading_post_detail.dart';
 
 // ignore: must_be_immutable
 class ProfileScreen extends StatefulWidget {
@@ -37,6 +45,10 @@ class _ProfileScreenState extends State<ProfileScreen>
   List<PostDetailModel> posts = [];
   //theo dõi user
   bool isFollow;
+  //image picker
+  List<Asset> images = <Asset>[];
+  List<MultipartFile> files = [];
+  MultiImagePickerHelper imagePicker = new MultiImagePickerHelper();
 
   // 1. HÀM GỌI API LẤY DS POST CỦA USER
   fetchPosts() async {
@@ -77,6 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     // Nếu kết trả không còn
     else {
       setState(() {
+        isLoading = false;
         stillSendApi = false;
       });
     }
@@ -113,24 +126,6 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   @override
   Widget build(BuildContext context) {
-    /*return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'ListViews',
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Center(
-            child: Text(widget.user.username),
-          ),
-        ),
-        body: bodyLayout(),
-        bottomNavigationBar: buildBottomNavigationBar(
-            context: context, index: kBottomBarIndexProfile),
-      ),
-    );*/
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -151,125 +146,158 @@ class _ProfileScreenState extends State<ProfileScreen>
         return [
           // USER INFO
           SliverToBoxAdapter(
-            child: Column(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              //crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: 20.0),
-                // USER INFO
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // AVATAR
-                    Container(
-                      alignment: Alignment.center,
-                      child: Container(
-                        width: 100.0,
-                        height: 100.0,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(90.0),
-                            image: DecorationImage(
-                                image: widget.user.avatarUrl != ''
-                                    ? NetworkImage(widget.user.avatarUrl)
-                                    : AssetImage('images/no-image.png'),
-                                fit: BoxFit.cover)),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 20.0),
+                      // USER INFO
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // AVATAR
+                          Container(
+                            alignment: Alignment.center,
+                            child: InkWell(
+                              onTap: () {
+                                getAvatar();
+                              },
+                              child: Container(
+                                child: Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: Container(
+                                    width: 20.0,
+                                    height: 20.0,
+                                    decoration: BoxDecoration(
+                                      color: Colors.teal,
+                                      borderRadius: BorderRadius.circular(100),
+                                    ),
+                                    child: Icon(
+                                      Icons.edit,
+                                      color: Colors.white,
+                                      size: 15.0,
+                                    ),
+                                  ),
+                                ),
+                                height: MediaQuery.of(context).size.width - 220,
+                                width: MediaQuery.of(context).size.width - 220,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(90.0),
+                                    image: DecorationImage(
+                                        image: widget.user.avatarUrl != ''
+                                            ? NetworkImage(
+                                                widget.user.avatarUrl)
+                                            : AssetImage('images/no-image.png'),
+                                        fit: BoxFit.cover)),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 20.0,
+                          ),
+                          // COLUMN INFO
+                          Flexible(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                // NAME + SETTING BUTTON
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    // NAME
+                                    Text(
+                                      widget.user.name,
+                                      style: TextStyle(fontSize: 18.0),
+                                    ),
+                                    // SETTING BUTTON
+                                    widget.currentUserId == widget.user.id
+                                        ? GearButtonBuild()
+                                        : SizedBox(),
+                                  ],
+                                ),
+                                Divider(),
+                                // FOLLOW INFO
+                                Row(
+                                  children: [
+                                    // FOLLOWERS
+                                    Column(
+                                      children: [
+                                        Text(
+                                          widget.user.followersNumber
+                                              .toString(),
+                                          style: TextStyle(fontSize: 18.0),
+                                        ),
+                                        Text(
+                                          'người theo dõi',
+                                          style: TextStyle(
+                                              fontSize: 15.0,
+                                              color: Colors.teal),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      width: 20.0,
+                                    ),
+                                    // FOLLOWING
+                                    Column(
+                                      children: [
+                                        Text(
+                                          widget.user.followingNumber
+                                              .toString(),
+                                          style: TextStyle(fontSize: 18.0),
+                                        ),
+                                        Text(
+                                          'đang theo dõi',
+                                          style: TextStyle(
+                                              fontSize: 15.0,
+                                              color: Colors.teal),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    SizedBox(
-                      width: 20.0,
-                    ),
-                    // COLUMN INFO
-                    Column(
-                      children: [
-                        // NAME + SETTING BUTTON
-                        Row(
-                          children: [
-                            // NAME
-                            Text(
-                              //widget.user.name,
-                              'MAI ĐĂNG Khoa',
-                              style: TextStyle(fontSize: 18.0),
-                            ),
-
-                            // SETTING BUTTON
-                            widget.currentUserId == widget.user.id
-                                ? GearButtonBuild()
-                                : SizedBox(),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 5.0,
-                        ),
-                        SizedBox(
-                          height: 10.0,
-                        ),
-                        // FOLLOW INFO
-                        Row(
-                          children: [
-                            // FOLLOWERS
-                            Column(
-                              children: [
-                                Text(
-                                  widget.user.followersNumber.toString(),
-                                  style: TextStyle(fontSize: 18.0),
-                                ),
-                                Text(
-                                  'người theo dõi',
-                                  style: TextStyle(
-                                      fontSize: 15.0, color: Colors.teal),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              width: 20.0,
-                            ),
-                            // FOLLOWING
-                            Column(
-                              children: [
-                                Text(
-                                  widget.user.followingNumber.toString(),
-                                  style: TextStyle(fontSize: 18.0),
-                                ),
-                                Text(
-                                  'đang theo dõi',
-                                  style: TextStyle(
-                                      fontSize: 15.0, color: Colors.teal),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
+                      SizedBox(
+                        height: 30,
+                      ),
+                      // BIO
+                      Text(widget.user.bio),
+                      SizedBox(
+                        height: 12,
+                      ),
+                      // FOLLOW BUTTON
+                      widget.currentUserId != widget.user.id
+                          ? ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                primary: isFollow == true
+                                    ? Colors.grey
+                                    : Colors.teal,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 10),
+                                textStyle: TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.bold),
+                              ),
+                              onPressed: () {
+                                followOrUnfollow();
+                              },
+                              child: isFollow == true
+                                  ? Text('Đang theo dõi')
+                                  : Text('Theo dõi'),
+                            )
+                          : SizedBox(),
+                    ],
+                  ),
                 ),
-                SizedBox(
-                  height: 30,
-                ),
-                // BIO
-                Text(widget.user.bio),
-                SizedBox(
-                  height: 12,
-                ),
-                // FOLLOW BUTTON
-                widget.currentUserId != widget.user.id
-                    ? ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: isFollow == true ? Colors.grey : Colors.teal,
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 10),
-                          textStyle: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.bold),
-                        ),
-                        onPressed: () {
-                          followOrUnfollow();
-                        },
-                        child: isFollow == true
-                            ? Text('Đang theo dõi')
-                            : Text('Theo dõi'),
-                      )
-                    : SizedBox(),
               ],
             ),
           ),
@@ -353,7 +381,14 @@ class _ProfileScreenState extends State<ProfileScreen>
                       child: ListTile(
                         leading: Icon(Icons.edit),
                         title: Text('Chỉnh sửa thông tin'),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProfileEditScreen(),
+                            ),
+                          );
+                        },
                       ),
                     ),
                     // LOGOUT BUTTON
@@ -385,100 +420,6 @@ class _ProfileScreenState extends State<ProfileScreen>
       itemCount: posts.length,
       physics: const NeverScrollableScrollPhysics(), // new
       itemBuilder: (context, index) {
-        /*return ListView(
-          physics: NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          children: [
-            // BÀI VIẾT MINI
-            Card(
-              margin: EdgeInsets.all(1),
-              color: Colors.white,
-              shadowColor: Colors.blueGrey,
-              elevation: 1,
-              child: InkWell(
-                child: Row(
-                  children: [
-                    // THUMBNAIL
-                    Container(
-                      width: 100.0,
-                      height: 100.0,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: posts[index].thumbNailUrl != ''
-                              ? NetworkImage(
-                                  posts[index].thumbNailUrl,
-                                )
-                              : AssetImage('images/no-image.png'),
-                          fit: BoxFit.cover,
-                          alignment: AlignmentDirectional.center,
-                        ),
-                      ),
-                    ),
-                    // CONTENT
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // TITLE + CONTENT
-                          ListTile(
-                            title: Text(
-                              posts[index].title,
-                              style: TextStyle(fontSize: 20),
-                            ),
-                            subtitle: Text(posts[index].content),
-                          ),
-                          // LIKE + COMMENT
-                          Row(
-                            children: [
-                              SizedBox(width: 15),
-                              // LIKE
-                              Icon(
-                                Icons.thumb_up,
-                                color: Colors.grey,
-                                size: 17,
-                              ),
-                              SizedBox(width: 3),
-                              Text(
-                                posts[index].like.toString(),
-                                style: TextStyle(fontSize: 17),
-                              ),
-                              SizedBox(width: 20),
-                              // COMMENT
-                              Icon(
-                                Icons.message,
-                                color: Colors.grey,
-                                size: 17,
-                              ),
-                              SizedBox(width: 3),
-                              Text(
-                                posts[index].commentsNumber.toString(),
-                                style: TextStyle(fontSize: 17),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LoadingPostDetailScreen(
-                        id: posts[index].id,
-                      ),
-                      //builder: (context) => PostDetail(),
-                    ),
-                  );
-                },
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-          ],
-        );*/
         return Column(
           children: [
             ListView(
@@ -588,11 +529,11 @@ class _ProfileScreenState extends State<ProfileScreen>
       'user_id': widget.user.id,
       'current_user_id': widget.currentUserId
     };
-    print(data);
+
     var res = await Network().postData(data, '/user/check_follow');
 
     var body = json.decode(res.body);
-    print(body);
+
     if (body['result'] == false) {
       setState(() {
         isFollow = false;
@@ -613,7 +554,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     var res = await Network().postData(data, '/user/follow_user');
 
     var body = json.decode(res.body);
-    print(body);
+
     if (body['follow'] == false) {
       setState(() {
         isFollow = false;
@@ -622,6 +563,52 @@ class _ProfileScreenState extends State<ProfileScreen>
       setState(() {
         isFollow = true;
       });
+    }
+  }
+
+  // IMAGE PICKER AVATAR
+  Future getAvatar() async {
+    this.images.clear();
+    List<Asset> resultList = <Asset>[];
+    String error = 'No Error Detected';
+
+    try {
+      resultList = await MultiImagePicker.pickImages(
+        maxImages: 1,
+        enableCamera: true,
+        selectedAssets: images,
+        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+        materialOptions: MaterialOptions(
+          actionBarColor: "#abcdef",
+          actionBarTitle: "Chọn ảnh",
+          allViewTitle: "Tất cả hình ảnh",
+          useDetailsView: false,
+          selectCircleStrokeColor: "#000000",
+        ),
+      );
+    } on Exception catch (e) {
+      error = e.toString();
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      images = resultList;
+    });
+
+    if (this.images.isEmpty == false) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AvatarPreviewScreen(
+            images: this.images,
+            userId: widget.currentUserId,
+          ),
+        ),
+      );
     }
   }
 }

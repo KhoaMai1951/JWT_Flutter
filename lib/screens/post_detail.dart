@@ -208,7 +208,7 @@ class _PostDetailState extends State<PostDetail> {
                   IconButton(
                     iconSize: 30.0,
                     color: this.isLiked == true ? Colors.teal : Colors.grey,
-                    icon: const Icon(Icons.thumb_up),
+                    icon: const Icon(Icons.favorite),
                     onPressed: () {
                       likePost();
                     },

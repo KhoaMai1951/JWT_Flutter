@@ -14,6 +14,8 @@ class PostDetailModel {
     this.imagesForPost,
     this.tags,
     this.user,
+    this.currentImageIndicator,
+    this.isLiked,
   });
 
   int id;
@@ -26,4 +28,6 @@ class PostDetailModel {
   List<String> imagesForPost;
   List<TagModel> tags;
   UserModel user;
+  int currentImageIndicator = 0;
+  bool isLiked;
 }

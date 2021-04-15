@@ -2,32 +2,33 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
+import 'file:///C:/Users/Khoa/AndroidStudioProjects/flutter_login_test_2/lib/screens/authentication/register.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'home.dart';
-import 'login.dart';
+import '../home.dart';
 
-class ConfirmEmail extends StatefulWidget {
-  static const String id = 'confirm_email_screen';
+class Login extends StatefulWidget {
+  static const String id = 'login_screen';
 
-  String email;
-  ConfirmEmail({@required this.email});
   @override
-  _ConfirmEmailState createState() => _ConfirmEmailState(email: this.email);
+  _LoginState createState() => _LoginState();
 }
 
-class _ConfirmEmailState extends State<ConfirmEmail> {
-  String email;
+class _LoginState extends State<Login> {
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
-  var verificationCode;
-
-  _ConfirmEmailState({@required this.email});
+  var email;
+  var password;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  String emailValidator;
+  String passwordValidator;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Container(
+    // Build a Form widget using the _formKey created above.
+    return Scaffold(
+      key: _scaffoldKey,
+      body: Container(
         color: Colors.teal,
         child: Stack(
           children: <Widget>[
@@ -59,17 +60,41 @@ class _ConfirmEmailState extends State<ConfirmEmail> {
                                     Icons.email,
                                     color: Colors.grey,
                                   ),
-                                  hintText: "Verification code",
+                                  hintText: "Email",
                                   hintStyle: TextStyle(
                                       color: Color(0xFF9b9b9b),
                                       fontSize: 15,
                                       fontWeight: FontWeight.normal),
                                 ),
-                                validator: (verificationCode) {
-                                  if (verificationCode.isEmpty) {
-                                    return 'Please enter verification code';
+                                validator: (emailValue) {
+                                  if (emailValue.isEmpty) {
+                                    return 'Hãy nhập email';
                                   }
-                                  this.verificationCode = verificationCode;
+                                  email = emailValue;
+                                  return null;
+                                },
+                              ),
+                              TextFormField(
+                                style: TextStyle(color: Color(0xFF000000)),
+                                cursorColor: Color(0xFF9b9b9b),
+                                keyboardType: TextInputType.text,
+                                obscureText: true,
+                                decoration: InputDecoration(
+                                  prefixIcon: Icon(
+                                    Icons.vpn_key,
+                                    color: Colors.grey,
+                                  ),
+                                  hintText: "Mật khẩu",
+                                  hintStyle: TextStyle(
+                                      color: Color(0xFF9b9b9b),
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.normal),
+                                ),
+                                validator: (passwordValue) {
+                                  if (passwordValue.isEmpty) {
+                                    return 'Hãy nhập mật khẩu';
+                                  }
+                                  password = passwordValue;
                                   return null;
                                 },
                               ),
@@ -80,7 +105,9 @@ class _ConfirmEmailState extends State<ConfirmEmail> {
                                     padding: EdgeInsets.only(
                                         top: 8, bottom: 8, left: 10, right: 10),
                                     child: Text(
-                                      _isLoading ? 'Proccessing...' : 'Verify',
+                                      _isLoading
+                                          ? 'Đang xử lý...'
+                                          : 'Đăng nhập',
                                       textDirection: TextDirection.ltr,
                                       style: TextStyle(
                                         color: Colors.white,
@@ -97,12 +124,32 @@ class _ConfirmEmailState extends State<ConfirmEmail> {
                                           new BorderRadius.circular(20.0)),
                                   onPressed: () {
                                     if (_formKey.currentState.validate()) {
-                                      _register();
+                                      _login();
                                     }
                                   },
                                 ),
                               ),
                             ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              new MaterialPageRoute(
+                                  builder: (context) => Register()));
+                        },
+                        child: Text(
+                          'Tạo tài khoản mới',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15.0,
+                            decoration: TextDecoration.none,
+                            fontWeight: FontWeight.normal,
                           ),
                         ),
                       ),
@@ -117,33 +164,42 @@ class _ConfirmEmailState extends State<ConfirmEmail> {
     );
   }
 
-  void _register() async {
+  void _login() async {
     setState(() {
       _isLoading = true;
     });
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
-    var data = {
-      'email': email,
-      'activation_token': verificationCode,
-    };
+    var data = {'email': email, 'password': password};
 
-    var res = await Network().authData(data, kApiActivateAccount);
+    var res = await Network().authData(data, kApiLogin);
     var body = json.decode(res.body);
-    // if activate success
+    //if success
     if (body['success']) {
-      // SharedPreferences localStorage = await SharedPreferences.getInstance();
-      // localStorage.setString('token', json.encode(body['token']));
-      // localStorage.setString('user', json.encode(body['user']));
+      SharedPreferences localStorage = await SharedPreferences.getInstance();
+      localStorage.setString('token', json.encode(body['token']));
+
+      localStorage.setString('user', json.encode(body['user']));
       Navigator.push(
         context,
-        new MaterialPageRoute(
-          builder: (context) => Login(),
-        ),
+        new MaterialPageRoute(builder: (context) => Home()),
       );
+    } else {
+      _showMsg(body['message']);
     }
-
     setState(() {
       _isLoading = false;
     });
+  }
+
+  _showMsg(msg) {
+    final snackBar = SnackBar(
+      content: Text(msg),
+      action: SnackBarAction(
+        label: 'Close',
+        onPressed: () {
+          // Some code to undo the change!
+        },
+      ),
+    );
+    _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 }

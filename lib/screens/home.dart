@@ -4,8 +4,8 @@ import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/testing/comment_infinite_list_view.dart';
+import 'package:flutter_login_test_2/screens/testing/search_bar.dart';
 import 'package:flutter_login_test_2/screens/upload_image.dart';
-import 'package:flutter_login_test_2/services/TagService.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -147,6 +147,23 @@ class _HomeState extends State<Home> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10))),
                 child: Text('Test infinite comment'),
+              ),
+            ),
+            Center(
+              child: RaisedButton(
+                elevation: 10,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SearchBarScreen(),
+                    ),
+                  );
+                },
+                color: Colors.lightGreen,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: Text('Search bar'),
               ),
             ),
             Container(

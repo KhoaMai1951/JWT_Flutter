@@ -7,7 +7,6 @@ import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/models/post_detail_model.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
-import 'package:flutter_login_test_2/screens/testing/test_animate.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';

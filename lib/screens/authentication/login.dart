@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
-import 'file:///C:/Users/Khoa/AndroidStudioProjects/flutter_login_test_2/lib/screens/authentication/register.dart';
+import 'package:flutter_login_test_2/screens/authentication/register.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../home.dart';

@@ -1,14 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_login_test_2/screens/home.dart';
-import 'file:///C:/Users/Khoa/AndroidStudioProjects/flutter_login_test_2/lib/screens/loading/loading_main.dart';
-import 'file:///C:/Users/Khoa/AndroidStudioProjects/flutter_login_test_2/lib/screens/authentication/login.dart';
-
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'constants/api_constant.dart';
-import 'network_utils/api.dart';
+import 'package:flutter_login_test_2/screens/loading/loading_main.dart';
 
 void main() => runApp(MyApp());
 

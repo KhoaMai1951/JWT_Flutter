@@ -12,10 +12,9 @@ import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:flutter_login_test_2/widgets/text_form_field/text_form_field_universal.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
+
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 import 'loading/loading_user_profile.dart';
 

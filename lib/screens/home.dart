@@ -69,7 +69,7 @@ class _HomeState extends State<Home> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              'Hi, $name',
+              'hi, $name',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             Center(

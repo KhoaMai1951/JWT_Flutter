@@ -8,8 +8,7 @@ import 'package:flutter_login_test_2/components/MultiSelectChip.dart';
 import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/validate_name_constant.dart';
-import 'package:flutter_login_test_2/helpers/upload_image.dart';
-import 'package:flutter_login_test_2/network_utils/api.dart';
+
 import 'package:flutter_login_test_2/services/TagService.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:flutter_login_test_2/widgets/text_form_field/text_form_field_universal.dart';

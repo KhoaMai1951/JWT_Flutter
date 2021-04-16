@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/api_constant.dart';
-import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/helpers/upload_image.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';

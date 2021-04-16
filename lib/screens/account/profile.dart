@@ -10,16 +10,9 @@ import 'package:flutter_login_test_2/models/post_detail_model.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/account/avatar_preview.dart';
-import 'package:flutter_login_test_2/screens/post_detail.dart';
-import '../home.dart';
-import 'file:///C:/Users/Khoa/AndroidStudioProjects/flutter_login_test_2/lib/screens/account/profile_edit.dart';
-import 'file:///C:/Users/Khoa/AndroidStudioProjects/flutter_login_test_2/lib/screens/submit_post/submit_post.dart';
+import 'package:flutter_login_test_2/screens/account/profile_edit.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
-import 'package:flutter_login_test_2/widgets/user_post_infinite_list/user_post_infinite_list.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
-
 import '../loading/loading_post_detail.dart';
 
 // ignore: must_be_immutable
@@ -234,7 +227,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                           style: TextStyle(fontSize: 18.0),
                                         ),
                                         Text(
-                                          'người theo dõi',
+                                          'người \ntheo dõi',
                                           style: TextStyle(
                                               fontSize: 15.0,
                                               color: Colors.teal),
@@ -253,7 +246,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                           style: TextStyle(fontSize: 18.0),
                                         ),
                                         Text(
-                                          'đang theo dõi',
+                                          'đang \ntheo dõi',
                                           style: TextStyle(
                                               fontSize: 15.0,
                                               color: Colors.teal),
@@ -310,7 +303,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                 isScrollable: true,
                 tabs: [
                   Tab(text: 'Danh sách \nbài viết'),
-                  Tab(text: 'Tab 2'),
+                  Tab(text: 'Tab 332'),
                   Tab(text: 'Tab 3'),
                   Tab(text: 'Tab 4'),
                 ],
@@ -385,7 +378,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ProfileEditScreen(),
+                              builder: (context) => ProfileEditScreen(
+                                userModel: widget.user,
+                              ),
                             ),
                           );
                         },

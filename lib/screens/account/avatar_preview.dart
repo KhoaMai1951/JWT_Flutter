@@ -121,7 +121,7 @@ class _AvatarPreviewScreenState extends State<AvatarPreviewScreen> {
     var response =
         await dio.post(kApiUrl + "/user/upload_avatar", data: formData);
     // print(response);
-
+    Navigator.pop(context);
     Navigator.push(
       context,
       MaterialPageRoute(

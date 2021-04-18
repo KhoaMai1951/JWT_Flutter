@@ -4,8 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/api_constant.dart';
+import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
-import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 
 class AvatarPreviewScreen extends StatefulWidget {
@@ -24,7 +24,7 @@ class _AvatarPreviewScreenState extends State<AvatarPreviewScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: Colors.teal,
+        backgroundColor: kAppBarColor,
         title: Row(children: [
           Expanded(
             child: new Column(
@@ -44,8 +44,8 @@ class _AvatarPreviewScreenState extends State<AvatarPreviewScreen> {
               backgroundColor: MaterialStateProperty.resolveWith<Color>(
                 (Set<MaterialState> states) {
                   if (states.contains(MaterialState.pressed))
-                    return Colors.green;
-                  return Colors.teal; // Use the component's default.
+                    return kAppBarColor;
+                  return kAppBarColor; // Use the component's default.
                 },
               ),
             ),

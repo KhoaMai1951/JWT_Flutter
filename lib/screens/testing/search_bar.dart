@@ -3,15 +3,20 @@ import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
+import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/models/post_detail_model.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_post_detail.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
+import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 
 class SearchBarScreen extends StatefulWidget {
+  int currentUserId;
+  SearchBarScreen({Key key, this.currentUserId}) : super(key: key);
   @override
   _SearchBarScreenState createState() => _SearchBarScreenState();
 }
@@ -22,7 +27,6 @@ class _SearchBarScreenState extends State<SearchBarScreen> {
   bool _isSearching = false;
   String searchQuery = "Search query";
   String keyword = '';
-  // INFINITE SCROLL
   // Biến phục vụ cho comment infinite scroll
   int skip = 0;
   int take = 6;
@@ -42,6 +46,7 @@ class _SearchBarScreenState extends State<SearchBarScreen> {
       'skip': this.skip,
       'take': take,
       'keyword': keyword,
+      'user_id': widget.currentUserId,
     };
     var res = await Network().postData(data, '/post/test_search');
     var body = json.decode(res.body);
@@ -121,11 +126,14 @@ class _SearchBarScreenState extends State<SearchBarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: kAppBarColor,
         leading: _isSearching ? const BackButton() : Container(),
-        title: _isSearching ? _buildSearchField() : Text('hi'),
+        title: _isSearching ? _buildSearchField() : Text('Khám phá'),
         actions: _buildActions(),
       ),
       body: buildBody(),
+      bottomNavigationBar: buildBottomNavigationBar(
+          context: context, index: kBottomBarIndexDiscover),
     );
   }
 
@@ -340,18 +348,30 @@ class _SearchBarScreenState extends State<SearchBarScreen> {
 
   Widget _buildSearchField() {
     return TextField(
+      cursorColor: Colors.white,
       controller: _searchQueryController,
       autofocus: true,
       decoration: InputDecoration(
-        hintText: "Search Data...",
+        hintText: "Tìm kiếm bài viết, người dùng",
         border: InputBorder.none,
-        hintStyle: TextStyle(color: Colors.white30),
+        hintStyle: TextStyle(color: Colors.white70),
       ),
       style: TextStyle(color: Colors.white, fontSize: 16.0),
       onChanged: (query) => updateSearchQuery(query),
     );
   }
 
+  void updateSearchQuery(String newQuery) {
+    setState(() {
+      keyword = newQuery;
+      posts.clear();
+      skip = 0;
+      searchQuery = newQuery;
+    });
+    fetchPosts();
+  }
+
+  // A. LIST WIDGET TRÊN APP BAR
   List<Widget> _buildActions() {
     if (_isSearching) {
       return <Widget>[
@@ -385,20 +405,11 @@ class _SearchBarScreenState extends State<SearchBarScreen> {
     });
   }
 
-  void updateSearchQuery(String newQuery) {
-    setState(() {
-      keyword = newQuery;
-      posts.clear();
-      skip = 0;
-      searchQuery = newQuery;
-    });
-    fetchPosts();
-  }
-
   void _stopSearching() {
     _clearSearchQuery();
 
     setState(() {
+      stillSendApi = true;
       _isSearching = false;
     });
   }

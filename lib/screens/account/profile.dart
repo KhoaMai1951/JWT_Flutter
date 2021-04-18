@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
+import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/helpers/account_manage.dart';
 import 'package:flutter_login_test_2/helpers/multi_image_picker_helper.dart';
 import 'package:flutter_login_test_2/models/post_detail_model.dart';
@@ -122,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: Colors.teal,
+        backgroundColor: kAppBarColor,
         title: Text(widget.user.username),
       ),
       body: bodyLayout(),
@@ -143,152 +144,160 @@ class _ProfileScreenState extends State<ProfileScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 20.0),
-                      // USER INFO
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // AVATAR
-                          Container(
-                            alignment: Alignment.center,
-                            child: InkWell(
-                              onTap: () {
-                                getAvatar();
-                              },
-                              child: Container(
-                                child: Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: Container(
-                                    width: 20.0,
-                                    height: 20.0,
-                                    decoration: BoxDecoration(
-                                      color: Colors.teal,
-                                      borderRadius: BorderRadius.circular(100),
-                                    ),
-                                    child: Icon(
-                                      Icons.edit,
-                                      color: Colors.white,
-                                      size: 15.0,
+                  child: Container(
+                    color: kUserInfoColor,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 20.0),
+                        // USER INFO
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // AVATAR
+                            Container(
+                              alignment: Alignment.center,
+                              child: InkWell(
+                                onTap: () {
+                                  getAvatar();
+                                },
+                                child: Container(
+                                  child: Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: Container(
+                                      width: 20.0,
+                                      height: 20.0,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFF294e21),
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                      ),
+                                      child: Icon(
+                                        Icons.edit,
+                                        color: Colors.white,
+                                        size: 15.0,
+                                      ),
                                     ),
                                   ),
+                                  height:
+                                      MediaQuery.of(context).size.width - 220,
+                                  width:
+                                      MediaQuery.of(context).size.width - 220,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(90.0),
+                                      image: DecorationImage(
+                                          image: widget.user.avatarUrl != ''
+                                              ? NetworkImage(
+                                                  widget.user.avatarUrl)
+                                              : AssetImage(
+                                                  'images/no-image.png'),
+                                          fit: BoxFit.cover)),
                                 ),
-                                height: MediaQuery.of(context).size.width - 220,
-                                width: MediaQuery.of(context).size.width - 220,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(90.0),
-                                    image: DecorationImage(
-                                        image: widget.user.avatarUrl != ''
-                                            ? NetworkImage(
-                                                widget.user.avatarUrl)
-                                            : AssetImage('images/no-image.png'),
-                                        fit: BoxFit.cover)),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            width: 20.0,
-                          ),
-                          // COLUMN INFO
-                          Flexible(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                // NAME + SETTING BUTTON
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    // NAME
-                                    Text(
-                                      widget.user.name,
-                                      style: TextStyle(fontSize: 18.0),
-                                    ),
-                                    // SETTING BUTTON
-                                    widget.currentUserId == widget.user.id
-                                        ? GearButtonBuild()
-                                        : SizedBox(),
-                                  ],
-                                ),
-                                Divider(),
-                                // FOLLOW INFO
-                                Row(
-                                  children: [
-                                    // FOLLOWERS
-                                    Column(
-                                      children: [
-                                        Text(
-                                          widget.user.followersNumber
-                                              .toString(),
-                                          style: TextStyle(fontSize: 18.0),
-                                        ),
-                                        Text(
-                                          'người \ntheo dõi',
-                                          style: TextStyle(
-                                              fontSize: 15.0,
-                                              color: Colors.teal),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      width: 20.0,
-                                    ),
-                                    // FOLLOWING
-                                    Column(
-                                      children: [
-                                        Text(
-                                          widget.user.followingNumber
-                                              .toString(),
-                                          style: TextStyle(fontSize: 18.0),
-                                        ),
-                                        Text(
-                                          'đang \ntheo dõi',
-                                          style: TextStyle(
-                                              fontSize: 15.0,
-                                              color: Colors.teal),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
+                            SizedBox(
+                              width: 20.0,
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      // BIO
-                      Text(widget.user.bio),
-                      SizedBox(
-                        height: 12,
-                      ),
-                      // FOLLOW BUTTON
-                      widget.currentUserId != widget.user.id
-                          ? ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: isFollow == true
-                                    ? Colors.grey
-                                    : Colors.teal,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 15, vertical: 10),
-                                textStyle: TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.bold),
+                            // COLUMN INFO
+                            Flexible(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  // NAME + SETTING BUTTON
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      // NAME
+                                      Text(
+                                        widget.user.name,
+                                        style: TextStyle(fontSize: 18.0),
+                                      ),
+                                      // SETTING BUTTON
+                                      widget.currentUserId == widget.user.id
+                                          ? GearButtonBuild()
+                                          : SizedBox(),
+                                    ],
+                                  ),
+                                  Divider(),
+                                  // FOLLOW INFO
+                                  Row(
+                                    children: [
+                                      // FOLLOWERS
+                                      Column(
+                                        children: [
+                                          Text(
+                                            widget.user.followersNumber
+                                                .toString(),
+                                            style: TextStyle(fontSize: 18.0),
+                                          ),
+                                          Text(
+                                            'followers',
+                                            style: TextStyle(
+                                                fontSize: 15.0,
+                                                color: Colors.teal),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        width: 20.0,
+                                      ),
+                                      // FOLLOWING
+                                      Column(
+                                        children: [
+                                          Text(
+                                            widget.user.followingNumber
+                                                .toString(),
+                                            style: TextStyle(fontSize: 18.0),
+                                          ),
+                                          Text(
+                                            'following',
+                                            style: TextStyle(
+                                                fontSize: 15.0,
+                                                color: Colors.teal),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
-                              onPressed: () {
-                                followOrUnfollow();
-                              },
-                              child: isFollow == true
-                                  ? Text('Đang theo dõi')
-                                  : Text('Theo dõi'),
-                            )
-                          : SizedBox(),
-                    ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 30,
+                        ),
+                        // BIO
+                        Text(widget.user.bio),
+                        SizedBox(
+                          height: 12,
+                        ),
+                        // FOLLOW BUTTON
+                        widget.currentUserId != widget.user.id
+                            ? ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  primary: isFollow == true
+                                      ? Colors.grey
+                                      : Colors.teal,
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 10),
+                                  textStyle: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                onPressed: () {
+                                  followOrUnfollow();
+                                },
+                                child: isFollow == true
+                                    ? Text('Đang theo dõi')
+                                    : Text('Theo dõi'),
+                              )
+                            : SizedBox(),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -574,7 +583,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         selectedAssets: images,
         cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
         materialOptions: MaterialOptions(
-          actionBarColor: "#abcdef",
+          actionBarColor: "#294e21",
           actionBarTitle: "Chọn ảnh",
           allViewTitle: "Tất cả hình ảnh",
           useDetailsView: false,

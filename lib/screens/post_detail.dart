@@ -4,6 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
+import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/constants/validate_name_constant.dart';
 import 'package:flutter_login_test_2/models/comment_model.dart';
 import 'package:flutter_login_test_2/models/post_detail_model.dart';
@@ -314,31 +315,16 @@ class _PostDetailState extends State<PostDetail> {
 
   @override
   Widget build(BuildContext context) {
-    // return MaterialApp(
-    //   debugShowCheckedModeBanner: false,
-    //   title: 'ListViews',
-    //   theme: ThemeData(
-    //     primarySwatch: Colors.teal,
-    //   ),
-    //   home: Scaffold(
-    //     appBar: AppBar(title: Text('Nội dung bài viết')),
-    //     body: bodyLayout(),
-    //     bottomNavigationBar: buildBottomNavigationBar(
-    //         context: context, index: kBottomBarIndexTestPostDetail),
-    //   ),
-    // );
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: Text(
           'Nội dung bài viết',
         ),
-        backgroundColor: Colors.teal,
+        backgroundColor: kAppBarColor,
       ),
       body: bodyLayout(),
-      bottomNavigationBar: buildBottomNavigationBar(
-          context: context, index: kBottomBarIndexTestPostDetail),
+      bottomNavigationBar: buildBottomNavigationBar(context: context, index: 1),
     );
   }
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
+import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/testing/comment_infinite_list_view.dart';
 import 'package:flutter_login_test_2/screens/testing/search_bar.dart';
@@ -23,6 +24,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   String name;
+  int currentUserId;
   @override
   void initState() {
     _loadUserData();
@@ -36,6 +38,7 @@ class _HomeState extends State<Home> {
     if (user != null) {
       setState(() {
         name = user['name'];
+        currentUserId = user['id'];
       });
     }
   }
@@ -61,7 +64,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Test App'),
-        backgroundColor: Colors.teal,
+        backgroundColor: kAppBarColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -156,7 +159,9 @@ class _HomeState extends State<Home> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => SearchBarScreen(),
+                      builder: (context) => SearchBarScreen(
+                        currentUserId: this.currentUserId,
+                      ),
                     ),
                   );
                 },

@@ -11,7 +11,9 @@ const String kApiUrl = 'http://192.168.1.2:8000/api/v1';
 // // UIT
 // const String kApiUrl = 'http://10.45.176.82:8000//api/v1';
 // // 3G
-// const String kApiUrl = 'http://192.168.43.165:8000///api/v1';
+// const String kApiUrl = 'http://192.168.24.165:8000///api/v1';
+// // CAFE
+// const String kApiUrl = 'http://192.168.222.107:8000/api/v1';
 
 // AUTHENTICATION SYSTEM
 const String kApiRegister = '/register';

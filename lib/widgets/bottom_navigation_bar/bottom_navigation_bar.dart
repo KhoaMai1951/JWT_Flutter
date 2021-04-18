@@ -1,32 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
+
+import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/screens/home.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_news_feed.dart';
-import 'package:flutter_login_test_2/screens/loading/loading_post_detail.dart';
+
 import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
 import 'package:flutter_login_test_2/screens/submit_post/submit_post.dart';
+import 'package:flutter_login_test_2/screens/testing/search_bar.dart';
 
 BottomNavigationBar buildBottomNavigationBar(
     {int index, BuildContext context}) {
   return BottomNavigationBar(
     type: BottomNavigationBarType.fixed,
-    backgroundColor: Colors.teal,
+    backgroundColor: kBottomBarColor,
     items: const <BottomNavigationBarItem>[
       BottomNavigationBarItem(
-        icon: Icon(Icons.people),
+        icon: Icon(
+          Icons.people,
+        ),
         label: 'Trang chính',
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.android_rounded),
-        label: 'Trang test',
+        icon: Icon(
+          Icons.public,
+        ),
+        label: 'Khám phá',
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.add_circle_outline),
         label: 'Đăng bài',
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.add_photo_alternate_outlined),
-        label: 'Test chi tiết \n bài viết',
+        icon: Icon(Icons.android_rounded),
+        label: 'Trang test',
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.person_pin),
@@ -46,11 +53,11 @@ BottomNavigationBar buildBottomNavigationBar(
             ),
           );
           break;
-        case kBottomBarIndexTest:
+        case kBottomBarIndexDiscover:
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => Home(),
+              builder: (context) => SearchBarScreen(),
             ),
           );
           break;
@@ -62,14 +69,11 @@ BottomNavigationBar buildBottomNavigationBar(
             ),
           );
           break;
-        case kBottomBarIndexTestPostDetail:
+        case kBottomBarIndexTest:
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => LoadingPostDetailScreen(
-                id: 9,
-              ),
-              //builder: (context) => PostDetail(),
+              builder: (context) => Home(),
             ),
           );
           break;

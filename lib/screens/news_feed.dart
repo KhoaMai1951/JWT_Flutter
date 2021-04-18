@@ -4,6 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
+import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/models/post_detail_model.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
@@ -125,7 +126,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
         title: Text(
           'Trang chính',
         ),
-        backgroundColor: Colors.teal,
+        backgroundColor: kAppBarColor,
       ),
       body: bodyLayout(),
       bottomNavigationBar: buildBottomNavigationBar(
@@ -202,6 +203,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                                     ),
                                   ],
                                 ),
+                                SizedBox(height: 10),
                                 // NGÀY
                                 Row(
                                   children: [
@@ -415,8 +417,12 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: map<Widget>(postDetailModel.imagesForPost, (index, url) {
         return Container(
-          width: 10.0,
-          height: 10.0,
+          width: posts[indexInPostsArray].currentImageIndicator == index
+              ? 8.0
+              : 6.0,
+          height: posts[indexInPostsArray].currentImageIndicator == index
+              ? 8.0
+              : 6.0,
           margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
           decoration: BoxDecoration(
             shape: BoxShape.circle,

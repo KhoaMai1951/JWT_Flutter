@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/components/MultiSelectChip.dart';
 import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
+import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/constants/validate_name_constant.dart';
 
 import 'package:flutter_login_test_2/services/TagService.dart';
@@ -18,7 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../loading/loading_post_detail.dart';
 
 class SubmitPostScreen extends StatefulWidget {
-  static const String id = 'submit_post_screen';
+  //static const String id = 'submit_post_screen';
   @override
   _SubmitPostScreenState createState() => _SubmitPostScreenState();
 }
@@ -75,11 +76,9 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ListViews',
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
-      ),
       home: Scaffold(
         appBar: AppBar(
+          backgroundColor: kAppBarColor,
           title: Text('Đăng bài'),
           centerTitle: true,
         ),
@@ -137,8 +136,18 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
                   ),
                   // CHỌN ẢNH
                   SizedBox(
+                    width: 115,
                     child: ElevatedButton(
-                      child: Text("Chọn ảnh"),
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(kButtonColor),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.insert_photo),
+                          Text("Chọn ảnh"),
+                        ],
+                      ),
                       onPressed: loadAssets,
                     ),
                   ),
@@ -187,7 +196,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
                           ),
                         ),
                       ),
-                      color: Colors.teal,
+                      color: kButtonColor,
                       disabledColor: Colors.grey,
                       shape: new RoundedRectangleBorder(
                           borderRadius: new BorderRadius.circular(20.0)),
@@ -379,18 +388,23 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
 
   // XUẤT HÌNH TỪ LIST ASSET RA ĐỂ REVIEW
   Widget buildGridView() {
-    return GridView.count(
-      physics: NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      crossAxisCount: 3,
-      children: List.generate(images.length, (index) {
-        Asset asset = images[index];
-        return AssetThumb(
-          asset: asset,
-          width: 300,
-          height: 300,
-        );
-      }),
-    );
+    return this.images.length != 0
+        ? GridView.count(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            crossAxisCount: 3,
+            children: List.generate(images.length, (index) {
+              Asset asset = images[index];
+              return Container(
+                margin: const EdgeInsets.all(1.0),
+                child: AssetThumb(
+                  asset: asset,
+                  width: 300,
+                  height: 300,
+                ),
+              );
+            }),
+          )
+        : SizedBox();
   }
 }

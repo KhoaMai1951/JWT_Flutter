@@ -14,6 +14,7 @@ class MultiSelectChip extends StatefulWidget {
 class _MultiSelectChipState extends State<MultiSelectChip> {
   List selectedChoices = [];
   int maxCounter = 0;
+  Color _color = Colors.grey;
   // this function will build and return the choice list
   _buildChoiceList() {
     List<Widget> choices = [];
@@ -22,9 +23,12 @@ class _MultiSelectChipState extends State<MultiSelectChip> {
         padding: const EdgeInsets.all(2.0),
         child: ChoiceChip(
           label: Text(item['name']),
+          labelStyle: TextStyle(color: Colors.black),
           selected: selectedChoices.contains(item),
+          selectedColor: Colors.lightGreen,
           onSelected: (selected) {
             setState(() {
+              _color = selected ? Colors.lightGreen : Colors.grey;
               // if array of choices < 3 parameters, then allow add more or delete already existing ones
               if (selectedChoices.length < 2) {
                 selectedChoices.contains(item)

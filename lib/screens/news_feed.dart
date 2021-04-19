@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
+import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/models/post_detail_model.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
@@ -39,11 +40,13 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
       isLoading = true;
     });
     var data = {
-      'user_id': widget.user.id,
+      //'user_id': widget.user.id,
+      'user_id': UserGlobal.user['id'],
       'skip': this.skip,
       'take': take,
     };
-    var res = await Network().postData(data, '/post/get_all_posts_by_chunk');
+    var res = await Network().postData(
+        data, '/post/get_all_posts_of_following_users_by_chunk_by_user_id');
     var body = json.decode(res.body);
 
     // Nếu có kết quả trả về
@@ -264,7 +267,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                               IconButton(
                                 onPressed: () {
                                   likePost(
-                                      userId: widget.user.id,
+                                      userId: UserGlobal.user['id'],
                                       postId: posts[index].id,
                                       currentPostsIndex: index);
                                 },

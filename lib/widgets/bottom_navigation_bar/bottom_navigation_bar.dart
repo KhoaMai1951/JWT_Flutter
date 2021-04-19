@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 
 import 'package:flutter_login_test_2/constants/color_constant.dart';
+import 'package:flutter_login_test_2/screens/discover/discover.dart';
 import 'package:flutter_login_test_2/screens/home.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_news_feed.dart';
 
 import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
+import 'package:flutter_login_test_2/screens/news_feed.dart';
 import 'package:flutter_login_test_2/screens/submit_post/submit_post.dart';
 import 'package:flutter_login_test_2/screens/testing/search_bar.dart';
 
@@ -49,7 +51,7 @@ BottomNavigationBar buildBottomNavigationBar(
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => LoadingNewsFeedScreen(),
+              builder: (context) => NewsFeedScreen(),
             ),
           );
           break;
@@ -57,7 +59,7 @@ BottomNavigationBar buildBottomNavigationBar(
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => SearchBarScreen(),
+              builder: (context) => DiscoverScreen(),
             ),
           );
           break;

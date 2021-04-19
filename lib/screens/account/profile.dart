@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
+import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/helpers/account_manage.dart';
 import 'package:flutter_login_test_2/helpers/multi_image_picker_helper.dart';
 import 'package:flutter_login_test_2/models/post_detail_model.dart';
@@ -124,7 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: kAppBarColor,
-        title: Text(widget.user.username),
+        title: Text(UserGlobal.user['username']),
       ),
       body: bodyLayout(),
       bottomNavigationBar: buildBottomNavigationBar(
@@ -445,7 +446,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                           height: 100.0,
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: posts[index].thumbNailUrl != ''
+                              image: (posts[index].thumbNailUrl != null)
                                   ? NetworkImage(
                                       posts[index].thumbNailUrl,
                                     )

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/api_constant.dart';
+import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/home.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -34,6 +35,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
       // token still valid
       if (response.statusCode == 200) {
         print('token valid');
+        // init user global variable
+        UserGlobal.fetchUserFromLocal();
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) {

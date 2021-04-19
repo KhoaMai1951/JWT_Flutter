@@ -8,10 +8,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AccountManage {
   static void logout({var context}) async {
-    print('here');
     var res = await Network().getData(kApiLogout);
     var body = json.decode(res.body);
-    //print(body);
+
     if (body['success']) {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       localStorage.remove('user');

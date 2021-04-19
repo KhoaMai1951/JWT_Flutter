@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
+import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/models/post_detail_model.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
@@ -46,7 +47,7 @@ class _SearchBarScreenState extends State<SearchBarScreen> {
       'skip': this.skip,
       'take': take,
       'keyword': keyword,
-      'user_id': widget.currentUserId,
+      'user_id': UserGlobal.user['id'],
     };
     var res = await Network().postData(data, '/post/test_search');
     var body = json.decode(res.body);

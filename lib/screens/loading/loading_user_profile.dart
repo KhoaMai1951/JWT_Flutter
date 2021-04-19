@@ -33,10 +33,10 @@ class _LoadingProfileScreenState extends State<LoadingProfileScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    fetchUser();
+    fetchUserInfoFromServer();
   }
 
-  fetchUser() async {
+  fetchUserInfoFromServer() async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var user = jsonDecode(localStorage.getString('user'));
     // NẾU LÀ CHỦ TÀI KHOẢN

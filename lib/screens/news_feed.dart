@@ -10,6 +10,7 @@ import 'package:flutter_login_test_2/models/post_detail_model.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
+import 'package:flutter_login_test_2/widgets/post_mini/post_mini.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 
@@ -155,170 +156,21 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                     shrinkWrap: true,
                     children: [
                       // BÀI VIẾT MINI
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          // BÀI VIẾT
-                          Container(
-                            margin: const EdgeInsets.only(right: 2, left: 2),
-                            child: Column(
-                              children: [
-                                // THÔNG TIN USER
-                                Row(
-                                  children: [
-                                    // AVATAR
-                                    Container(
-                                      alignment: Alignment.center,
-                                      child: Container(
-                                        width: 50.0,
-                                        height: 50.0,
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(90.0),
-                                            image: DecorationImage(
-                                                image: posts[index]
-                                                            .user
-                                                            .avatarUrl !=
-                                                        ''
-                                                    ? NetworkImage(posts[index]
-                                                        .user
-                                                        .avatarUrl)
-                                                    : AssetImage(
-                                                        'images/no-image.png'),
-                                                fit: BoxFit.cover)),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 10.0,
-                                    ),
-                                    // USERNAME
-                                    InkWell(
-                                      child: Text(
-                                        posts[index].user.username,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      onTap: () {
-                                        navigateToUserProfile(
-                                            userId: posts[index].user.id);
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 10),
-                                // NGÀY
-                                Row(
-                                  children: [
-                                    // NGÀY
-                                    Text(
-                                      timeAgoSinceDate(
-                                          dateString: posts[index].createdAt),
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 5.0,
-                                ),
-                                // TIÊU ĐỀ BÀI VIẾT
-                                InkWell(
-                                  onTap: () {
-                                    navigateToPostDetail(
-                                        postId: posts[index].id);
-                                  },
-                                  child: Text(
-                                    posts[index].title,
-                                    style: TextStyle(
-                                        fontSize: 20.0,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 5.0,
-                                ),
-                                // NỘI DUNG BÀI VIẾT
-                                InkWell(
-                                  onTap: () {
-                                    navigateToPostDetail(
-                                        postId: posts[index].id);
-                                  },
-                                  child: Text(
-                                    posts[index].content,
-                                    style: TextStyle(fontSize: 17.0),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 5.0),
-                          ImageCarouselBuilder(
-                              postDetailModel: posts[index],
-                              indexInPostsArray: index),
-                          CarouselIndicator(
-                              postDetailModel: posts[index],
-                              indexInPostsArray: index),
-                          // LIKE + COMMENT ICON
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // LIKE ICON
-                              IconButton(
-                                onPressed: () {
-                                  likePost(
-                                      userId: UserGlobal.user['id'],
-                                      postId: posts[index].id,
-                                      currentPostsIndex: index);
-                                },
-                                iconSize: 30.0,
-                                icon: Icon(
-                                  Icons.favorite,
-                                  color: posts[index].isLiked == true
-                                      ? Colors.teal
-                                      : Colors.grey,
-                                ),
-                              ),
-                              // LIKE NUMBER
-                              Text(
-                                posts[index].like.toString(),
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                ),
-                              ),
-                              SizedBox(
-                                width: 40.0,
-                              ),
-                              // COMMENT
-                              InkWell(
-                                child: Row(
-                                  children: [
-                                    // COMMENT ICON
-                                    Icon(
-                                      Icons.chat,
-                                      size: 27.0,
-                                    ),
-                                    SizedBox(
-                                      width: 7.0,
-                                    ),
-                                    // COMMENT NUMBER
-                                    Text(
-                                      posts[index].commentsNumber.toString(),
-                                      style: TextStyle(
-                                        fontSize: 20.0,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                onTap: () {
-                                  navigateToPostDetail(postId: posts[index].id);
-                                },
-                              ),
-                            ],
-                          ),
-                          // BÌNH LUẬN
-                          //CommentList(),
-                        ],
+                      PostMini(
+                        currentUserId: UserGlobal.user['id'],
+                        post: posts[index],
+                        onImageChange: (int currentImageIndexIndicator) {
+                          setState(() {
+                            posts[index].currentImageIndicator =
+                                currentImageIndexIndicator;
+                          });
+                        },
+                        onLikePost: (int numberOfLikes, bool isLiked) {
+                          setState(() {
+                            posts[index].like = numberOfLikes;
+                            posts[index].isLiked = isLiked;
+                          });
+                        },
                       ),
                       SizedBox(
                         height: 20,

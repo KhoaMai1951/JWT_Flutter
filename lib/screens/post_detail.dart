@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/constants/validate_name_constant.dart';
 import 'package:flutter_login_test_2/models/comment_model.dart';
@@ -12,6 +11,7 @@ import 'package:flutter_login_test_2/models/tag_model.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
+import 'package:flutter_login_test_2/widgets/post_mini/post_mini.dart';
 import 'package:flutter_login_test_2/widgets/text_form_field/text_form_field_universal.dart';
 
 import 'package:intl/intl.dart';
@@ -91,6 +91,7 @@ class _PostDetailState extends State<PostDetail> {
           createdAt: comment['created_at'],
           postId: comment['post_id'],
           userId: comment['user_id'],
+          avatarLink: comment['avatar_link'],
         );
 
         fetchedComments.add(cmt);
@@ -126,6 +127,7 @@ class _PostDetailState extends State<PostDetail> {
             username: comments[index].username,
             createdDate: comments[index].createdAt,
             userId: comments[index].userId,
+            avatarLink: comments[index].avatarLink,
           ),
         );
       },
@@ -145,11 +147,27 @@ class _PostDetailState extends State<PostDetail> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               // BÀI VIẾT
-              Container(
+              /* Container(
                 margin: const EdgeInsets.only(right: 2, left: 2),
                 child: Column(
                   children: [
                     // THÔNG TIN USER
+                    // AVATAR
+                    Container(
+                      alignment: Alignment.center,
+                      child: Container(
+                        width: 50.0,
+                        height: 50.0,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(90.0),
+                          image: DecorationImage(
+                              image: (widget.userOfPost.avatarUrl != null)
+                                  ? NetworkImage(widget.userOfPost.avatarUrl)
+                                  : AssetImage('images/no-image.png'),
+                              fit: BoxFit.cover),
+                        ),
+                      ),
+                    ),
                     Row(
                       children: [
                         // USERNAME
@@ -240,6 +258,22 @@ class _PostDetailState extends State<PostDetail> {
                     ),
                   ),
                 ],
+              ),*/
+              PostMini(
+                currentUserId: widget.userOfPost.id,
+                post: widget.post,
+                onLikePost: (int numberOfLikes, bool isLiked) {
+                  setState(() {
+                    widget.post.like = numberOfLikes;
+                    widget.post.isLiked = isLiked;
+                  });
+                },
+                onImageChange: (int currentImageIndexIndicator) {
+                  setState(() {
+                    widget.post.currentImageIndicator =
+                        currentImageIndexIndicator;
+                  });
+                },
               ),
               // FORM NHẬP BÌNH LUẬN
               Padding(
@@ -290,7 +324,7 @@ class _PostDetailState extends State<PostDetail> {
     super.initState();
     like = widget.post.like;
     _loadUserData();
-    checkLikePost();
+
     // Hàm clear toàn bộ mảng comments + lấy cụm comments mới + lấy lấy số lượng comment
     _loadComments();
 
@@ -413,165 +447,130 @@ class _PostDetailState extends State<PostDetail> {
     print(body);
   }
 
-  // COMMENT LIST
-  CommentList() {
-    return FutureBuilder<dynamic>(
-      //future: getCommentList(), // async work
-      future: _getComments, // async work
-      // async work
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        if (!snapshot.hasData) {
-          return Text('Loading....');
-        }
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return Text('Loading....');
-          default:
-            if (snapshot.hasError)
-              return Text('Error: ${snapshot.error}');
-            else {
-              var result = snapshot.data;
-              return Container(
-                child: ListView.builder(
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: result['comments'].length,
-                  itemBuilder: (context, index) {
-                    //return Text(result['comments'][index]['content']);
-                    return Align(
-                      alignment: Alignment.topLeft,
-                      child: CommentBubble(
-                          content: result['comments'][index]['content'],
-                          username: result['comments'][index]['username'],
-                          createdDate: result['comments'][index]['created_at']),
-                    );
-                  },
-                ),
-              );
-              //return Text(result['comments'][0]['content']);
-            }
-        }
-      },
-    );
-  }
+  // // COMMENT LIST
+  // CommentList() {
+  //   return FutureBuilder<dynamic>(
+  //     future: _getComments, // async work
+  //     // async work
+  //     builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+  //       if (!snapshot.hasData) {
+  //         return Text('Loading....');
+  //       }
+  //       switch (snapshot.connectionState) {
+  //         case ConnectionState.waiting:
+  //           return Text('Loading....');
+  //         default:
+  //           if (snapshot.hasError)
+  //             return Text('Error: ${snapshot.error}');
+  //           else {
+  //             var result = snapshot.data;
+  //             return Container(
+  //               child: ListView.builder(
+  //                 physics: NeverScrollableScrollPhysics(),
+  //                 shrinkWrap: true,
+  //                 itemCount: result['comments'].length,
+  //                 itemBuilder: (context, index) {
+  //                   //return Text(result['comments'][index]['content']);
+  //                   return Align(
+  //                     alignment: Alignment.topLeft,
+  //                     child: CommentBubble(
+  //                       content: result['comments'][index]['content'],
+  //                       username: result['comments'][index]['username'],
+  //                       createdDate: result['comments'][index]['created_at'],
+  //                       avatarLink: 'sss',
+  //                     ),
+  //                   );
+  //                 },
+  //               ),
+  //             );
+  //             //return Text(result['comments'][0]['content']);
+  //           }
+  //       }
+  //     },
+  //   );
+  // }
 
   // COMMENT
-  CommentBubble(
-      {String content, String username, String createdDate, int userId}) {
-    return Padding(
-      padding: EdgeInsets.all(10.0),
-      child: Column(
-        children: <Widget>[
-          Material(
-            borderRadius: BorderRadius.circular(10.0),
-            elevation: 5.0,
-            color: Colors.white,
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // USERNAME
-                  InkWell(
-                    child: Text(
-                      username,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 19.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+
+  CommentBubble({
+    String content,
+    String username,
+    String createdDate,
+    String avatarLink,
+    int userId,
+  }) {
+    return SizedBox(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            backgroundColor: Colors.red,
+            radius: 22,
+            backgroundImage: NetworkImage(avatarLink),
+            child: CircleAvatar(
+              radius: 65,
+              backgroundColor: Colors.transparent,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Column(
+              children: <Widget>[
+                Material(
+                  borderRadius: BorderRadius.circular(10.0),
+                  elevation: 5.0,
+                  color: Colors.white,
+                  child: Padding(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // USERNAME
+                        InkWell(
+                          child: Text(
+                            username,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 19.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          onTap: () {
+                            navigateToUserProfile(userId: userId);
+                          },
+                        ),
+                        SizedBox(height: 5.0),
+                        // CONTENT
+                        Text(
+                          content,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 15.0,
+                          ),
+                        ),
+                        SizedBox(height: 5.0),
+                        const Divider(
+                          color: Colors.grey,
+                        ),
+                        // TIME AGO
+                        Text(
+                          timeAgoSinceDate(dateString: createdDate),
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                    onTap: () {
-                      navigateToUserProfile(userId: userId);
-                    },
                   ),
-                  SizedBox(height: 5.0),
-                  // CONTENT
-                  Text(
-                    content,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 15.0,
-                    ),
-                  ),
-                  SizedBox(height: 5.0),
-                  const Divider(
-                    color: Colors.grey,
-                  ),
-                  // TIME AGO
-                  Text(
-                    timeAgoSinceDate(dateString: createdDate),
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
       ),
-    );
-  }
-
-  // IMAGE CAROUSEL
-  ImageCarouselBuilder() {
-    return Row(
-      children: [
-        Expanded(
-          child: CarouselSlider(
-            options: CarouselOptions(
-              height: 300,
-              //aspectRatio: 4 / 3,
-              viewportFraction: 1,
-              initialPage: 0,
-              enableInfiniteScroll: true,
-              reverse: false,
-              autoPlayInterval: Duration(seconds: 3),
-              autoPlayAnimationDuration: Duration(milliseconds: 800),
-              autoPlayCurve: Curves.fastOutSlowIn,
-              enlargeCenterPage: true,
-              onPageChanged: (index, reason) {
-                setState(() {
-                  _currentImageIndicator = index;
-                });
-              },
-              scrollDirection: Axis.horizontal,
-            ),
-            items: widget.post.imagesForPost.map((i) {
-              return Builder(
-                builder: (BuildContext context) {
-                  return Container(
-                    child: Center(
-                      child: Image.network(i, fit: BoxFit.cover, width: 1000),
-                    ),
-                  );
-                },
-              );
-            }).toList(),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // CAROUSEL INDICATOR
-  CarouselIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: map<Widget>(widget.post.imagesForPost, (index, url) {
-        return Container(
-          width: 10.0,
-          height: 10.0,
-          margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: _currentImageIndicator == index ? Colors.green : Colors.grey,
-          ),
-        );
-      }),
     );
   }
 
@@ -582,27 +581,6 @@ class _PostDetailState extends State<PostDetail> {
       result.add(handler(i, list[i]));
     }
     return result;
-  }
-
-  // CHECK LIKE FUNCTION
-  Future<void> checkLikePost() async {
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
-    var user = jsonDecode(localStorage.getString('user'));
-    var res = await Network().getData('/post/check_like_post?post_id=' +
-        widget.post.id.toString() +
-        '&user_id=' +
-        user['id'].toString());
-
-    var body = json.decode(res.body);
-    if (body['result'] == false) {
-      setState(() {
-        isLiked = false;
-      });
-    } else {
-      setState(() {
-        isLiked = true;
-      });
-    }
   }
 
   // LIKE FUNCTION
@@ -642,7 +620,7 @@ class _PostDetailState extends State<PostDetail> {
     return body;
   }
 
-  // GET COMMENTS LIST
+  // GET NUMBER OF COMMENTS
   Future<int> getNumberOfComment() async {
     var res = await Network().getData(
         '/comment/get_number_of_comments_by_post_id?post_id=' +

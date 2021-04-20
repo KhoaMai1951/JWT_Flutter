@@ -11,8 +11,10 @@ import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
 class PostMini extends StatefulWidget {
-  PostMini({this.onImageChange, this.onLikePost, this.post});
+  PostMini(
+      {this.onImageChange, this.onLikePost, this.post, this.currentUserId});
   PostDetailModel post;
+  int currentUserId;
   final Function(int) onImageChange;
   final Function(int numberOfLikes, bool liked) onLikePost;
   @override
@@ -31,52 +33,86 @@ class _PostMiniState extends State<PostMini> {
           margin: const EdgeInsets.only(right: 2, left: 2),
           child: Column(
             children: [
+              // THÔNG TIN USER + MENU
               Container(
-                child: Column(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // THÔNG TIN USER
-                    Row(
+                    Column(
                       children: [
-                        // AVATAR
-                        Container(
-                          alignment: Alignment.center,
-                          child: Container(
-                            width: 50.0,
-                            height: 50.0,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(90.0),
-                                image: DecorationImage(
-                                    image: widget.post.user.avatarUrl != ''
-                                        ? NetworkImage(
-                                            widget.post.user.avatarUrl)
-                                        : AssetImage('images/no-image.png'),
-                                    fit: BoxFit.cover)),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10.0,
-                        ),
-                        // USERNAME
-                        InkWell(
-                          child: Text(
-                            widget.post.user.username,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          onTap: () {
-                            navigateToUserProfile(userId: widget.post.user.id);
-                          },
+                        // THÔNG TIN USER
+                        Row(
+                          children: [
+                            // AVATAR
+                            InkWell(
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: Container(
+                                  width: 50.0,
+                                  height: 50.0,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(90.0),
+                                      image: DecorationImage(
+                                          image: (widget.post.user.avatarUrl !=
+                                                  '')
+                                              ? NetworkImage(
+                                                  widget.post.user.avatarUrl)
+                                              : AssetImage(
+                                                  'images/no-avatar.png'),
+                                          fit: BoxFit.cover)),
+                                ),
+                              ),
+                              onTap: () {
+                                navigateToUserProfile(
+                                    userId: widget.post.user.id);
+                              },
+                            ),
+                            SizedBox(
+                              width: 10.0,
+                            ),
+                            // USERNAME + NGÀY
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // USERNAME
+                                InkWell(
+                                  child: Text(
+                                    widget.post.user.username,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15),
+                                  ),
+                                  onTap: () {
+                                    navigateToUserProfile(
+                                        userId: widget.post.user.id);
+                                  },
+                                ),
+                                SizedBox(
+                                  height: 5.0,
+                                ),
+                                // NGÀY
+                                Text(
+                                  timeAgoSinceDate(
+                                      dateString: widget.post.createdAt),
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 12.5),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    // NGÀY
-                    Row(
-                      children: [
-                        // NGÀY
-                        Text(
-                          timeAgoSinceDate(dateString: widget.post.createdAt),
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                    // MENU
+                    GestureDetector(
+                      onTapDown: (TapDownDetails details) {
+                        var selected = _showPopupMenu(
+                            details.globalPosition, widget.post.user.id);
+                        print(selected);
+                      },
+                      child: Icon(Icons.more_vert),
                     ),
                   ],
                 ),
@@ -169,6 +205,7 @@ class _PostMiniState extends State<PostMini> {
             ),
           ],
         ),
+
         // BÌNH LUẬN
         //CommentList(),
       ],
@@ -319,6 +356,51 @@ class _PostMiniState extends State<PostMini> {
           id: postId,
         ),
       ),
+    );
+  }
+
+  //POPUP MENU
+  _showPopupMenu(Offset offset, int postUserId) async {
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      context: context,
+      builder: (context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.2,
+          decoration: new BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: new BorderRadius.only(
+              topLeft: const Radius.circular(25.0),
+              topRight: const Radius.circular(25.0),
+            ),
+          ),
+          child: ListView(
+            children: [
+              // EDIT INFO BUTTON
+              (widget.currentUserId == widget.post.user.id)
+                  ? Ink(
+                      color: Colors.white,
+                      child: ListTile(
+                        leading: Icon(Icons.edit),
+                        title: Text('Chỉnh sửa bài viết'),
+                        onTap: () {},
+                      ),
+                    )
+                  : SizedBox(),
+              // EDIT INFO BUTTON
+              Ink(
+                color: Colors.white,
+                child: ListTile(
+                  leading: Icon(Icons.bookmarks),
+                  title: Text('Lưu bài viết'),
+                  onTap: () {},
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

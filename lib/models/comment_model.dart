@@ -5,12 +5,15 @@ class CommentModel {
   int id;
   String createdAt;
   String username;
+  String avatarLink;
 
-  CommentModel(
-      {this.createdAt,
-      this.id,
-      this.username,
-      this.content,
-      this.userId,
-      this.postId});
+  CommentModel({
+    this.createdAt,
+    this.id,
+    this.username,
+    this.content,
+    this.userId,
+    this.postId,
+    this.avatarLink,
+  });
 }

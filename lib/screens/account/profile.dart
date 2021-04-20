@@ -12,6 +12,7 @@ import 'package:flutter_login_test_2/models/post_detail_model.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/account/avatar_preview.dart';
+import 'package:flutter_login_test_2/screens/account/change_password.dart';
 import 'package:flutter_login_test_2/screens/account/profile_edit.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
@@ -94,7 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
 
     // check follow
     checkFollow();
@@ -162,30 +163,37 @@ class _ProfileScreenState extends State<ProfileScreen>
                               alignment: Alignment.center,
                               child: InkWell(
                                 onTap: () {
-                                  getAvatar();
+                                  // thay avatar
+                                  widget.currentUserId == widget.user.id
+                                      ? getAvatar()
+                                      : null;
                                 },
                                 child: Container(
-                                  child: Align(
-                                    alignment: Alignment.bottomRight,
-                                    child: Container(
-                                      width: 20.0,
-                                      height: 20.0,
-                                      decoration: BoxDecoration(
-                                        color: Color(0xFF294e21),
-                                        borderRadius:
-                                            BorderRadius.circular(100),
-                                      ),
-                                      child: Icon(
-                                        Icons.edit,
-                                        color: Colors.white,
-                                        size: 15.0,
-                                      ),
-                                    ),
-                                  ),
+                                  // NÚT ĐỔI AVATAR
+                                  child: widget.currentUserId == widget.user.id
+                                      ? Align(
+                                          alignment: Alignment.bottomRight,
+                                          child: Container(
+                                            width: 20.0,
+                                            height: 20.0,
+                                            decoration: BoxDecoration(
+                                              color: Color(0xFF294e21),
+                                              borderRadius:
+                                                  BorderRadius.circular(100),
+                                            ),
+                                            child: Icon(
+                                              Icons.edit,
+                                              color: Colors.white,
+                                              size: 15.0,
+                                            ),
+                                          ),
+                                        )
+                                      : SizedBox(),
                                   height:
                                       MediaQuery.of(context).size.width - 220,
                                   width:
                                       MediaQuery.of(context).size.width - 220,
+                                  // AVATAR
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(90.0),
                                       image: DecorationImage(
@@ -193,7 +201,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                               ? NetworkImage(
                                                   widget.user.avatarUrl)
                                               : AssetImage(
-                                                  'images/no-image.png'),
+                                                  'images/no-avatar.png'),
                                           fit: BoxFit.cover)),
                                 ),
                               ),
@@ -311,11 +319,20 @@ class _ProfileScreenState extends State<ProfileScreen>
                 controller: _tabController,
                 labelColor: Colors.teal,
                 isScrollable: true,
+                indicator: UnderlineTabIndicator(
+                  borderSide: BorderSide(width: 5.0),
+                  insets: EdgeInsets.symmetric(horizontal: 16.0),
+                ),
                 tabs: [
-                  Tab(text: 'Danh sách \nbài viết'),
-                  Tab(text: 'Tab 332'),
-                  Tab(text: 'Tab 3'),
-                  Tab(text: 'Tab 4'),
+                  Container(
+                    margin: const EdgeInsets.all(10.0),
+                    child: Tab(
+                      text: 'Danh sách \nbài viết',
+                    ),
+                  ),
+                  Tab(
+                    text: 'Bài viết \nđã lưu',
+                  ),
                 ],
               ),
             ),
@@ -329,24 +346,9 @@ class _ProfileScreenState extends State<ProfileScreen>
             infiniteListView(),
             Container(
               child: Center(
-                child: Text('Display Tab 3',
+                child: Text('Display Tab 2',
                     style:
                         TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              ),
-            ),
-            Container(
-              child: Center(
-                child: Text('Display Tab 3',
-                    style:
-                        TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              ),
-            ),
-            Container(
-              child: Center(
-                child: Text(
-                  'Display Tab 4',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
               ),
             ),
           ],
@@ -391,6 +393,22 @@ class _ProfileScreenState extends State<ProfileScreen>
                               builder: (context) => ProfileEditScreen(
                                 userModel: widget.user,
                               ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    // CHANGE PASSWORD
+                    Ink(
+                      color: Colors.white,
+                      child: ListTile(
+                        leading: Icon(Icons.lock),
+                        title: Text('Thay đổi mật khẩu'),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChangePasswordScreen(),
                             ),
                           );
                         },

@@ -2,8 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_login_test_2/constants/api_constant.dart';
+
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
+import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
@@ -27,7 +28,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: Colors.teal,
+        backgroundColor: kBottomBarColor,
         title: Text('Chỉnh sửa thông tin'),
       ),
       body: bodyLayout(),
@@ -131,11 +132,14 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               ),
               // BUTTON
               ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(kButtonColor),
+                ),
                 onPressed: () {
                   // Validate returns true if the form is valid, or false otherwise.
                   if (_formKey.currentState.validate() == true) {
-                    // If the form is valid, display a snackbar. In the real world,
-                    // you'd often call a server or save the information in a database.
+                    // If the form is valid, display a snackbar.
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Đang xử lý'),

@@ -4,41 +4,52 @@ import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/screens/discover/discover.dart';
 import 'package:flutter_login_test_2/screens/home.dart';
-import 'package:flutter_login_test_2/screens/loading/loading_news_feed.dart';
 
 import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
 import 'package:flutter_login_test_2/screens/news_feed.dart';
 import 'package:flutter_login_test_2/screens/submit_post/submit_post.dart';
-import 'package:flutter_login_test_2/screens/testing/search_bar.dart';
 
 BottomNavigationBar buildBottomNavigationBar(
     {int index, BuildContext context}) {
   return BottomNavigationBar(
+    showSelectedLabels: false, // <-- HERE
+    showUnselectedLabels: false, // <-- AND HERE
     type: BottomNavigationBarType.fixed,
     backgroundColor: kBottomBarColor,
     items: const <BottomNavigationBarItem>[
       BottomNavigationBarItem(
         icon: Icon(
           Icons.people,
+          size: 30,
         ),
-        label: 'Trang chính',
+        label: ' ',
       ),
       BottomNavigationBarItem(
         icon: Icon(
           Icons.public,
+          size: 30,
         ),
         label: 'Khám phá',
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.add_circle_outline),
+        icon: Icon(
+          Icons.add_circle_outline,
+          size: 30,
+        ),
         label: 'Đăng bài',
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.android_rounded),
+        icon: Icon(
+          Icons.android_rounded,
+          size: 30,
+        ),
         label: 'Trang test',
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.person_pin),
+        icon: Icon(
+          Icons.person_pin,
+          size: 30,
+        ),
         label: 'Cá nhân',
       ),
     ],

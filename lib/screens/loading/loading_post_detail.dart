@@ -48,6 +48,14 @@ class _LoadingPostDetailScreenState extends State<LoadingPostDetailScreen> {
       TagModel tagModel = new TagModel(id: tag['id'], name: tag['name']);
       tags.add(tagModel);
     }
+    // user model
+    int userId = body['user']['id'];
+    String username = body['user']['username'];
+    String avatarUrl = body['post']['user']['avatar_url'];
+
+    UserModel user =
+        new UserModel(id: userId, username: username, avatarUrl: avatarUrl);
+
     // post model
     int id = body['post']['id'];
     String title = body['post']['title'];
@@ -56,25 +64,26 @@ class _LoadingPostDetailScreenState extends State<LoadingPostDetailScreen> {
     int commentsNumber = body['comments_number'];
     List<String> imagesForPost = [];
     String createdAt = body['post']['created_at'];
+    bool isLiked = body['post']['is_liked'];
+
     for (var image in body['images_for_post']) {
       imagesForPost.add(image['dynamic_url']);
     }
 
     PostDetailModel postDetail = new PostDetailModel(
-        id: id,
-        like: like,
-        commentsNumber: commentsNumber,
-        title: title,
-        content: content,
-        imagesForPost: imagesForPost,
-        tags: tags,
-        createdAt: createdAt);
+      id: id,
+      like: like,
+      commentsNumber: commentsNumber,
+      title: title,
+      content: content,
+      imagesForPost: imagesForPost,
+      tags: tags,
+      createdAt: createdAt,
+      isLiked: isLiked,
+      currentImageIndicator: 0,
+      user: user,
+    );
 
-    // user model
-    int userId = body['user']['id'];
-    String username = body['user']['username'];
-
-    UserModel user = new UserModel(id: userId, username: username);
     // pop trang loading ra khỏi stack
     Navigator.pop(context);
     // push vào stack trang post detail

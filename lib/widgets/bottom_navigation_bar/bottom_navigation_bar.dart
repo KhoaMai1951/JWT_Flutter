@@ -20,14 +20,14 @@ BottomNavigationBar buildBottomNavigationBar(
       BottomNavigationBarItem(
         icon: Icon(
           Icons.people,
-          size: 30,
+          size: 25,
         ),
         label: ' ',
       ),
       BottomNavigationBarItem(
         icon: Icon(
           Icons.public,
-          size: 30,
+          size: 25,
         ),
         label: 'Khám phá',
       ),
@@ -41,14 +41,14 @@ BottomNavigationBar buildBottomNavigationBar(
       BottomNavigationBarItem(
         icon: Icon(
           Icons.android_rounded,
-          size: 30,
+          size: 25,
         ),
         label: 'Trang test',
       ),
       BottomNavigationBarItem(
         icon: Icon(
           Icons.person_pin,
-          size: 30,
+          size: 25,
         ),
         label: 'Cá nhân',
       ),

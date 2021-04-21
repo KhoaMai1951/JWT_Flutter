@@ -24,6 +24,14 @@ class PostMini extends StatefulWidget {
 }
 
 class _PostMiniState extends State<PostMini> {
+  bool savedPost;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    checkSavedPost();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -110,7 +118,10 @@ class _PostMiniState extends State<PostMini> {
                     // MENU
                     InkWell(
                       child: Icon(Icons.more_vert),
-                      onTap: () {
+                      onTap: () async {
+                        //check saved post or not
+                        checkSavedPost();
+                        // show popup menu
                         _showPopupMenu(widget.post.user.id);
                       },
                     ),
@@ -327,8 +338,6 @@ class _PostMiniState extends State<PostMini> {
 
     // handle number of likes + like/unlike condition
     setState(() {
-      // widget.post.isLiked = body['liked'];
-      // widget.post.like = body['likes']['like'];
       widget.onLikePost(body['likes']['like'], body['liked']);
     });
   }
@@ -389,23 +398,46 @@ class _PostMiniState extends State<PostMini> {
                     )
                   : SizedBox(),
               // SAVE POST
-              Ink(
-                color: Colors.white,
-                child: ListTile(
-                  leading: Icon(Icons.bookmarks),
-                  title: Text('Lưu bài viết'),
-                  onTap: () async {
-                    var result = await savePost();
-                    if (result == true) {
-                      // If save post success, show snackbar
-                      buildSnackBar(
-                          context: context, message: 'Đã lưu bài viết');
-                      // Close popupmenu
-                      Navigator.pop(context);
-                    }
-                  },
-                ),
-              ),
+              savedPost == true
+                  ? SizedBox()
+                  : Ink(
+                      color: Colors.white,
+                      child: ListTile(
+                        leading: Icon(Icons.bookmarks),
+                        title: Text('Lưu bài viết'),
+                        onTap: () async {
+                          var result = await savePost();
+                          if (result == true) {
+                            // If save post success, show snackbar
+                            buildSnackBar(
+                                context: context, message: 'Đã lưu bài viết');
+                            // Close popupmenu
+                            Navigator.pop(context);
+                          }
+                        },
+                      ),
+                    ),
+              // UNSAVE POST
+              savedPost == false
+                  ? SizedBox()
+                  : Ink(
+                      color: Colors.white,
+                      child: ListTile(
+                        leading: Icon(Icons.bookmarks),
+                        title: Text('Bỏ lưu bài viết'),
+                        onTap: () async {
+                          var result = await unsavePost();
+                          if (result == true) {
+                            // If save post success, show snackbar
+                            buildSnackBar(
+                                context: context,
+                                message: 'Đã bỏ lưu bài viết');
+                            // Close popup menu
+                            Navigator.pop(context);
+                          }
+                        },
+                      ),
+                    ),
             ],
           ),
         );
@@ -413,6 +445,7 @@ class _PostMiniState extends State<PostMini> {
     );
   }
 
+  // LƯU BÀI VIẾT
   Future<bool> savePost() async {
     var data = {
       'user_id': UserGlobal.user['id'],
@@ -420,8 +453,48 @@ class _PostMiniState extends State<PostMini> {
     };
     var response = await Network().postData(data, '/post/save_post');
     if (response.statusCode == 200) {
+      setState(() {
+        savedPost = true;
+      });
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // BỎ LƯU BÀI VIẾT
+  Future<bool> unsavePost() async {
+    var data = {
+      'user_id': UserGlobal.user['id'],
+      'post_id': widget.post.id,
+    };
+    var response = await Network().postData(data, '/post/unsave_post');
+    if (response.statusCode == 200) {
+      setState(() {
+        savedPost = false;
+      });
       return true;
     } else
       return false;
+  }
+
+  // KIỂM TRA ĐÃ LƯU BÀI VIẾT HAY CHƯA
+  checkSavedPost() async {
+    var data = {
+      'user_id': UserGlobal.user['id'],
+      'post_id': widget.post.id,
+    };
+    var res = await Network().postData(data, '/post/check_save_post');
+    var body = json.decode(res.body);
+
+    if (body['saved_post']) {
+      setState(() {
+        savedPost = true;
+      });
+    } else {
+      setState(() {
+        savedPost = false;
+      });
+    }
   }
 }

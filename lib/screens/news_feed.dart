@@ -41,7 +41,6 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
       isLoading = true;
     });
     var data = {
-      //'user_id': widget.user.id,
       'user_id': UserGlobal.user['id'],
       'skip': this.skip,
       'take': take,

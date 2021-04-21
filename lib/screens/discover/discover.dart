@@ -155,6 +155,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     children: [
                       // BÀI VIẾT MINI
                       PostMini(
+                        currentUserId: UserGlobal.user['id'],
                         post: posts[index],
                         onImageChange: (int currentImageIndexIndicator) {
                           setState(() {

@@ -38,7 +38,8 @@ class _ProfileScreenState extends State<ProfileScreen>
   //bool noMoreDataToFetch = false;
   bool isLoading = false;
   bool stillSendApi = true;
-  List<PostDetailModel> posts = [];
+  List<PostDetailModel> postsOfUser = []; //post của user
+  List<PostDetailModel> savedPostsOfUser = []; //post được user save
   //theo dõi user
   bool isFollow;
   //image picker
@@ -64,7 +65,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     if (body['posts'].isEmpty == false) {
       List<PostDetailModel> fetchedPosts = [];
       for (var post in body['posts']) {
-        PostDetailModel cmt = new PostDetailModel(
+        PostDetailModel postDetailModel = new PostDetailModel(
             id: post['id'],
             createdAt: post['created_at'],
             thumbNailUrl: post['image_url'],
@@ -73,11 +74,11 @@ class _ProfileScreenState extends State<ProfileScreen>
             like: post['like'],
             commentsNumber: post['comments_number']);
 
-        fetchedPosts.add(cmt);
+        fetchedPosts.add(postDetailModel);
       }
       setState(() {
         this.skip += take;
-        this.posts.addAll(fetchedPosts);
+        this.postsOfUser.addAll(fetchedPosts);
         isLoading = false;
         print(skip);
       });
@@ -101,16 +102,66 @@ class _ProfileScreenState extends State<ProfileScreen>
     checkFollow();
     // get post
     fetchPosts();
+    fetchSavedPosts();
+
     _scrollController.addListener(() {
+      //nếu cuộn cuối màn hình
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
+        //nếu không còn đang load api
         if (isLoading == false) {
+          //nếu còn data để gọi
           if (stillSendApi == true) {
             fetchPosts();
           }
         }
       }
     });
+  }
+
+  // get saved posts
+  fetchSavedPosts() async {
+    setState(() {
+      isLoading = true;
+    });
+    var data = {
+      'user_id': widget.user.id,
+      'skip': this.skip,
+      'take': take,
+    };
+    var res = await Network()
+        .postData(data, '/post/get_all_saved_posts_by_chunk_by_user_id');
+    var body = json.decode(res.body);
+
+    // Nếu có kết quả trả về
+    if (body['posts'].isEmpty == false) {
+      List<PostDetailModel> fetchedPosts = [];
+      for (var post in body['posts']) {
+        PostDetailModel postDetailModel = new PostDetailModel(
+            id: post['id'],
+            createdAt: post['created_at'],
+            thumbNailUrl: post['image_url'],
+            title: post['title'],
+            content: post['short_content'],
+            like: post['like'],
+            commentsNumber: post['comments_number']);
+
+        fetchedPosts.add(postDetailModel);
+      }
+      setState(() {
+        this.skip += take;
+        this.savedPostsOfUser.addAll(fetchedPosts);
+        isLoading = false;
+        print(skip);
+      });
+    }
+    // Nếu kết trả không còn
+    else {
+      setState(() {
+        isLoading = false;
+        stillSendApi = false;
+      });
+    }
   }
 
   // 3. DISPOSE CONTROLLER
@@ -168,6 +219,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                       ? getAvatar()
                                       : null;
                                 },
+                                // AVATAR + NÚT ĐỔI AVATAR
                                 child: Container(
                                   // NÚT ĐỔI AVATAR
                                   child: widget.currentUserId == widget.user.id
@@ -313,14 +365,41 @@ class _ProfileScreenState extends State<ProfileScreen>
             ),
           ),
           // NAVIGATE TAB
-          SliverToBoxAdapter(
-            child: Center(
+          //SliverToBoxAdapter(
+          SliverAppBar(
+            backgroundColor: Colors.white,
+            automaticallyImplyLeading: false,
+            expandedHeight: 80,
+            floating:
+                true, // <--- this is required if you want the appbar to come back into view when you scroll up
+            // pinned: true, // <--- this will make the appbar disappear on scrolling down
+            snap: true,
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(10),
+              child: TabBar(
+                controller: _tabController,
+                labelColor: Colors.teal,
+                isScrollable: false,
+                tabs: [
+                  Container(
+                    margin: const EdgeInsets.all(5.0),
+                    child: Tab(
+                      text: 'Danh sách \nbài viết',
+                    ),
+                  ),
+                  Tab(
+                    text: 'Bài viết \nđã lưu',
+                  ),
+                ],
+              ),
+            ),
+            /* child: Center(
               child: TabBar(
                 controller: _tabController,
                 labelColor: Colors.teal,
                 isScrollable: true,
                 indicator: UnderlineTabIndicator(
-                  borderSide: BorderSide(width: 5.0),
+                  borderSide: BorderSide(width: 3.0),
                   insets: EdgeInsets.symmetric(horizontal: 16.0),
                 ),
                 tabs: [
@@ -335,7 +414,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                   ),
                 ],
               ),
-            ),
+            ),*/
           ),
         ];
       },
@@ -343,14 +422,8 @@ class _ProfileScreenState extends State<ProfileScreen>
         child: TabBarView(
           controller: _tabController,
           children: [
-            infiniteListView(),
-            Container(
-              child: Center(
-                child: Text('Display Tab 2',
-                    style:
-                        TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              ),
-            ),
+            infiniteUserPostsListView(), //LIST DANH SÁCH BÀI POST CỦA USER
+            infiniteSavedPostsListView(), //LIST DANH SÁCH BÀI ĐƯỢC SAVE POST CỦA USER
           ],
         ),
       ),
@@ -437,10 +510,10 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   //LIST DANH SÁCH BÀI POST CỦA USER
-  infiniteListView() {
+  infiniteUserPostsListView() {
     return ListView.builder(
       //controller: this._scrollController,
-      itemCount: posts.length,
+      itemCount: postsOfUser.length,
       physics: const NeverScrollableScrollPhysics(), // new
       itemBuilder: (context, index) {
         return Column(
@@ -464,9 +537,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                           height: 100.0,
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: (posts[index].thumbNailUrl != null)
+                              image: (postsOfUser[index].thumbNailUrl != null)
                                   ? NetworkImage(
-                                      posts[index].thumbNailUrl,
+                                      postsOfUser[index].thumbNailUrl,
                                     )
                                   : AssetImage('images/no-image.png'),
                               fit: BoxFit.cover,
@@ -482,10 +555,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                               // TITLE + CONTENT
                               ListTile(
                                 title: Text(
-                                  posts[index].title,
+                                  postsOfUser[index].title,
                                   style: TextStyle(fontSize: 20),
                                 ),
-                                subtitle: Text(posts[index].content),
+                                subtitle: Text(postsOfUser[index].content),
                               ),
                               // LIKE + COMMENT
                               Row(
@@ -499,7 +572,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                   ),
                                   SizedBox(width: 3),
                                   Text(
-                                    posts[index].like.toString(),
+                                    postsOfUser[index].like.toString(),
                                     style: TextStyle(fontSize: 17),
                                   ),
                                   SizedBox(width: 20),
@@ -511,7 +584,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                                   ),
                                   SizedBox(width: 3),
                                   Text(
-                                    posts[index].commentsNumber.toString(),
+                                    postsOfUser[index]
+                                        .commentsNumber
+                                        .toString(),
                                     style: TextStyle(fontSize: 17),
                                   ),
                                 ],
@@ -526,7 +601,120 @@ class _ProfileScreenState extends State<ProfileScreen>
                         context,
                         MaterialPageRoute(
                           builder: (context) => LoadingPostDetailScreen(
-                            id: posts[index].id,
+                            id: postsOfUser[index].id,
+                          ),
+                          //builder: (context) => PostDetail(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+              ],
+            ),
+            //isLoading == true ? Text('loading...') : SizedBox(),
+          ],
+        );
+      },
+    );
+  }
+
+  //LIST DANH SÁCH BÀI POST ĐƯỢC SAVE CỦA USER
+  infiniteSavedPostsListView() {
+    return ListView.builder(
+      //controller: this._scrollController,
+      itemCount: savedPostsOfUser.length,
+      physics: const NeverScrollableScrollPhysics(), // new
+      itemBuilder: (context, index) {
+        return Column(
+          children: [
+            ListView(
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              children: [
+                // BÀI VIẾT MINI
+                Card(
+                  margin: EdgeInsets.all(1),
+                  color: Colors.white,
+                  shadowColor: Colors.blueGrey,
+                  elevation: 1,
+                  child: InkWell(
+                    child: Row(
+                      children: [
+                        // THUMBNAIL
+                        Container(
+                          width: 100.0,
+                          height: 100.0,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image:
+                                  (savedPostsOfUser[index].thumbNailUrl != null)
+                                      ? NetworkImage(
+                                          savedPostsOfUser[index].thumbNailUrl,
+                                        )
+                                      : AssetImage('images/no-image.png'),
+                              fit: BoxFit.cover,
+                              alignment: AlignmentDirectional.center,
+                            ),
+                          ),
+                        ),
+                        // CONTENT
+                        Expanded(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // TITLE + CONTENT
+                              ListTile(
+                                title: Text(
+                                  savedPostsOfUser[index].title,
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                                subtitle: Text(savedPostsOfUser[index].content),
+                              ),
+                              // LIKE + COMMENT
+                              Row(
+                                children: [
+                                  SizedBox(width: 15),
+                                  // LIKE
+                                  Icon(
+                                    Icons.thumb_up,
+                                    color: Colors.grey,
+                                    size: 17,
+                                  ),
+                                  SizedBox(width: 3),
+                                  Text(
+                                    savedPostsOfUser[index].like.toString(),
+                                    style: TextStyle(fontSize: 17),
+                                  ),
+                                  SizedBox(width: 20),
+                                  // COMMENT
+                                  Icon(
+                                    Icons.message,
+                                    color: Colors.grey,
+                                    size: 17,
+                                  ),
+                                  SizedBox(width: 3),
+                                  Text(
+                                    savedPostsOfUser[index]
+                                        .commentsNumber
+                                        .toString(),
+                                    style: TextStyle(fontSize: 17),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LoadingPostDetailScreen(
+                            id: savedPostsOfUser[index].id,
                           ),
                           //builder: (context) => PostDetail(),
                         ),

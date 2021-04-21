@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/models/post_detail_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_post_detail.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
+import 'package:flutter_login_test_2/widgets/snack_bar/snack_bar.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
@@ -106,13 +108,11 @@ class _PostMiniState extends State<PostMini> {
                       ],
                     ),
                     // MENU
-                    GestureDetector(
-                      onTapDown: (TapDownDetails details) {
-                        var selected = _showPopupMenu(
-                            details.globalPosition, widget.post.user.id);
-                        print(selected);
-                      },
+                    InkWell(
                       child: Icon(Icons.more_vert),
+                      onTap: () {
+                        _showPopupMenu(widget.post.user.id);
+                      },
                     ),
                   ],
                 ),
@@ -360,7 +360,7 @@ class _PostMiniState extends State<PostMini> {
   }
 
   //POPUP MENU
-  _showPopupMenu(Offset offset, int postUserId) async {
+  _showPopupMenu(int postUserId) async {
     showModalBottomSheet(
       backgroundColor: Colors.white,
       isScrollControlled: true,
@@ -377,7 +377,7 @@ class _PostMiniState extends State<PostMini> {
           ),
           child: ListView(
             children: [
-              // EDIT INFO BUTTON
+              // EDIT POST
               (widget.currentUserId == widget.post.user.id)
                   ? Ink(
                       color: Colors.white,
@@ -388,13 +388,22 @@ class _PostMiniState extends State<PostMini> {
                       ),
                     )
                   : SizedBox(),
-              // EDIT INFO BUTTON
+              // SAVE POST
               Ink(
                 color: Colors.white,
                 child: ListTile(
                   leading: Icon(Icons.bookmarks),
                   title: Text('Lưu bài viết'),
-                  onTap: () {},
+                  onTap: () async {
+                    var result = await savePost();
+                    if (result == true) {
+                      // If save post success, show snackbar
+                      buildSnackBar(
+                          context: context, message: 'Đã lưu bài viết');
+                      // Close popupmenu
+                      Navigator.pop(context);
+                    }
+                  },
                 ),
               ),
             ],
@@ -402,5 +411,17 @@ class _PostMiniState extends State<PostMini> {
         );
       },
     );
+  }
+
+  Future<bool> savePost() async {
+    var data = {
+      'user_id': UserGlobal.user['id'],
+      'post_id': widget.post.id,
+    };
+    var response = await Network().postData(data, '/post/save_post');
+    if (response.statusCode == 200) {
+      return true;
+    } else
+      return false;
   }
 }

@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/models/post_detail_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
+import 'package:flutter_login_test_2/screens/account/profile_edit.dart';
+import 'package:flutter_login_test_2/screens/edit_post/edit_post.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_post_detail.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
 import 'package:flutter_login_test_2/widgets/snack_bar/snack_bar.dart';
@@ -393,7 +395,16 @@ class _PostMiniState extends State<PostMini> {
                       child: ListTile(
                         leading: Icon(Icons.edit),
                         title: Text('Chỉnh sửa bài viết'),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditPostScreen(
+                                postId: widget.post.id,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     )
                   : SizedBox(),

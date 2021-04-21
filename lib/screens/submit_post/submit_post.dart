@@ -91,7 +91,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
 
   bodyLayout() {
     return ListView(
-      padding: EdgeInsets.all(20.0),
+      padding: EdgeInsets.all(10.0),
       children: <Widget>[
         Column(
           children: [
@@ -135,21 +135,19 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
                     height: 40.0,
                   ),
                   // CHỌN ẢNH
-                  SizedBox(
-                    width: 115,
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all<Color>(kButtonColor),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.insert_photo),
-                          Text("Chọn ảnh"),
-                        ],
-                      ),
-                      onPressed: loadAssets,
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(kButtonColor),
                     ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.insert_photo),
+                        Text("Chọn ảnh"),
+                      ],
+                    ),
+                    onPressed: loadAssets,
                   ),
                   // VÙNG REVIEW ẢNH ĐÃ CHỌN
                   buildGridView(),
@@ -190,7 +188,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
                           textDirection: TextDirection.ltr,
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 15.0,
+                            fontSize: 20.0,
                             decoration: TextDecoration.none,
                             fontWeight: FontWeight.normal,
                           ),
@@ -383,7 +381,6 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
 
     Dio dio = new Dio();
     var response = await dio.post(kApiUrl + "/post/test_dio", data: formData);
-    print(response);
   }
 
   // XUẤT HÌNH TỪ LIST ASSET RA ĐỂ REVIEW

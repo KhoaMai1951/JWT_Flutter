@@ -15,9 +15,14 @@ import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
 class PostMini extends StatefulWidget {
-  PostMini(
-      {this.onImageChange, this.onLikePost, this.post, this.currentUserId});
+  PostMini({
+    this.onImageChange,
+    this.onLikePost,
+    this.post,
+    this.currentUserId,
+  });
   PostDetailModel post;
+
   int currentUserId;
   final Function(int) onImageChange;
   final Function(int numberOfLikes, bool liked) onLikePost;
@@ -27,6 +32,8 @@ class PostMini extends StatefulWidget {
 
 class _PostMiniState extends State<PostMini> {
   bool savedPost;
+  PersistentBottomSheetController bottomSheetController;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -123,7 +130,7 @@ class _PostMiniState extends State<PostMini> {
                       onTap: () async {
                         //check saved post or not
                         checkSavedPost();
-                        // show popup menu
+                        // // show popup menu
                         _showPopupMenu(widget.post.user.id);
                       },
                     ),
@@ -378,7 +385,7 @@ class _PostMiniState extends State<PostMini> {
       context: context,
       builder: (context) {
         return Container(
-          height: MediaQuery.of(context).size.height * 0.2,
+          height: MediaQuery.of(context).size.height * 0.5,
           decoration: new BoxDecoration(
             color: Colors.transparent,
             borderRadius: new BorderRadius.only(
@@ -449,9 +456,58 @@ class _PostMiniState extends State<PostMini> {
                         },
                       ),
                     ),
+              // DELETE POST
+              (widget.currentUserId == widget.post.user.id)
+                  ? Ink(
+                      color: Colors.white,
+                      child: ListTile(
+                        leading: Icon(Icons.delete),
+                        title: Text('Xóa bài viết'),
+                        onTap: () async {
+                          //showAlertDialog(context);
+                          deletePost();
+                          // Close popupmenu
+                          Navigator.pop(context);
+                        },
+                      ),
+                    )
+                  : SizedBox(),
             ],
           ),
         );
+      },
+    );
+  }
+
+  // HỘP THOẠI XÁC NHẬN XÓA BÀI VIẾT
+  showAlertDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = FlatButton(
+        child: Text("Không"),
+        onPressed: () {
+          //Navigator.of(context).pop(); //dismiss dialog
+          Navigator.of(context, rootNavigator: true).pop('dialog');
+        });
+    Widget continueButton = FlatButton(
+      child: Text("Có"),
+      onPressed: () {},
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Xóa bài viết"),
+      content: Text("Bạn có chắc chắn muốn xóa bài viết?"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
       },
     );
   }
@@ -499,13 +555,30 @@ class _PostMiniState extends State<PostMini> {
     var body = json.decode(res.body);
 
     if (body['saved_post']) {
-      setState(() {
-        savedPost = true;
-      });
+      if (mounted) {
+        setState(() {
+          savedPost = true;
+        });
+      }
     } else {
-      setState(() {
-        savedPost = false;
-      });
+      if (mounted) {
+        setState(() {
+          savedPost = false;
+        });
+      }
+    }
+  }
+
+  // XÓA BÀI VIẾT
+  deletePost() async {
+    var data = {
+      'id': widget.post.id,
+    };
+    var res = await Network().postData(data, '/post/delete_post');
+    var body = json.decode(res.body);
+    if (res.statusCode == 200) {
+      // If save post success, show snackbar
+      buildSnackBar(context: context, message: 'Đã xóa bài viết');
     }
   }
 }

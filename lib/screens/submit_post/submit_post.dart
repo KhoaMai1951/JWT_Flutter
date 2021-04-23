@@ -224,7 +224,6 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
 
     // DIO
     List<MultipartFile> listFiles = await assetToFile() as List<MultipartFile>;
-    print(listFiles);
 
     FormData formData = new FormData.fromMap({
       "files": listFiles,

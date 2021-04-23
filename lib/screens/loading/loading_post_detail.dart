@@ -6,6 +6,7 @@ import 'package:flutter_login_test_2/models/post_detail_model.dart';
 import 'package:flutter_login_test_2/models/tag_model.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
+import 'package:flutter_login_test_2/screens/blank/no_post.dart';
 import 'package:flutter_login_test_2/screens/post_detail.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -35,28 +36,51 @@ class _LoadingPostDetailScreenState extends State<LoadingPostDetailScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getPost(searchId: widget.id);
+    handleRedirect(searchId: widget.id);
   }
 
-  getPost({int searchId}) async {
+  // HANDLE REDIRECT LOGIC
+  handleRedirect({int searchId}) async {
+    // FETCH POST
     var res = await Network().getData('/post/get_post?id=$searchId');
+    // IF STATUS 400
+    if (res.statusCode == 400) {
+      redirectNoPost();
+      return;
+    }
+    // ELSE
     var body = json.decode(res.body);
-
     // tags model
+    List<TagModel> tags = handleTagObject(body);
+    // user model
+    UserModel user = handleUserObject(body);
+    // post model
+    PostDetailModel postDetail = handlePostObject(body, tags, user);
+    // REDIRECT TO POST DETAIL
+    redirectPostDetail(userOfPost: user, postDetailModel: postDetail);
+  }
+
+  // HANDLE TAG MODEL
+  handleTagObject(var body) {
     List<TagModel> tags = [];
     for (var tag in body['tags']) {
       TagModel tagModel = new TagModel(id: tag['id'], name: tag['name']);
       tags.add(tagModel);
     }
-    // user model
+    return tags;
+  }
+
+  // HANDLE USER MODEL
+  handleUserObject(var body) {
     int userId = body['user']['id'];
     String username = body['user']['username'];
     String avatarUrl = body['post']['user']['avatar_url'];
 
-    UserModel user =
-        new UserModel(id: userId, username: username, avatarUrl: avatarUrl);
+    return new UserModel(id: userId, username: username, avatarUrl: avatarUrl);
+  }
 
-    // post model
+  // HANDLE POST MODEL
+  handlePostObject(var body, var tags, var user) {
     int id = body['post']['id'];
     String title = body['post']['title'];
     String content = body['post']['content'];
@@ -70,7 +94,7 @@ class _LoadingPostDetailScreenState extends State<LoadingPostDetailScreen> {
       imagesForPost.add(image['dynamic_url']);
     }
 
-    PostDetailModel postDetail = new PostDetailModel(
+    return new PostDetailModel(
       id: id,
       like: like,
       commentsNumber: commentsNumber,
@@ -83,7 +107,10 @@ class _LoadingPostDetailScreenState extends State<LoadingPostDetailScreen> {
       currentImageIndicator: 0,
       user: user,
     );
+  }
 
+  // REDIRECT TO POST DETAIL
+  redirectPostDetail({UserModel userOfPost, PostDetailModel postDetailModel}) {
     // pop trang loading ra khỏi stack
     Navigator.pop(context);
     // push vào stack trang post detail
@@ -91,9 +118,22 @@ class _LoadingPostDetailScreenState extends State<LoadingPostDetailScreen> {
       context,
       MaterialPageRoute(builder: (context) {
         return PostDetail(
-          userOfPost: user,
-          post: postDetail,
+          userOfPost: userOfPost,
+          post: postDetailModel,
         );
+      }),
+    );
+  }
+
+  // REDIRECT TO NO POST
+  redirectNoPost() {
+    // pop trang loading ra khỏi stack
+    Navigator.pop(context);
+    // push vào stack trang post detail
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) {
+        return NoPostScreen();
       }),
     );
   }

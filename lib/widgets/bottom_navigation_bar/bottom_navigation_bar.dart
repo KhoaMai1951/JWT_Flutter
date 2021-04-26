@@ -1,19 +1,34 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 
 import 'package:flutter_login_test_2/constants/color_constant.dart';
+import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/discover/discover.dart';
 import 'package:flutter_login_test_2/screens/home.dart';
 
 import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
 import 'package:flutter_login_test_2/screens/news_feed.dart';
+import 'package:flutter_login_test_2/screens/plant_care/plant_discover.dart';
 import 'package:flutter_login_test_2/screens/submit_post/submit_post.dart';
 
 BottomNavigationBar buildBottomNavigationBar(
     {int index, BuildContext context}) {
+  //GET AVATAR URL
+  getAvatarUrl({int userId}) async {
+    var data = {
+      'id': userId,
+    };
+
+    var res = await Network().postData(data, '/user/get_avatar_url');
+    var body = json.decode(res.body);
+    return body['avatar_link'];
+  }
+
   return BottomNavigationBar(
-    showSelectedLabels: false, // <-- HERE
-    showUnselectedLabels: false, // <-- AND HERE
+    // showSelectedLabels: false, // <-- HERE
+    // showUnselectedLabels: false, // <-- AND HERE
     type: BottomNavigationBarType.fixed,
     backgroundColor: kBottomBarColor,
     items: const <BottomNavigationBarItem>[
@@ -22,7 +37,7 @@ BottomNavigationBar buildBottomNavigationBar(
           Icons.people,
           size: 25,
         ),
-        label: ' ',
+        label: 'Trang chính',
       ),
       BottomNavigationBarItem(
         icon: Icon(
@@ -40,14 +55,14 @@ BottomNavigationBar buildBottomNavigationBar(
       ),
       BottomNavigationBarItem(
         icon: Icon(
-          Icons.android_rounded,
+          Icons.local_florist,
           size: 25,
         ),
-        label: 'Trang test',
+        label: 'Cây cảnh',
       ),
       BottomNavigationBarItem(
         icon: Icon(
-          Icons.person_pin,
+          Icons.account_box,
           size: 25,
         ),
         label: 'Cá nhân',
@@ -82,11 +97,11 @@ BottomNavigationBar buildBottomNavigationBar(
             ),
           );
           break;
-        case kBottomBarIndexTest:
+        case kBottomBarIndexPlant:
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => Home(),
+              builder: (context) => PlantDiscoverScreen(),
             ),
           );
           break;

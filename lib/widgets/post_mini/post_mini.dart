@@ -403,6 +403,7 @@ class _PostMiniState extends State<PostMini> {
                         leading: Icon(Icons.edit),
                         title: Text('Chỉnh sửa bài viết'),
                         onTap: () {
+                          Navigator.pop(context);
                           Navigator.push(
                             context,
                             MaterialPageRoute(

@@ -140,7 +140,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
         isLoading = false;
       });
     }
-    // Nếu kết trả không còn
+    // Nếu kết quả trả về không còn
     else {
       setState(() {
         stillSendApi = false;
@@ -371,14 +371,13 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                               ),
                             ),
                             onTap: () {
-                              // navigateToUserProfile(
-                              //     userId: widget.post.user.id);
+                              navigateToUserProfile(userId: users[index].id);
                             },
                           ),
                           SizedBox(
                             width: 10.0,
                           ),
-                          // USERNAME + NGÀY
+                          // USERNAME
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -391,8 +390,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                                       fontSize: 15),
                                 ),
                                 onTap: () {
-                                  // navigateToUserProfile(
-                                  //     userId: widget.post.user.id);
+                                  navigateToUserProfile(
+                                      userId: users[index].id);
                                 },
                               ),
                               SizedBox(
@@ -508,5 +507,18 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       _searchQueryController.clear();
       updateSearchQuery("");
     });
+  }
+
+  //NAVIGATE TO PROFILE SCREEN
+  navigateToUserProfile({int userId}) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        // builder: (context) => ProfileScreen(),
+        builder: (context) => LoadingProfileScreen(
+          userId: userId,
+        ),
+      ),
+    );
   }
 }

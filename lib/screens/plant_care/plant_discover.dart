@@ -6,6 +6,8 @@ import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/models/plant_detail_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
+import 'package:flutter_login_test_2/screens/loading/loading_server_plant_detail.dart';
+import 'package:flutter_login_test_2/screens/plant_care/plant_detail.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -26,7 +28,7 @@ class _PlantDiscoverScreenState extends State<PlantDiscoverScreen>
   ScrollController _scrollController = new ScrollController();
   // Biến phục vụ cho infinite scroll của cây cảnh
   int skipPlant = 0;
-  int takePlant = 6;
+  int takePlant = 10;
   bool isLoadingPlant = false;
   bool stillSendApiPlant = true;
   List<PlantDetailModel> plants = [];
@@ -94,70 +96,27 @@ class _PlantDiscoverScreenState extends State<PlantDiscoverScreen>
     // get plant
     fetchPlants();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
-        // FOR POSTS
-        if (isLoadingPlant == false) {
-          if (stillSendApiPlant == true) {
-            fetchPlants();
-          }
-        }
-      }
+      handleScrollBottom();
     });
   }
 
+  handleScrollBottom() {
+    //NẾU CHƯA CUỘN XUỐNG BOTTOM, TRẢ NULL
+    if (_scrollController.position.pixels !=
+        _scrollController.position.maxScrollExtent) return null;
+    //NẾU CÒN ĐANG LOAD PLANT, TRẢ NULL
+    if (isLoadingPlant == true) return null;
+    //NẾU VẪN CÒN DATA Ở BACKEND, GỌI DS PLANT MỚI
+    if (stillSendApiPlant == true) fetchPlants();
+  }
+
   bodyLayout() {
-    //return infinitePlantListView();
-    return testInfinitePlantView();
+    return infinitePlantListView();
   }
 
-  // LIST DS CÂY CẢNH THEO TỪ KHÓA
   infinitePlantListView() {
-    return Column(
-      children: [
-        // NEWSFEED
-        Expanded(
-          child: ListView.builder(
-            shrinkWrap: true,
-            controller: this._scrollController,
-            itemCount: plants.length,
-            physics: const AlwaysScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              return Column(
-                children: [
-                  ListView(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    children: [
-                      Text(plants[index].commonName),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Divider(
-                        thickness: 1,
-                      ),
-                    ],
-                  ),
-                  //isLoading == true ? Text('loading...') : SizedBox(),
-                ],
-              );
-            },
-          ),
-        ),
-        // SPINNING
-        isLoadingPlant == true
-            ? SpinKitRing(
-                color: Colors.teal,
-                lineWidth: 3.0,
-                size: 40.0,
-              )
-            : SizedBox(),
-      ],
-    );
-  }
-
-  testInfinitePlantView() {
     return GridView.builder(
+        controller: _scrollController,
         gridDelegate:
             SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
         physics: ScrollPhysics(),
@@ -197,7 +156,13 @@ class _PlantDiscoverScreenState extends State<PlantDiscoverScreen>
                   )
                 ]),
             onTap: () {
-              print('hee');
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      LoadingServerPlantDetailScreen(id: plants[index].id),
+                ),
+              );
             },
           );
         });
@@ -285,16 +250,12 @@ class _PlantDiscoverScreenState extends State<PlantDiscoverScreen>
   void updateSearchQuery(String newQuery) {
     setState(() {
       keyword = newQuery;
-      // // FOR POSTS
-      // posts.clear();
-      // skip = 0;
-      // // FOR USERS
-      // users.clear();
-      // skipUser = 0;
+      // FOR PLANTS
+      plants.clear();
+      skipPlant = 0;
 
       searchQuery = newQuery;
     });
-    // fetchPosts();
-    // fetchUsers();
+    fetchPlants();
   }
 }

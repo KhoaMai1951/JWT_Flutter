@@ -163,19 +163,25 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
         // FOR POSTS
-        if (isLoading == false) {
-          if (stillSendApi == true) {
-            fetchPosts();
-          }
-        }
+        handleScrollBottomForPosts();
         // FOR USERS
-        if (isLoadingUser == false) {
-          if (stillSendApiUser == true) {
-            fetchUsers();
-          }
-        }
+        handleScrollBottomForUsers();
       }
     });
+  }
+
+  handleScrollBottomForPosts() {
+    if (isLoading == true) return;
+    if (stillSendApi == true) {
+      fetchPosts();
+    }
+  }
+
+  handleScrollBottomForUsers() {
+    if (isLoadingUser == true) return;
+    if (stillSendApiUser == true) {
+      fetchUsers();
+    }
   }
 
   // 3A. DISPOSE CONTROLLER
@@ -233,28 +239,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                 ],
               ),
             ),
-            /* child: Center(
-              child: TabBar(
-                controller: _tabController,
-                labelColor: Colors.teal,
-                isScrollable: true,
-                indicator: UnderlineTabIndicator(
-                  borderSide: BorderSide(width: 3.0),
-                  insets: EdgeInsets.symmetric(horizontal: 16.0),
-                ),
-                tabs: [
-                  Container(
-                    margin: const EdgeInsets.all(10.0),
-                    child: Tab(
-                      text: 'Danh sách \nbài viết',
-                    ),
-                  ),
-                  Tab(
-                    text: 'Bài viết \nđã lưu',
-                  ),
-                ],
-              ),
-            ),*/
           ),
         ];
       },

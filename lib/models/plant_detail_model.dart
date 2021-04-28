@@ -7,11 +7,11 @@ class PlantDetailModel {
   bool petFriendly;
   int difficulty;
   int waterLevel;
+  int sunLight;
   String information;
-  String sunLight;
   String feedInformation;
   String commonIssue;
-  List<int> temperatureRange = [];
+  List<dynamic> temperatureRange = [];
   List<int> pHRange = [];
 
   PlantDetailModel({

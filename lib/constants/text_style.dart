@@ -16,3 +16,9 @@ const TextStyle kPlantDetailLabel = TextStyle(
   fontSize: 20.0,
   fontWeight: FontWeight.w500,
 );
+
+// CONTRIBUTE LABEL
+const TextStyle kContributeLabel = TextStyle(
+  fontWeight: FontWeight.w500,
+  fontSize: 20.0,
+);

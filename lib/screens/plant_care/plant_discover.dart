@@ -7,6 +7,7 @@ import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/models/plant_detail_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_server_plant_detail.dart';
+import 'package:flutter_login_test_2/screens/plant_care/contribute_plant.dart';
 import 'package:flutter_login_test_2/screens/plant_care/plant_detail.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -215,7 +216,12 @@ class _PlantDiscoverScreenState extends State<PlantDiscoverScreen>
           size: 30.0,
         ),
         onPressed: () {
-          print('add new');
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ContributePlantScreen(),
+            ),
+          );
         },
       ),
     ];

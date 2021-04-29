@@ -38,6 +38,7 @@ dependencies:
   flutter_swiper: ^1.1.6
   intl: ^0.17.0
   timeago: ^3.0.2
+  toggle_switch: ^0.1.9
 
 
 dev_dependencies:

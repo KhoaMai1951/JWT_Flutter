@@ -417,6 +417,10 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
                         plantDetailTextRegion(
                             title: 'Tên thường gọi',
                             content: widget.plantDetailModel.commonName),
+                        // SCIENTIFIC NAME
+                        plantDetailTextRegion(
+                            title: 'Tên khoa học',
+                            content: widget.plantDetailModel.scientificName),
                         //INFORMATION
                         plantDetailTextRegion(
                           title: 'Thông tin',
@@ -513,7 +517,7 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
         return 'không trực tiếp';
       case 4:
         return 'không trực tiếp-ngoài trời';
-      case 4:
+      case 5:
         return 'ngoài trời';
     }
   }
@@ -529,7 +533,7 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
         return 'thường xuyên';
       case 4:
         return 'thường xuyên-liên tục';
-      case 4:
+      case 5:
         return 'liên tục';
     }
   }

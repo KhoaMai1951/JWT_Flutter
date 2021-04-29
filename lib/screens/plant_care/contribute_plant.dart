@@ -1,13 +1,15 @@
 import 'dart:typed_data';
-
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/constants/text_style.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 class ContributePlantScreen extends StatefulWidget {
@@ -399,10 +401,67 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all<Color>(kButtonColor),
             ),
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState.validate() == true) {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Processing Data')));
+                print('here');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Processing Data'),
+                  ),
+                );
+                //SUBMIT TO SERVER
+                // DIO
+                List<MultipartFile> listFiles =
+                    await assetToFile() as List<MultipartFile>;
+                FormData formData = new FormData.fromMap({
+                  "files": listFiles,
+                  'common_name': commonName,
+                  'scientific_name': scientificName,
+                  'pet_friendly': petFriendly ? 1 : 0,
+                  'water_level': waterLevel.toInt(),
+                  'sunlight': sunLight.toInt(),
+                  'information': information,
+                  'feed_information': feedInformation,
+                  'common_issue': commonIssue,
+                  'max_temperature': temperatureRangeValue.start.round(),
+                  'min_temperature': temperatureRangeValue.end.round(),
+                });
+                // BEGIN CALL API
+                Dio dio = new Dio();
+                SharedPreferences localStorage =
+                    await SharedPreferences.getInstance();
+                var token =
+                    jsonDecode(localStorage.getString('token'))['token'];
+                try {
+                  var response = await dio.post(
+                    kApiUrl + "/server_plant/upload_plant",
+                    data: formData,
+                    options: Options(
+                      headers: {
+                        'Accept': 'application/json',
+                        'Authorization': 'Bearer $token',
+                      },
+                    ),
+                  );
+
+                  var jsonData = json.decode(response.toString());
+                  print(jsonData);
+                  if (jsonData['status'] == true) {
+                    // Redirect to post detail
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => LoadingPostDetailScreen(
+                    //       id: jsonData['post_id'],
+                    //     ),
+                    //   ),
+                    // );
+                  } else
+                    print('Failed');
+                } catch (e) {
+                  print('exception: ' + e.toString());
+                  Future.error(e.toString());
+                }
               }
             },
             child: Text('Đóng góp'),
@@ -520,7 +579,7 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
         cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
         materialOptions: MaterialOptions(
           actionBarColor: "#abcdef",
-          actionBarTitle: "Example App",
+          actionBarTitle: "Chọn ảnh cây cảnh",
           allViewTitle: "All Photos",
           useDetailsView: false,
           selectCircleStrokeColor: "#000000",
@@ -562,7 +621,6 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
         });
       }
     }
-    ;
 
     return files;
   }

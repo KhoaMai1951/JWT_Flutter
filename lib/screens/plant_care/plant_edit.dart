@@ -1,5 +1,5 @@
-import 'dart:typed_data';
 import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,38 +7,33 @@ import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/constants/text_style.dart';
-import 'package:flutter_login_test_2/screens/plant_care/plant_discover.dart';
+import 'package:flutter_login_test_2/globals/user_global.dart';
+import 'package:flutter_login_test_2/models/plant_detail_model.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
-class ContributePlantScreen extends StatefulWidget {
+class PlantEditScreen extends StatefulWidget {
+  PlantDetailModel plantDetailModel;
+  PlantEditScreen({Key key, @required this.plantDetailModel}) : super(key: key);
   @override
-  _ContributePlantScreenState createState() => _ContributePlantScreenState();
+  _PlantEditScreenState createState() => _PlantEditScreenState();
 }
 
-class _ContributePlantScreenState extends State<ContributePlantScreen> {
-  List<Asset> images = <Asset>[];
-  List<MultipartFile> files = [];
+class _PlantEditScreenState extends State<PlantEditScreen> {
   final _formKey = GlobalKey<FormState>();
+  String contributorName;
+  //focus node
+  FocusNode focusContributorName = new FocusNode();
+  FocusNode focusCommonName = new FocusNode();
+  FocusNode focusScientificName = new FocusNode();
+
   //for pet toggle
   int initialIndex = 0;
-  //plant info
-  String contributorName;
-  String commonName;
-  String scientificName;
-  bool petFriendly = false;
-  int difficulty;
-  double waterLevel = 1;
-  double sunLight = 1;
-  String information;
-  String feedInformation;
-  String commonIssue;
-  double maxTemperature = 30;
-  double minTemperature = 1;
   //range
-  RangeValues temperatureRangeValue = const RangeValues(20, 30);
+  double minTemperature = 20;
+  double maxTemperature = 40;
+  RangeValues temperatureRangeValue = new RangeValues(20, 30);
   List<String> waterLevelString = [
     'thỉnh thoảng',
     'thỉnh thoảng\n-thường xuyên',
@@ -55,13 +50,28 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
   ];
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setState(() {
+      //FOR TEMP
+      temperatureRangeValue = new RangeValues(
+          widget.plantDetailModel.temperatureRange[0].toDouble(),
+          widget.plantDetailModel.temperatureRange[1].toDouble());
+      //FOR PET
+      widget.plantDetailModel.petFriendly ? initialIndex = 0 : initialIndex = 1;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: kAppBarColor,
-        title: Text('🌷  Đóng góp cây cảnh mới'),
+        title: Text('Đóng góp \nthông tin cây cảnh'),
       ),
       body: bodyLayout(),
+      backgroundColor: Colors.white,
       bottomNavigationBar: buildBottomNavigationBar(
           context: context, index: kBottomBarIndexPlant),
     );
@@ -84,13 +94,16 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
                   ),
                   // NAME TEXTFIELD
                   textFormFieldBuilder(
+                    focusNode: focusContributorName,
                     label: 'Tên \*',
                     hintText: 'Tên',
                     validateFunction: (value) {
                       if (value.length > 100) {
+                        focusContributorName.requestFocus();
                         return 'Tên phải nhỏ hơn 100 kí tự';
                       }
                       if (value.length == 0) {
+                        focusContributorName.requestFocus();
                         return 'Phải nhập tên';
                       }
                       setState(() {
@@ -108,17 +121,21 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
                   ),
                   // COMMON NAME TEXT FIELD
                   textFormFieldBuilder(
+                    focusNode: focusCommonName,
+                    initialValue: widget.plantDetailModel.commonName,
                     label: 'Tên thường gọi \*',
                     hintText: 'Tên thường gọi',
                     validateFunction: (value) {
                       if (value.length > 100) {
+                        focusCommonName.requestFocus();
                         return 'Tên phải nhỏ hơn 100 kí tự';
                       }
                       if (value.length == 0) {
+                        focusCommonName.requestFocus();
                         return 'Phải nhập tên';
                       }
                       setState(() {
-                        this.commonName = value;
+                        widget.plantDetailModel.commonName = value;
                       });
                       return null;
                     },
@@ -128,6 +145,7 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
                   ),
                   // COMMON NAME TEXT FIELD
                   textFormFieldBuilder(
+                    initialValue: widget.plantDetailModel.scientificName,
                     label: 'Tên khoa học \*',
                     hintText: 'Tên khoa học',
                     validateFunction: (value) {
@@ -138,7 +156,7 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
                         return 'Phải nhập tên';
                       }
                       setState(() {
-                        this.scientificName = value;
+                        widget.plantDetailModel.scientificName = value;
                       });
                       return null;
                     },
@@ -148,6 +166,7 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
                   ),
                   // COMMON NAME TEXT FIELD
                   textFormFieldBuilder(
+                    initialValue: widget.plantDetailModel.information,
                     label: 'Mô tả \*',
                     hintText: 'Mô tả',
                     maxLines: 5,
@@ -159,7 +178,7 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
                         return 'Phải nhập tên';
                       }
                       setState(() {
-                        this.information = value;
+                        widget.plantDetailModel.information = value;
                       });
                       return null;
                     },
@@ -173,18 +192,20 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
                   ),
                   // SLIDER LABEL
                   sliderLabelBuilder(
-                      currentLevel: waterLevel,
+                      currentLevel:
+                          widget.plantDetailModel.waterLevel.toDouble(),
                       labelList: waterLevelString,
                       length: 5),
                   // WATER LEVEL SLIDER
                   sliderBuilder(
-                      currentLevel: waterLevel,
+                      currentLevel:
+                          widget.plantDetailModel.waterLevel.toDouble(),
                       divisions: 4,
                       max: 5,
                       min: 1,
                       function: (double value) {
                         setState(() {
-                          waterLevel = value;
+                          widget.plantDetailModel.waterLevel = value.toInt();
                         });
                       }),
                   SizedBox(
@@ -196,18 +217,18 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
                   ),
                   // SLIDER LABEL
                   sliderLabelBuilder(
-                      currentLevel: sunLight,
+                      currentLevel: widget.plantDetailModel.sunLight.toDouble(),
                       labelList: sunlightLevelString,
                       length: 5),
                   // SUNLIGHT LEVEL SLIDER
                   sliderBuilder(
-                      currentLevel: sunLight,
+                      currentLevel: widget.plantDetailModel.sunLight.toDouble(),
                       divisions: 4,
                       max: 5,
                       min: 1,
                       function: (double value) {
                         setState(() {
-                          sunLight = value;
+                          widget.plantDetailModel.sunLight = value.toInt();
                         });
                       }),
                   SizedBox(
@@ -287,8 +308,8 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
                           setState(() {
                             initialIndex = index;
                             index == 0
-                                ? petFriendly = true
-                                : petFriendly = false;
+                                ? widget.plantDetailModel.petFriendly = true
+                                : widget.plantDetailModel.petFriendly = false;
                           });
                         }),
                   ),
@@ -301,6 +322,7 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
                   ),
                   // NAME TEXTFIELD
                   textFormFieldBuilder(
+                    initialValue: widget.plantDetailModel.feedInformation,
                     maxLines: 4,
                     label: 'Bón phân',
                     hintText: 'Bón phân',
@@ -309,7 +331,7 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
                         return 'Tên phải nhỏ hơn 1000 kí tự';
                       }
                       setState(() {
-                        this.feedInformation = value;
+                        widget.plantDetailModel.feedInformation = value;
                       });
                       return null;
                     },
@@ -323,6 +345,7 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
                   ),
                   // NAME TEXTFIELD
                   textFormFieldBuilder(
+                    initialValue: widget.plantDetailModel.commonIssue,
                     maxLines: 4,
                     label: 'Các vấn đề thường gặp',
                     hintText: 'Các vấn đề thường gặp',
@@ -331,46 +354,13 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
                         return 'Tên phải nhỏ hơn 1000 kí tự';
                       }
                       setState(() {
-                        this.commonIssue = value;
+                        widget.plantDetailModel.commonIssue = value;
                       });
                       return null;
                     },
                   ),
                   SizedBox(
                     height: 60.0,
-                  ),
-                  // CONTRIBUTOR NAME LABEL ====================================
-                  labelBuilder(
-                    label: 'Hình ảnh',
-                  ),
-                  // CHOOSE PIC
-                  Center(
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all<Color>(kButtonColor),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.insert_photo),
-                          Text("Chọn ảnh"),
-                        ],
-                      ),
-                      onPressed: loadAssets,
-                    ),
-                  ),
-                  // VÙNG REVIEW ẢNH ĐÃ CHỌN
-                  buildGridView(),
-                  SizedBox(
-                    height: 30.0,
-                  ),
-                  Divider(
-                    color: kBottomBarColor,
-                    thickness: 2.0,
-                  ),
-                  SizedBox(
-                    height: 30.0,
                   ),
                   // SUBMIT BUTTON
                   submitButton(),
@@ -396,27 +386,29 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
             ),
             onPressed: () async {
               if (_formKey.currentState.validate() == true) {
+                print('here');
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Đang upload'),
+                    content: Text('Processing Data'),
                   ),
                 );
                 //SUBMIT TO SERVER
                 // DIO
-                List<MultipartFile> listFiles =
-                    await assetToFile() as List<MultipartFile>;
                 FormData formData = new FormData.fromMap({
-                  "files": listFiles,
-                  'common_name': commonName,
-                  'scientific_name': scientificName,
-                  'pet_friendly': petFriendly ? 1 : 0,
-                  'water_level': waterLevel.toInt(),
-                  'sunlight': sunLight.toInt(),
-                  'information': information,
-                  'feed_information': feedInformation,
-                  'common_issue': commonIssue,
-                  'max_temperature': temperatureRangeValue.start.round(),
-                  'min_temperature': temperatureRangeValue.end.round(),
+                  'user_id': UserGlobal.user['id'],
+                  'server_plant_id': widget.plantDetailModel.id,
+                  'common_name': widget.plantDetailModel.commonName,
+                  'scientific_name': widget.plantDetailModel.scientificName,
+                  'pet_friendly': widget.plantDetailModel.petFriendly ? 1 : 0,
+                  'water_level': widget.plantDetailModel.waterLevel.toInt(),
+                  'sunlight': widget.plantDetailModel.sunLight.toInt(),
+                  'information': widget.plantDetailModel.information,
+                  'feed_information': widget.plantDetailModel.feedInformation,
+                  'common_issue': widget.plantDetailModel.commonIssue,
+                  'max_temperature':
+                      widget.plantDetailModel.temperatureRange[0],
+                  'min_temperature':
+                      widget.plantDetailModel.temperatureRange[1],
                 });
                 // BEGIN CALL API
                 Dio dio = new Dio();
@@ -426,7 +418,7 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
                     jsonDecode(localStorage.getString('token'))['token'];
                 try {
                   var response = await dio.post(
-                    kApiUrl + "/server_plant/upload_plant",
+                    kApiUrl + "/server_plant_user_edit/upload_plant",
                     data: formData,
                     options: Options(
                       headers: {
@@ -438,19 +430,15 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
 
                   var jsonData = json.decode(response.toString());
                   if (jsonData['status'] == true) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Đã gửi'),
-                      ),
-                    );
-                    //Redirect to post detail
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PlantDiscoverScreen(),
-                      ),
-                    );
+                    // Redirect to post detail
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => LoadingPostDetailScreen(
+                    //       id: jsonData['post_id'],
+                    //     ),
+                    //   ),
+                    // );
                   } else
                     print('Failed');
                 } catch (e) {
@@ -458,6 +446,11 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
                   Future.error(e.toString());
                 }
               }
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Thông tin còn thiếu'),
+                ),
+              );
             },
             child: Text('Đóng góp'),
           ),
@@ -467,12 +460,17 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
   }
 
   // TEXT FORM FIELD
-  textFormFieldBuilder(
-      {String label,
-      int maxLines,
-      String hintText,
-      Function validateFunction}) {
+  textFormFieldBuilder({
+    String label,
+    String initialValue,
+    int maxLines,
+    String hintText,
+    FocusNode focusNode,
+    Function validateFunction,
+  }) {
     return TextFormField(
+      focusNode: focusNode,
+      initialValue: initialValue,
       maxLines: maxLines,
       decoration: InputDecoration(
         floatingLabelBehavior: FloatingLabelBehavior.always,
@@ -558,87 +556,5 @@ class _ContributePlantScreenState extends State<ContributePlantScreen> {
         }),
       ),
     );
-  }
-
-  // LẤY ẢNH TRONG GALLERY VÀO LIST ASSET
-  Future<void> loadAssets() async {
-    this.images.clear();
-    List<Asset> resultList = <Asset>[];
-    String error = 'No Error Detected';
-
-    try {
-      resultList = await MultiImagePicker.pickImages(
-        maxImages: 1,
-        enableCamera: true,
-        selectedAssets: images,
-        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
-        materialOptions: MaterialOptions(
-          actionBarColor: "#abcdef",
-          actionBarTitle: "Chọn ảnh cây cảnh",
-          allViewTitle: "All Photos",
-          useDetailsView: false,
-          selectCircleStrokeColor: "#000000",
-        ),
-      );
-    } on Exception catch (e) {
-      error = e.toString();
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      images = resultList;
-    });
-  }
-
-  // CONVERT TỪ ASSET SANG MULTIPLE PART FILE
-  Future<dynamic> assetToFile() async {
-    files.clear();
-
-    //images.forEach((asset) async {
-    for (var asset in images) {
-      int MAX_WIDTH = 500; //keep ratio
-      int height = ((500 * asset.originalHeight) / asset.originalWidth).round();
-
-      ByteData byteData =
-          await asset.getThumbByteData(MAX_WIDTH, height, quality: 80);
-
-      if (byteData != null) {
-        List<int> imageData = byteData.buffer.asUint8List();
-        MultipartFile u =
-            await MultipartFile.fromBytes(imageData, filename: asset.name);
-
-        setState(() {
-          this.files.add(u);
-        });
-      }
-    }
-
-    return files;
-  }
-
-  // XUẤT HÌNH TỪ LIST ASSET RA ĐỂ REVIEW
-  Widget buildGridView() {
-    return this.images.length != 0
-        ? GridView.count(
-            physics: NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            crossAxisCount: 1,
-            children: List.generate(images.length, (index) {
-              Asset asset = images[index];
-              return Container(
-                margin: const EdgeInsets.all(1.0),
-                child: AssetThumb(
-                  asset: asset,
-                  width: 300,
-                  height: 300,
-                ),
-              );
-            }),
-          )
-        : SizedBox();
   }
 }

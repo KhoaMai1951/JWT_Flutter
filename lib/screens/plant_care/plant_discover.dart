@@ -154,7 +154,7 @@ class _PlantDiscoverScreenState extends State<PlantDiscoverScreen>
                         Text(plants[index].commonName),
                       ],
                     ),
-                  )
+                  ),
                 ]),
             onTap: () {
               Navigator.push(

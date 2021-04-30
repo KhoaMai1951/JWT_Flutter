@@ -4,6 +4,7 @@ import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/constants/text_style.dart';
 import 'package:flutter_login_test_2/models/plant_detail_model.dart';
+import 'package:flutter_login_test_2/screens/loading/loading_server_plant_detail_edit.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 
 class PlantDetailScreen extends StatefulWidget {
@@ -33,7 +34,7 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
         backgroundColor: kAppBarColor,
         title: Text(widget.plantDetailModel.commonName),
       ),
-      body: bodyLayoutTest(),
+      body: bodyLayout(),
       backgroundColor: Colors.white,
       bottomNavigationBar: buildBottomNavigationBar(
           context: context, index: kBottomBarIndexPlant),
@@ -41,167 +42,6 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
   }
 
   bodyLayout() {
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      child: Container(
-        width: double.infinity,
-        child: Column(
-          children: [
-            // IMAGE + NAMES
-            Stack(clipBehavior: Clip.none, children: [
-              // IMAGE
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 300,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: NetworkImage(
-                        "https://cf.shopee.vn/file/202d4cfe4546d4273665d3b24a707d55"),
-                  ),
-                ),
-              ),
-              // NAMES
-              Positioned(
-                top: 265.0,
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Card(
-                        elevation: 4.0,
-                        color: Colors.white,
-                        margin: EdgeInsets.only(left: 20, right: 20),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15)),
-                        child: Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              Text(
-                                'cây nắp ấm',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 22.0,
-                                ),
-                              ),
-                              SizedBox(height: 10.0),
-                              Text(
-                                'Nepenthes edwardsiana',
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ]),
-            // INFO
-            Container(
-              //margin: EdgeInsets.only(left: 5.0, right: 5.0),
-              width: MediaQuery.of(context).size.width,
-              child: Padding(
-                padding: EdgeInsets.only(
-                  left: 10.0,
-                  right: 10.0,
-                  top: 40.0,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // left
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'Độ khó',
-                            style: kPlantInfoLabel,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          'Thân thiện thú nuôi',
-                          style: kPlantInfoLabel,
-                        ),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          'Ánh sáng',
-                          style: kPlantInfoLabel,
-                        ),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          'Tưới nước',
-                          style: kPlantInfoLabel,
-                        ),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          'Nhiệt độ',
-                          style: kPlantInfoLabel,
-                        ),
-                      ],
-                    ),
-                    // right
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          '★★★✩✩',
-                          style: kPlantInfo,
-                        ),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          'không',
-                          style: kPlantInfo,
-                        ),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          'trực tiếp',
-                          style: kPlantInfo,
-                        ),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          'thường xuyên',
-                          style: kPlantInfo,
-                        ),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          '18 - 26°C',
-                          style: kPlantInfo,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  bodyLayoutTest() {
     return NestedScrollView(
       controller: this._scrollController,
       headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -218,6 +58,42 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
                   image: DecorationImage(
                     fit: BoxFit.fill,
                     image: NetworkImage(widget.plantDetailModel.imageUrl),
+                  ),
+                ),
+              ),
+              // EDIT BUTTON
+              Positioned(
+                top: 10.0,
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      InkWell(
+                        child: Container(
+                          margin: EdgeInsets.all(10),
+                          padding: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  LoadingServerPlantDetailEditScreen(
+                                      id: widget.plantDetailModel.id),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),

@@ -41,10 +41,10 @@ BottomNavigationBar buildBottomNavigationBar(
       ),
       BottomNavigationBarItem(
         icon: Icon(
-          Icons.public,
+          Icons.featured_play_list_outlined,
           size: 25,
         ),
-        label: 'Khám phá',
+        label: 'Lướt',
       ),
       BottomNavigationBarItem(
         icon: Icon(

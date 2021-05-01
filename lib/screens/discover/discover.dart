@@ -25,18 +25,26 @@ class DiscoverScreen extends StatefulWidget {
 class _DiscoverScreenState extends State<DiscoverScreen>
     with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  //current tab
+  int currentTabIndex = 0;
 
   // SEARCH
   TextEditingController _searchQueryController = TextEditingController();
   bool _isSearching = false;
   String searchQuery = "Search query";
   String keyword = '';
-  // Biến phục vụ cho comment infinite scroll của bài post
-  int skip = 0;
-  int take = 6;
-  bool isLoading = false;
-  bool stillSendApi = true;
-  List<PostDetailModel> posts = [];
+  // Biến phục vụ cho comment infinite scroll của global
+  int skipPostGlobal = 0;
+  int takePostGlobal = 10;
+  bool isLoadingPostGlobal = false;
+  bool stillSendApiPostGlobal = true;
+  List<PostDetailModel> postsGlobal = [];
+  // Biến phục vụ cho comment infinite scroll của home
+  int skipPostHome = 0;
+  int takePostHome = 10;
+  bool isLoadingPostHome = false;
+  bool stillSendApiPostHome = true;
+  List<PostDetailModel> postsHome = [];
   // Biến phục vụ cho comment infinite scroll của user
   int skipUser = 0;
   int takeUser = 6;
@@ -48,7 +56,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   // TAB
   TabController _tabController;
 
-  //1B HÀM GỌI API LẤY DS USER THEO CỤM
+  //1C HÀM GỌI API LẤY DS USER THEO CỤM
   fetchUsers() async {
     setState(() {
       isLoadingUser = true;
@@ -89,20 +97,19 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     }
   }
 
-  //1A. HÀM GỌI API LẤY DS POST THEO CỤM
-  fetchPosts() async {
+  //1B. HÀM GỌI API LẤY DS POST GLOBAL THEO CỤM
+  fetchPostsGlobal() async {
     setState(() {
-      isLoading = true;
+      isLoadingPostGlobal = true;
     });
     var data = {
-      'skip': this.skip,
-      'take': take,
+      'skip': this.skipPostGlobal,
+      'take': takePostGlobal,
       'keyword': keyword,
       'user_id': UserGlobal.user['id'],
     };
     var res = await Network().postData(data, '/post/test_search');
     var body = json.decode(res.body);
-
     // Nếu có kết quả trả về
     if (body['posts'].isEmpty == false) {
       List<PostDetailModel> fetchedPosts = [];
@@ -135,48 +142,121 @@ class _DiscoverScreenState extends State<DiscoverScreen>
         fetchedPosts.add(postModel);
       }
       setState(() {
-        this.skip += take;
-        this.posts.addAll(fetchedPosts);
-        isLoading = false;
+        this.skipPostGlobal += takePostGlobal;
+        this.postsGlobal.addAll(fetchedPosts);
+        isLoadingPostGlobal = false;
       });
     }
     // Nếu kết quả trả về không còn
     else {
       setState(() {
-        stillSendApi = false;
-        isLoading = false;
+        stillSendApiPostGlobal = false;
+        isLoadingPostGlobal = false;
       });
     }
   }
 
-  // 2A. GỌI HÀM LẤY DS POST + CHECK CUỘN BOTTOM ĐỂ GỌI TIẾP
-  // 2B. GỌI HÀM LẤY DS USER + CHECK CUỘN BOTTOM ĐỂ GỌI TIẾP
+  //1A. HÀM GỌI API LẤY DS POST HOME THEO CỤM
+  fetchPostsHome() async {
+    setState(() {
+      isLoadingPostHome = true;
+    });
+    var data = {
+      'user_id': UserGlobal.user['id'],
+      'skip': this.skipPostHome,
+      'take': takePostHome,
+      'keyword': keyword,
+    };
+    var res = await Network().postData(
+        data, '/post/get_all_posts_of_following_users_by_chunk_by_user_id');
+    var body = json.decode(res.body);
+    // Nếu có kết quả trả về
+    if (body['posts'].isEmpty == false) {
+      List<PostDetailModel> fetchedPosts = [];
+      for (var post in body['posts']) {
+        // user handle
+        UserModel userModel = new UserModel(
+          id: post['user']['id'],
+          username: post['user']['username'],
+          avatarUrl: post['user']['avatar_url'],
+        );
+        // image for post handle
+        List<String> imagesForPost = [];
+        for (var image in post['images_for_post']) {
+          imagesForPost.add(image['dynamic_url']);
+        }
+        // post handle
+        PostDetailModel postModel = new PostDetailModel(
+          id: post['id'],
+          createdAt: post['created_at'],
+          imagesForPost: imagesForPost,
+          title: post['title'],
+          content: post['short_content'],
+          like: post['like'],
+          commentsNumber: post['comments_number'],
+          user: userModel,
+          currentImageIndicator: 0,
+          isLiked: post['is_liked'],
+        );
+
+        fetchedPosts.add(postModel);
+      }
+      setState(() {
+        this.skipPostHome += takePostHome;
+        this.postsHome.addAll(fetchedPosts);
+        isLoadingPostHome = false;
+      });
+    } else {
+      setState(() {
+        stillSendApiPostHome = false;
+        isLoadingPostHome = false;
+      });
+    }
+  }
+
+  // 2A. GỌI HÀM LẤY DS POST HOME + CHECK CUỘN BOTTOM ĐỂ GỌI TIẾP
+  // 2B. GỌI HÀM LẤY DS POST GLOBAL + CHECK CUỘN BOTTOM ĐỂ GỌI TIẾP
+  // 2C. GỌI HÀM LẤY DS USER + CHECK CUỘN BOTTOM ĐỂ GỌI TIẾP
   @override
   void initState() {
     super.initState();
     // TAB CONTROLLER
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     // get post
-    fetchPosts();
+    fetchPostsHome();
+    fetchPostsGlobal();
     fetchUsers();
+
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
-        // FOR POSTS
-        handleScrollBottomForPosts();
+        // FOR POSTS HOME
+        handleScrollBottomForPostsHome();
+        // FOR POSTS GLOBAL
+        handleScrollBottomForPostsGlobal();
         // FOR USERS
         handleScrollBottomForUsers();
       }
     });
   }
 
-  handleScrollBottomForPosts() {
-    if (isLoading == true) return;
-    if (stillSendApi == true) {
-      fetchPosts();
+  // HANDLE SCROLL BOTTOM HOME
+  handleScrollBottomForPostsHome() {
+    if (isLoadingPostHome == true) return;
+    if (stillSendApiPostHome == true) {
+      fetchPostsHome();
     }
   }
 
+  // HANDLE SCROLL BOTTOM GLOBAL
+  handleScrollBottomForPostsGlobal() {
+    if (isLoadingPostGlobal == true) return;
+    if (stillSendApiPostGlobal == true) {
+      fetchPostsGlobal();
+    }
+  }
+
+  // HANDLE SCROLL BOTTOM USER
   handleScrollBottomForUsers() {
     if (isLoadingUser == true) return;
     if (stillSendApiUser == true) {
@@ -199,7 +279,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       appBar: AppBar(
         backgroundColor: kAppBarColor,
         leading: _isSearching ? const BackButton() : Container(),
-        title: _isSearching ? _buildSearchField() : Text('Khám phá'),
+        title: _isSearching ? _buildSearchField() : Text('🌿  Don\'t Leaf Me '),
         actions: _buildActions(),
       ),
       body: buildBody(),
@@ -223,18 +303,26 @@ class _DiscoverScreenState extends State<DiscoverScreen>
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(0.0),
               child: TabBar(
+                onTap: (index) {
+                  setState(() {
+                    currentTabIndex = index;
+                  });
+                },
                 controller: _tabController,
                 labelColor: Colors.teal,
                 isScrollable: false,
                 tabs: [
+                  Tab(
+                    icon: Icon(Icons.home),
+                  ),
                   Container(
                     margin: const EdgeInsets.all(3.0),
                     child: Tab(
-                      text: 'Bài viết',
+                      icon: Icon(Icons.public),
                     ),
                   ),
                   Tab(
-                    text: 'Người dùng',
+                    icon: Icon(Icons.people),
                   ),
                 ],
               ),
@@ -246,7 +334,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
         child: TabBarView(
           controller: _tabController,
           children: [
-            infinitePostListView(), // LIST DS BÀI VIẾT THEO TỪ KHÓA
+            infiniteHomeListView(),
+            infiniteGlobalListView(), // LIST DS BÀI VIẾT THEO TỪ KHÓA
             infiniteUserListView(),
           ],
         ),
@@ -254,16 +343,15 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     );
   }
 
-  // LIST DS BÀI VIẾT THEO TỪ KHÓA
-  infinitePostListView() {
+  // LIST DS BÀI VIẾT HOME
+  infiniteHomeListView() {
     return Column(
       children: [
         // NEWSFEED
         Expanded(
           child: ListView.builder(
             shrinkWrap: true,
-            //controller: this._scrollController,
-            itemCount: posts.length,
+            itemCount: postsHome.length,
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               return Column(
@@ -275,17 +363,17 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                       // BÀI VIẾT MINI
                       PostMini(
                         currentUserId: UserGlobal.user['id'],
-                        post: posts[index],
+                        post: postsHome[index],
                         onImageChange: (int currentImageIndexIndicator) {
                           setState(() {
-                            posts[index].currentImageIndicator =
+                            postsHome[index].currentImageIndicator =
                                 currentImageIndexIndicator;
                           });
                         },
                         onLikePost: (int numberOfLikes, bool isLiked) {
                           setState(() {
-                            posts[index].like = numberOfLikes;
-                            posts[index].isLiked = isLiked;
+                            postsHome[index].like = numberOfLikes;
+                            postsHome[index].isLiked = isLiked;
                           });
                         },
                       ),
@@ -304,13 +392,75 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           ),
         ),
         // SPINNING
-        isLoading == true
-            ? SpinKitRing(
-                color: Colors.teal,
-                lineWidth: 3.0,
-                size: 40.0,
-              )
-            : SizedBox(),
+        isLoadingPostGlobal == true ? Text('đang tải...') : SizedBox(),
+      ],
+    );
+  }
+
+  // LIST DS BÀI VIẾT GLOBAL
+  infiniteGlobalListView() {
+    return Column(
+      children: [
+        SizedBox(height: 20.0),
+        // LABEL
+        Padding(
+          padding: EdgeInsets.only(left: 10.0),
+          child: Row(
+            children: [
+              Text(
+                'Khám phá bài viết',
+                style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 20.0),
+        // NEWSFEED
+        Expanded(
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: postsGlobal.length,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              return Column(
+                children: [
+                  ListView(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    children: [
+                      // BÀI VIẾT MINI
+                      PostMini(
+                        currentUserId: UserGlobal.user['id'],
+                        post: postsGlobal[index],
+                        onImageChange: (int currentImageIndexIndicator) {
+                          setState(() {
+                            postsGlobal[index].currentImageIndicator =
+                                currentImageIndexIndicator;
+                          });
+                        },
+                        onLikePost: (int numberOfLikes, bool isLiked) {
+                          setState(() {
+                            postsGlobal[index].like = numberOfLikes;
+                            postsGlobal[index].isLiked = isLiked;
+                          });
+                        },
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Divider(
+                        thickness: 1,
+                      ),
+                    ],
+                  ),
+                  //isLoading == true ? Text('loading...') : SizedBox(),
+                ],
+              );
+            },
+          ),
+        ),
+        // SPINNING
+        isLoadingPostGlobal == true ? Text('đang tải...') : SizedBox(),
       ],
     );
   }
@@ -319,6 +469,20 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   infiniteUserListView() {
     return Column(
       children: [
+        SizedBox(height: 20.0),
+        // LABEL
+        Padding(
+          padding: EdgeInsets.only(left: 10.0),
+          child: Row(
+            children: [
+              Text(
+                'Tìm kiếm người dùng',
+                style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 20.0),
         // NEWSFEED
         Expanded(
           child: ListView.builder(
@@ -400,7 +564,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           ),
         ),
         // SPINNING
-        isLoading == true
+        isLoadingPostGlobal == true
             ? SpinKitRing(
                 color: Colors.teal,
                 lineWidth: 3.0,
@@ -427,19 +591,38 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   }
 
   void updateSearchQuery(String newQuery) {
-    setState(() {
-      keyword = newQuery;
-      // FOR POSTS
-      posts.clear();
-      skip = 0;
-      // FOR USERS
-      users.clear();
-      skipUser = 0;
-
-      searchQuery = newQuery;
-    });
-    fetchPosts();
-    fetchUsers();
+    switch (currentTabIndex) {
+      case 0: // nếu đang ở tab home
+        setState(() {
+          keyword = newQuery;
+          // FOR HOME POSTS
+          postsHome.clear();
+          skipPostHome = 0;
+          searchQuery = newQuery;
+        });
+        fetchPostsHome();
+        break;
+      case 1: // nếu đang ở tab global
+        setState(() {
+          keyword = newQuery;
+          // FOR GLOBAL POSTS
+          postsGlobal.clear();
+          skipPostGlobal = 0;
+          searchQuery = newQuery;
+        });
+        fetchPostsGlobal();
+        break;
+      case 2: // nếu đang ở tab user
+        setState(() {
+          keyword = newQuery;
+          // FOR USERS
+          users.clear();
+          skipUser = 0;
+          searchQuery = newQuery;
+        });
+        fetchUsers();
+        break;
+    }
   }
 
   // A. LIST WIDGET TRÊN APP BAR
@@ -470,7 +653,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   void _startSearch() {
     ModalRoute.of(context)
         .addLocalHistoryEntry(LocalHistoryEntry(onRemove: _stopSearching));
-
     setState(() {
       _isSearching = true;
     });
@@ -480,7 +662,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     _clearSearchQuery();
 
     setState(() {
-      stillSendApi = true;
+      stillSendApiPostGlobal = true;
       stillSendApiUser = true;
       _isSearching = false;
     });

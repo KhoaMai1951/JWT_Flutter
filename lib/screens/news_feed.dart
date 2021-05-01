@@ -35,7 +35,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
   // Biến phục vụ cho image carousel
   int _currentImageIndicator = 0;
 
-  //1. HÀM GỌI API LẤY DS POST THEO CỤM
+  // 1. HÀM GỌI API LẤY DS POST THEO CỤM
   fetchPosts() async {
     setState(() {
       isLoading = true;

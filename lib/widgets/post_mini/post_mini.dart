@@ -385,7 +385,7 @@ class _PostMiniState extends State<PostMini> {
       context: context,
       builder: (context) {
         return Container(
-          height: MediaQuery.of(context).size.height * 0.5,
+          height: MediaQuery.of(context).size.height * 0.3,
           decoration: new BoxDecoration(
             color: Colors.transparent,
             borderRadius: new BorderRadius.only(

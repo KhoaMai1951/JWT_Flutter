@@ -1,10 +1,15 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:dio/dio.dart';
+import 'package:emoji_picker/emoji_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/constants/validate_name_constant.dart';
+import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/models/comment_model.dart';
 import 'package:flutter_login_test_2/models/post_detail_model.dart';
 import 'package:flutter_login_test_2/models/tag_model.dart';
@@ -15,6 +20,7 @@ import 'package:flutter_login_test_2/widgets/post_mini/post_mini.dart';
 import 'package:flutter_login_test_2/widgets/text_form_field/text_form_field_universal.dart';
 
 import 'package:intl/intl.dart';
+import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'loading/loading_user_profile.dart';
@@ -41,6 +47,7 @@ class _PostDetailState extends State<PostDetail> {
   PostDetailModel post;
   // Controller cho comment
   TextEditingController commentController = TextEditingController();
+  String commentContent;
   // Biến phục vụ cho comment infinite scroll
   int skip = 0;
   int take = 6;
@@ -48,6 +55,13 @@ class _PostDetailState extends State<PostDetail> {
   bool stillSendApi = true;
   List<CommentModel> comments = [];
   ScrollController _scrollController = new ScrollController();
+  //biến hình ảnh cmt
+  List<Asset> images = <Asset>[];
+  List<MultipartFile> files = [];
+  //biến phục vụ submit comment
+  bool isSubmittingComment = false;
+  //biến phục vụ like cmt
+  bool isLikingComment = false;
 
   // Hàm future lấy list comment
   Future<dynamic> _getComments;
@@ -73,6 +87,7 @@ class _PostDetailState extends State<PostDetail> {
       isLoading = true;
     });
     var data = {
+      'user_id': UserGlobal.user['id'],
       'post_id': widget.post.id,
       'skip': this.skip,
       'take': take,
@@ -85,15 +100,16 @@ class _PostDetailState extends State<PostDetail> {
       List<CommentModel> fetchedComments = [];
       for (var comment in body['comments']) {
         CommentModel cmt = new CommentModel(
-          username: comment['username'],
-          content: comment['content'],
-          id: comment['id'],
-          createdAt: comment['created_at'],
-          postId: comment['post_id'],
-          userId: comment['user_id'],
-          avatarLink: comment['avatar_link'],
-        );
-
+            imageUrl: comment['image_url'] == null ? '' : comment['image_url'],
+            username: comment['username'],
+            content: comment['content'],
+            id: comment['id'],
+            createdAt: comment['created_at'],
+            postId: comment['post_id'],
+            userId: comment['user_id'],
+            avatarLink: comment['avatar_link'],
+            likes: comment['like'],
+            isLiked: comment['is_liked']);
         fetchedComments.add(cmt);
       }
       setState(() {
@@ -123,11 +139,16 @@ class _PostDetailState extends State<PostDetail> {
         return Align(
           alignment: Alignment.topLeft,
           child: CommentBubble(
+            imageUrl:
+                comments[index].imageUrl != '' ? comments[index].imageUrl : '',
             content: comments[index].content,
             username: comments[index].username,
             createdDate: comments[index].createdAt,
             userId: comments[index].userId,
             avatarLink: comments[index].avatarLink,
+            likes: comments[index].likes,
+            isLiked: comments[index].isLiked,
+            commentIndex: index,
           ),
         );
       },
@@ -147,118 +168,7 @@ class _PostDetailState extends State<PostDetail> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               // BÀI VIẾT
-              /* Container(
-                margin: const EdgeInsets.only(right: 2, left: 2),
-                child: Column(
-                  children: [
-                    // THÔNG TIN USER
-                    // AVATAR
-                    Container(
-                      alignment: Alignment.center,
-                      child: Container(
-                        width: 50.0,
-                        height: 50.0,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(90.0),
-                          image: DecorationImage(
-                              image: (widget.userOfPost.avatarUrl != null)
-                                  ? NetworkImage(widget.userOfPost.avatarUrl)
-                                  : AssetImage('images/no-image.png'),
-                              fit: BoxFit.cover),
-                        ),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        // USERNAME
-                        Text('Bởi '),
-                        InkWell(
-                          child: Text(
-                            widget.userOfPost.username,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          onTap: () {
-                            navigateToUserProfile(userId: widget.userOfPost.id);
-                          },
-                        ),
-                      ],
-                    ),
-                    // NGÀY
-                    Row(
-                      children: [
-                        // NGÀY
-                        Text(
-                          timeAgoSinceDate(dateString: widget.post.createdAt),
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    // TIÊU ĐỀ BÀI VIẾT
-                    Text(
-                      widget.post.title,
-                      style: TextStyle(
-                          fontSize: 40.0, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                    // NỘI DUNG BÀI VIẾT
-                    Text(
-                      widget.post.content,
-                      style: TextStyle(fontSize: 17.0),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 10.0),
-              // IMAGES CAROUSEL
-              ImageCarouselBuilder(),
-              // CAROUSEL INDICATOR
-              CarouselIndicator(),
-              // LIKE + COMMENT ICON
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // LIKE ICON
-                  IconButton(
-                    iconSize: 30.0,
-                    color: this.isLiked == true ? Colors.teal : Colors.grey,
-                    icon: const Icon(Icons.favorite),
-                    onPressed: () {
-                      likePost();
-                    },
-                  ),
-                  // LIKE NUMBER
-                  Text(
-                    like.toString(),
-                    style: TextStyle(
-                      fontSize: 20.0,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 40.0,
-                  ),
-                  // COMMENT ICON
-                  Icon(
-                    Icons.chat,
-                    size: 27.0,
-                  ),
-                  SizedBox(
-                    width: 7.0,
-                  ),
-                  // COMMENT NUMBER
-                  Text(
-                    //widget.post.commentsNumber.toString(),
-                    numberOfComments != null ? numberOfComments : 'loading',
-                    style: TextStyle(
-                      fontSize: 20.0,
-                    ),
-                  ),
-                ],
-              ),*/
+
               PostMini(
                 currentUserId: widget.userOfPost.id,
                 post: widget.post,
@@ -277,18 +187,37 @@ class _PostDetailState extends State<PostDetail> {
               ),
               // FORM NHẬP BÌNH LUẬN
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(4.0),
                 child: Form(
                   key: _formKey,
                   child: Row(
                     children: [
+                      // NÚT CHỌN HÌNH ẢNH
+                      IconButton(
+                        iconSize: 30.0,
+                        color: Colors.grey,
+                        icon: const Icon(Icons.image),
+                        onPressed: () {
+                          loadAssets();
+                        },
+                      ),
                       // Ô NHẬP BÌNH LUẬN
                       Expanded(
-                          child: TextFormFieldMethod(
-                              validateOption: kValidateCommentInput,
-                              hintText: 'Nhập bình luận',
-                              textEditingController: commentController,
-                              maxLines: 2)),
+                        child: textFormFieldBuilder(
+                          maxLines: 2,
+                          textController: commentController,
+                          hintText: 'Nhập bình luận',
+                          validateFunction: (value) {
+                            if (value.isEmpty) {
+                              return 'Xin nhập bình luận';
+                            }
+                            setState(() {
+                              this.commentContent = value;
+                            });
+                            return null;
+                          },
+                        ),
+                      ),
                       // NÚT ĐĂNG BÌNH LUẬN
                       IconButton(
                         iconSize: 30.0,
@@ -296,7 +225,7 @@ class _PostDetailState extends State<PostDetail> {
                         icon: const Icon(Icons.send),
                         onPressed: () {
                           if (_formKey.currentState.validate()) {
-                            // submit bài post
+                            // submit comment
                             commentSubmit();
                             // clear field nhập comment
                             commentController.clear();
@@ -309,8 +238,8 @@ class _PostDetailState extends State<PostDetail> {
                   ),
                 ),
               ),
-              // BÌNH LUẬN
-              //CommentList(),
+              // VÙNG REVIEW ẢNH ĐÃ CHỌN
+              buildGridView(),
             ],
           ),
         )
@@ -437,81 +366,92 @@ class _PostDetailState extends State<PostDetail> {
 
   // SUBMIT COMMENT
   commentSubmit() async {
-    var data = {
-      'post_id': widget.post.id,
-      'user_id': currentUser['id'],
-      'content': commentController.text,
-    };
-    var res = await Network().postData(data, '/comment/submit_comment');
-    var body = json.decode(res.body);
-    print(body);
+    // var data = {
+    //   'post_id': widget.post.id,
+    //   'user_id': currentUser['id'],
+    //   'content': commentController.text,
+    // };
+    // var res = await Network().postData(data, '/comment/submit_comment');
+    // var body = json.decode(res.body);
+    // print(body);
+
+    if (isSubmittingComment == false) {
+      setState(() {
+        isSubmittingComment = true;
+      });
+      List<MultipartFile> listFiles =
+          await assetToFile() as List<MultipartFile>;
+      FormData formData = new FormData.fromMap({
+        "files": listFiles,
+        "post_id": widget.post.id,
+        "user_id": UserGlobal.user['id'],
+        "content": commentContent,
+      });
+
+      Dio dio = new Dio();
+      SharedPreferences localStorage = await SharedPreferences.getInstance();
+      var token = jsonDecode(localStorage.getString('token'))['token'];
+      if (token == null) {
+        token = 1;
+      }
+      var response = await dio.post(
+        kApiUrl + "/comment/submit_comment",
+        data: formData,
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+      //clear hình ảnh + comment
+      setState(() {
+        this.commentContent = '';
+        this.commentController.clear();
+        this.images.clear();
+        this.comments.clear();
+        this.skip = 0;
+        this.isSubmittingComment = false;
+      });
+      // gọi mới
+      fetchComments();
+      var jsonData = json.decode(response.toString());
+    }
   }
 
-  // // COMMENT LIST
-  // CommentList() {
-  //   return FutureBuilder<dynamic>(
-  //     future: _getComments, // async work
-  //     // async work
-  //     builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-  //       if (!snapshot.hasData) {
-  //         return Text('Loading....');
-  //       }
-  //       switch (snapshot.connectionState) {
-  //         case ConnectionState.waiting:
-  //           return Text('Loading....');
-  //         default:
-  //           if (snapshot.hasError)
-  //             return Text('Error: ${snapshot.error}');
-  //           else {
-  //             var result = snapshot.data;
-  //             return Container(
-  //               child: ListView.builder(
-  //                 physics: NeverScrollableScrollPhysics(),
-  //                 shrinkWrap: true,
-  //                 itemCount: result['comments'].length,
-  //                 itemBuilder: (context, index) {
-  //                   //return Text(result['comments'][index]['content']);
-  //                   return Align(
-  //                     alignment: Alignment.topLeft,
-  //                     child: CommentBubble(
-  //                       content: result['comments'][index]['content'],
-  //                       username: result['comments'][index]['username'],
-  //                       createdDate: result['comments'][index]['created_at'],
-  //                       avatarLink: 'sss',
-  //                     ),
-  //                   );
-  //                 },
-  //               ),
-  //             );
-  //             //return Text(result['comments'][0]['content']);
-  //           }
-  //       }
-  //     },
-  //   );
-  // }
-
-  // COMMENT
-
   CommentBubble({
+    String imageUrl,
     String content,
     String username,
     String createdDate,
     String avatarLink,
+    int likes,
+    bool isLiked,
     int userId,
+    int commentIndex,
   }) {
     return SizedBox(
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            backgroundColor: Colors.red,
-            radius: 22,
-            backgroundImage: NetworkImage(avatarLink),
-            child: CircleAvatar(
-              radius: 65,
-              backgroundColor: Colors.transparent,
-            ),
+          //AVATAR
+          Column(
+            children: [
+              SizedBox(
+                height: 12.0,
+              ),
+              CircleAvatar(
+                backgroundColor: Colors.red,
+                radius: 22,
+                backgroundImage: NetworkImage(avatarLink),
+                child: CircleAvatar(
+                  radius: 65,
+                  backgroundColor: Colors.transparent,
+                ),
+              ),
+            ],
           ),
+          // CONTENT
           Padding(
             padding: EdgeInsets.all(10.0),
             child: Column(
@@ -549,18 +489,48 @@ class _PostDetailState extends State<PostDetail> {
                             fontSize: 15.0,
                           ),
                         ),
+                        // IMAGE
+                        imageUrl != ''
+                            ? Container(
+                                height: 200,
+                                width: 200,
+                                child: Image.network(imageUrl),
+                              )
+                            : SizedBox(),
                         SizedBox(height: 5.0),
                         const Divider(
                           color: Colors.grey,
                         ),
-                        // TIME AGO
-                        Text(
-                          timeAgoSinceDate(dateString: createdDate),
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 12.0,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // TIME AGO
+                            Text(
+                              timeAgoSinceDate(dateString: createdDate),
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(width: 30.0),
+                            // LIKE COMMENT BUTTON
+                            InkWell(
+                              child: Icon(
+                                Icons.favorite,
+                                size: 25.0,
+                                color: isLiked ? Colors.teal : Colors.grey,
+                              ),
+                              onTap: () {
+                                likeComment(
+                                  commentId: comments[commentIndex].id,
+                                  commentIndex: commentIndex,
+                                );
+                              },
+                            ),
+                            // LIKES NUMBER
+                            Text(likes.toString()),
+                          ],
                         ),
                       ],
                     ),
@@ -583,7 +553,7 @@ class _PostDetailState extends State<PostDetail> {
     return result;
   }
 
-  // LIKE FUNCTION
+  // LIKE POST FUNCTION
   Future<void> likePost() async {
     var res = await Network().getData('/post/like_post?post_id=' +
         widget.post.id.toString() +
@@ -607,6 +577,44 @@ class _PostDetailState extends State<PostDetail> {
     else {
       setState(() {
         this.isLiked = true;
+      });
+    }
+  }
+
+  // LIKE COMMENT FUNCTION
+  likeComment({int commentId, int commentIndex}) async {
+    if (isLikingComment == false) {
+      setState(() {
+        isLikingComment = true;
+        comments[commentIndex].isLiked = !comments[commentIndex].isLiked;
+      });
+      var res = await Network().getData('/comment/like_comment?comment_id=' +
+          commentId.toString() +
+          '&user_id=' +
+          UserGlobal.user['id'].toString());
+
+      var body = json.decode(res.body);
+
+      // handle number of likes
+      setState(() {
+        comments[commentIndex].likes = body['likes']['like'];
+      });
+
+      // // unliked
+      // if (body['liked'] == false) {
+      //   setState(() {
+      //     comments[commentIndex].isLiked = false;
+      //   });
+      // }
+      // // liked
+      // else {
+      //   setState(() {
+      //     comments[commentIndex].isLiked = true;
+      //   });
+      // }
+
+      setState(() {
+        isLikingComment = false;
       });
     }
   }
@@ -674,6 +682,126 @@ class _PostDetailState extends State<PostDetail> {
           userId: userId,
         ),
       ),
+    );
+  }
+
+  // LẤY ẢNH TRONG GALLERY VÀO LIST ASSET
+  Future<void> loadAssets() async {
+    this.images.clear();
+    List<Asset> resultList = <Asset>[];
+    String error = 'No Error Detected';
+
+    try {
+      resultList = await MultiImagePicker.pickImages(
+        maxImages: 1,
+        enableCamera: true,
+        selectedAssets: images,
+        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+        materialOptions: MaterialOptions(
+          actionBarColor: "#abcdef",
+          actionBarTitle: "Chọn hình ảnh",
+          allViewTitle: "All Photos",
+          useDetailsView: false,
+          selectCircleStrokeColor: "#000000",
+        ),
+      );
+    } on Exception catch (e) {
+      error = e.toString();
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      images = resultList;
+    });
+  }
+
+  // CONVERT TỪ ASSET SANG MULTIPLE PART FILE
+  Future<dynamic> assetToFile() async {
+    files.clear();
+
+    //images.forEach((asset) async {
+    for (var asset in images) {
+      int MAX_WIDTH = 500; //keep ratio
+      int height = ((500 * asset.originalHeight) / asset.originalWidth).round();
+
+      ByteData byteData =
+          await asset.getThumbByteData(MAX_WIDTH, height, quality: 80);
+
+      if (byteData != null) {
+        List<int> imageData = byteData.buffer.asUint8List();
+        MultipartFile u =
+            await MultipartFile.fromBytes(imageData, filename: asset.name);
+
+        setState(() {
+          this.files.add(u);
+        });
+      }
+    }
+    ;
+
+    return files;
+  }
+
+  // XUẤT HÌNH TỪ LIST ASSET RA ĐỂ REVIEW
+  Widget buildGridView() {
+    if (this.images.length != 0) {
+      return Row(
+        children: [
+          Container(
+            margin: const EdgeInsets.all(1.0),
+            child: AssetThumb(
+              asset: images[0],
+              width: 100,
+              height: 100,
+            ),
+          ),
+          InkWell(
+            child: Icon(Icons.cancel),
+            onTap: () {
+              setState(() {
+                this.images.clear();
+              });
+            },
+          ),
+        ],
+      );
+    } else {
+      return SizedBox();
+    }
+  }
+
+  // TEXT FORM FIELD
+  textFormFieldBuilder(
+      {String label,
+      TextEditingController textController,
+      int maxLines,
+      String hintText,
+      Function validateFunction}) {
+    return TextFormField(
+      controller: textController,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        labelStyle: TextStyle(
+          color: Colors.blueGrey,
+        ),
+        labelText: label,
+        hintText: hintText,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+      ),
+      validator: validateFunction,
     );
   }
 }

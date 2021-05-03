@@ -581,7 +581,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       controller: _searchQueryController,
       autofocus: true,
       decoration: InputDecoration(
-        hintText: "Tìm kiếm bài viết, người dùng",
+        hintText: "Tìm kiếm",
         border: InputBorder.none,
         hintStyle: TextStyle(color: Colors.white70),
       ),

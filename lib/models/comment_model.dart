@@ -6,6 +6,9 @@ class CommentModel {
   String createdAt;
   String username;
   String avatarLink;
+  String imageUrl;
+  int likes;
+  bool isLiked;
 
   CommentModel({
     this.createdAt,
@@ -15,5 +18,8 @@ class CommentModel {
     this.userId,
     this.postId,
     this.avatarLink,
+    this.imageUrl,
+    this.likes,
+    this.isLiked,
   });
 }

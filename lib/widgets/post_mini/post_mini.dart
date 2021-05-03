@@ -225,9 +225,6 @@ class _PostMiniState extends State<PostMini> {
             ),
           ],
         ),
-
-        // BÌNH LUẬN
-        //CommentList(),
       ],
     );
   }

@@ -39,6 +39,8 @@ dependencies:
   intl: ^0.17.0
   timeago: ^3.0.2
   toggle_switch: ^0.1.9
+  emoji_picker: ^0.1.0
+
 
 
 dev_dependencies:

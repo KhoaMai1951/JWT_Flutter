@@ -75,8 +75,14 @@ class _LoadingPostDetailScreenState extends State<LoadingPostDetailScreen> {
     int userId = body['user']['id'];
     String username = body['user']['username'];
     String avatarUrl = body['post']['user']['avatar_url'];
+    int roleId = body['post']['user']['role_id'];
 
-    return new UserModel(id: userId, username: username, avatarUrl: avatarUrl);
+    return new UserModel(
+      id: userId,
+      username: username,
+      avatarUrl: avatarUrl,
+      roleId: roleId,
+    );
   }
 
   // HANDLE POST MODEL

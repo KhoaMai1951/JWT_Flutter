@@ -10,6 +10,7 @@ import 'package:flutter_login_test_2/screens/account/profile_edit.dart';
 import 'package:flutter_login_test_2/screens/edit_post/edit_post.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_post_detail.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
+import 'package:flutter_login_test_2/widgets/label/expert_label.dart';
 import 'package:flutter_login_test_2/widgets/snack_bar/snack_bar.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
@@ -94,6 +95,9 @@ class _PostMiniState extends State<PostMini> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                widget.post.user.roleId == 2
+                                    ? expertLabelBuild()
+                                    : SizedBox(),
                                 // USERNAME
                                 InkWell(
                                   child: Text(

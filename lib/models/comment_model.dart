@@ -1,3 +1,5 @@
+import 'package:flutter_login_test_2/models/user_model.dart';
+
 class CommentModel {
   int userId;
   int postId;
@@ -9,6 +11,7 @@ class CommentModel {
   String imageUrl;
   int likes;
   bool isLiked;
+  UserModel userModel;
 
   CommentModel({
     this.createdAt,
@@ -21,5 +24,6 @@ class CommentModel {
     this.imageUrl,
     this.likes,
     this.isLiked,
+    this.userModel,
   });
 }

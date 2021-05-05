@@ -13,6 +13,7 @@ import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_post_detail.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
+import 'package:flutter_login_test_2/widgets/label/expert_label.dart';
 import 'package:flutter_login_test_2/widgets/post_mini/post_mini.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
@@ -65,6 +66,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       'skip': this.skipUser,
       'take': takeUser,
       'keyword': keyword,
+      'role_id_array': [1, 2],
     };
     var res = await Network().postData(data, '/user/search_user');
     var body = json.decode(res.body);
@@ -78,6 +80,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           username: user['username'],
           name: user['name'],
           avatarUrl: user['avatar_url'],
+          roleId: user['role_id'],
         );
 
         fetchedUsers.add(userModel);
@@ -119,6 +122,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           id: post['user']['id'],
           username: post['user']['username'],
           avatarUrl: post['user']['avatar_url'],
+          roleId: post['user']['role_id'],
         );
         // image for post handle
         List<String> imagesForPost = [];
@@ -169,6 +173,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     };
     var res = await Network().postData(
         data, '/post/get_all_posts_of_following_users_by_chunk_by_user_id');
+
     var body = json.decode(res.body);
     // Nếu có kết quả trả về
     if (body['posts'].isEmpty == false) {
@@ -179,6 +184,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           id: post['user']['id'],
           username: post['user']['username'],
           avatarUrl: post['user']['avatar_url'],
+          roleId: post['user']['role_id'],
         );
         // image for post handle
         List<String> imagesForPost = [];
@@ -483,7 +489,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           ),
         ),
         SizedBox(height: 20.0),
-        // NEWSFEED
+        // USER FEED
         Expanded(
           child: ListView.builder(
             shrinkWrap: true,
@@ -525,10 +531,13 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                           SizedBox(
                             width: 10.0,
                           ),
-                          // USERNAME
+                          // USERNAME + LABEL
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              users[index].roleId == 2
+                                  ? expertLabelBuild()
+                                  : SizedBox(),
                               // USERNAME
                               InkWell(
                                 child: Text(
@@ -536,6 +545,17 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 15),
+                                ),
+                                onTap: () {
+                                  navigateToUserProfile(
+                                      userId: users[index].id);
+                                },
+                              ),
+                              // NAME
+                              InkWell(
+                                child: Text(
+                                  users[index].name,
+                                  style: TextStyle(fontSize: 15),
                                 ),
                                 onTap: () {
                                   navigateToUserProfile(

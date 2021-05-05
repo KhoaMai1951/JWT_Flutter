@@ -1,13 +1,15 @@
 class UserModel {
-  UserModel(
-      {this.bio,
-      this.email,
-      this.name,
-      this.username,
-      this.id,
-      this.avatarUrl,
-      this.followersNumber,
-      this.followingNumber});
+  UserModel({
+    this.bio,
+    this.email,
+    this.name,
+    this.username,
+    this.id,
+    this.avatarUrl,
+    this.followersNumber,
+    this.followingNumber,
+    this.roleId,
+  });
 
   String bio;
   String name;
@@ -17,4 +19,5 @@ class UserModel {
   String avatarUrl;
   int followingNumber;
   int followersNumber;
+  int roleId;
 }

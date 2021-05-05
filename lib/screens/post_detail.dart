@@ -16,6 +16,7 @@ import 'package:flutter_login_test_2/models/tag_model.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
+import 'package:flutter_login_test_2/widgets/label/expert_label.dart';
 import 'package:flutter_login_test_2/widgets/post_mini/post_mini.dart';
 import 'package:flutter_login_test_2/widgets/text_form_field/text_form_field_universal.dart';
 
@@ -26,8 +27,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'loading/loading_user_profile.dart';
 
 class PostDetail extends StatefulWidget {
-  static const String id = 'post_detail_screen';
-
   PostDetail({Key key, this.post, this.userOfPost}) : super(key: key);
   //int id;
   PostDetailModel post;
@@ -66,7 +65,7 @@ class _PostDetailState extends State<PostDetail> {
   // Hàm future lấy list comment
   Future<dynamic> _getComments;
 
-  // Hàm clear toàn bộ mảng comments + lấy cụm comments mới + lấy lấy số lượng comment
+  // Hàm clear toàn bộ mảng comments + lấy cụm comments mới + lấy số lượng comment
   void _loadComments() {
     setState(() {
       //_getComments = getCommentList();
@@ -99,17 +98,24 @@ class _PostDetailState extends State<PostDetail> {
     if (body['comments'].isEmpty == false) {
       List<CommentModel> fetchedComments = [];
       for (var comment in body['comments']) {
+        //USER MODEL
+        UserModel userModel = new UserModel(
+          id: comment['user_id'],
+          roleId: comment['user']['role_id'],
+          username: comment['user']['username'],
+          avatarUrl: comment['user']['avatar_link'],
+        );
+        //COMMENT MODEL
         CommentModel cmt = new CommentModel(
-            imageUrl: comment['image_url'] == null ? '' : comment['image_url'],
-            username: comment['username'],
-            content: comment['content'],
-            id: comment['id'],
-            createdAt: comment['created_at'],
-            postId: comment['post_id'],
-            userId: comment['user_id'],
-            avatarLink: comment['avatar_link'],
-            likes: comment['like'],
-            isLiked: comment['is_liked']);
+          imageUrl: comment['image_url'] == null ? '' : comment['image_url'],
+          content: comment['content'],
+          id: comment['id'],
+          createdAt: comment['created_at'],
+          postId: comment['post_id'],
+          likes: comment['like'],
+          isLiked: comment['is_liked'],
+          userModel: userModel,
+        );
         fetchedComments.add(cmt);
       }
       setState(() {
@@ -126,7 +132,7 @@ class _PostDetailState extends State<PostDetail> {
     }
   }
 
-  // Hàm listview builder theo cụm
+  // Hàm listview builder comment theo cụm
   listViewCommentsBuild() {
     return ListView.builder(
       //controller: this._scrollController,
@@ -139,15 +145,7 @@ class _PostDetailState extends State<PostDetail> {
         return Align(
           alignment: Alignment.topLeft,
           child: CommentBubble(
-            imageUrl:
-                comments[index].imageUrl != '' ? comments[index].imageUrl : '',
-            content: comments[index].content,
-            username: comments[index].username,
-            createdDate: comments[index].createdAt,
-            userId: comments[index].userId,
-            avatarLink: comments[index].avatarLink,
-            likes: comments[index].likes,
-            isLiked: comments[index].isLiked,
+            commentModel: comments[index],
             commentIndex: index,
           ),
         );
@@ -168,7 +166,6 @@ class _PostDetailState extends State<PostDetail> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               // BÀI VIẾT
-
               PostMini(
                 currentUserId: widget.userOfPost.id,
                 post: widget.post,
@@ -420,15 +417,8 @@ class _PostDetailState extends State<PostDetail> {
   }
 
   CommentBubble({
-    String imageUrl,
-    String content,
-    String username,
-    String createdDate,
-    String avatarLink,
-    int likes,
-    bool isLiked,
-    int userId,
     int commentIndex,
+    CommentModel commentModel,
   }) {
     return SizedBox(
       child: Row(
@@ -443,7 +433,7 @@ class _PostDetailState extends State<PostDetail> {
               CircleAvatar(
                 backgroundColor: Colors.red,
                 radius: 22,
-                backgroundImage: NetworkImage(avatarLink),
+                backgroundImage: NetworkImage(commentModel.userModel.avatarUrl),
                 child: CircleAvatar(
                   radius: 65,
                   backgroundColor: Colors.transparent,
@@ -466,10 +456,13 @@ class _PostDetailState extends State<PostDetail> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        commentModel.userModel.roleId == 2
+                            ? expertLabelBuild()
+                            : SizedBox(),
                         // USERNAME
                         InkWell(
                           child: Text(
-                            username,
+                            commentModel.userModel.username,
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 19.0,
@@ -477,24 +470,25 @@ class _PostDetailState extends State<PostDetail> {
                             ),
                           ),
                           onTap: () {
-                            navigateToUserProfile(userId: userId);
+                            navigateToUserProfile(
+                                userId: commentModel.userModel.id);
                           },
                         ),
                         SizedBox(height: 5.0),
                         // CONTENT
                         Text(
-                          content,
+                          commentModel.content,
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 15.0,
                           ),
                         ),
                         // IMAGE
-                        imageUrl != ''
+                        commentModel.imageUrl != ''
                             ? Container(
                                 height: 200,
                                 width: 200,
-                                child: Image.network(imageUrl),
+                                child: Image.network(commentModel.imageUrl),
                               )
                             : SizedBox(),
                         SizedBox(height: 5.0),
@@ -506,7 +500,8 @@ class _PostDetailState extends State<PostDetail> {
                           children: [
                             // TIME AGO
                             Text(
-                              timeAgoSinceDate(dateString: createdDate),
+                              timeAgoSinceDate(
+                                  dateString: commentModel.createdAt),
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 12.0,
@@ -519,7 +514,9 @@ class _PostDetailState extends State<PostDetail> {
                               child: Icon(
                                 Icons.favorite,
                                 size: 25.0,
-                                color: isLiked ? Colors.teal : Colors.grey,
+                                color: commentModel.isLiked
+                                    ? Colors.teal
+                                    : Colors.grey,
                               ),
                               onTap: () {
                                 likeComment(
@@ -529,7 +526,7 @@ class _PostDetailState extends State<PostDetail> {
                               },
                             ),
                             // LIKES NUMBER
-                            Text(likes.toString()),
+                            Text(commentModel.likes.toString()),
                           ],
                         ),
                       ],

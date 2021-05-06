@@ -58,6 +58,7 @@ class _LoadingProfileScreenState extends State<LoadingProfileScreen> {
     String avatarUrl = body['avatar_link'];
     int numberOfFollowers = body['number_of_followers'];
     int numberOfFollowing = body['number_of_following'];
+    int roleId = body['user'][0]['role_id'];
 
     UserModel userModel = new UserModel(
       id: id,
@@ -68,6 +69,7 @@ class _LoadingProfileScreenState extends State<LoadingProfileScreen> {
       avatarUrl: avatarUrl,
       followersNumber: numberOfFollowers,
       followingNumber: numberOfFollowing,
+      roleId: roleId,
     );
     // pop trang loading ra khỏi stack
     Navigator.pop(context);

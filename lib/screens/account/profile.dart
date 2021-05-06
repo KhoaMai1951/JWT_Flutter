@@ -14,7 +14,9 @@ import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/account/avatar_preview.dart';
 import 'package:flutter_login_test_2/screens/account/change_password.dart';
 import 'package:flutter_login_test_2/screens/account/profile_edit.dart';
+import 'package:flutter_login_test_2/screens/expert/expert_request.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
+import 'package:flutter_login_test_2/widgets/label/expert_label.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import '../loading/loading_post_detail.dart';
 
@@ -266,6 +268,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
+                                  // LABEL EXPERT
+                                  widget.user.roleId == 2
+                                      ? expertLabelBuild()
+                                      : SizedBox(),
                                   // NAME + SETTING BUTTON
                                   Row(
                                     mainAxisAlignment:
@@ -482,6 +488,22 @@ class _ProfileScreenState extends State<ProfileScreen>
                             context,
                             MaterialPageRoute(
                               builder: (context) => ChangePasswordScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    // REQUEST EXPERT ROLE
+                    Ink(
+                      color: Colors.white,
+                      child: ListTile(
+                        leading: Icon(Icons.local_police),
+                        title: Text('Yêu cầu làm chuyên gia cây cảnh'),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ExpertRequestScreen(),
                             ),
                           );
                         },

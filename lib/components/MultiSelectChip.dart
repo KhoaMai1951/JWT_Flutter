@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 class MultiSelectChip extends StatefulWidget {
   // constructor
   //MultiSelectChip({this.reportList, this.onSelectionChanged});
-  MultiSelectChip({this.list, this.onSelectionChanged});
+  MultiSelectChip({this.list, this.onSelectionChanged, this.selectLimit});
   final List list;
   final Function(List, int) onSelectionChanged;
+  final selectLimit;
   @override
   _MultiSelectChipState createState() => _MultiSelectChipState();
 }
@@ -30,7 +31,7 @@ class _MultiSelectChipState extends State<MultiSelectChip> {
             setState(() {
               _color = selected ? Colors.lightGreen : Colors.grey;
               // if array of choices < 3 parameters, then allow add more or delete already existing ones
-              if (selectedChoices.length < 2) {
+              if (selectedChoices.length < widget.selectLimit) {
                 selectedChoices.contains(item)
                     ? selectedChoices.remove(item)
                     : selectedChoices.add(item);

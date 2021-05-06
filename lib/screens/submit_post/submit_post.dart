@@ -288,6 +288,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
   BuildPlantTagChip() {
     if (_plantTagListIsLoading) return Text('đang tải...');
     return MultiSelectChip(
+        selectLimit: 2,
         list: this.plantTagList,
         onSelectionChanged: (selectedList, maxCounter) {
           setState(() {
@@ -301,6 +302,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
   BuildContentTagChip() {
     if (_contentTagListIsLoading) return Text('đang tải...');
     return MultiSelectChip(
+        selectLimit: 2,
         list: this.contentTagList,
         onSelectionChanged: (selectedList, maxCounter) {
           setState(() {
@@ -348,7 +350,6 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
   Future<dynamic> assetToFile() async {
     files.clear();
 
-    //images.forEach((asset) async {
     for (var asset in images) {
       int MAX_WIDTH = 500; //keep ratio
       int height = ((500 * asset.originalHeight) / asset.originalWidth).round();

@@ -466,6 +466,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         leading: Icon(Icons.edit),
                         title: Text('Chỉnh sửa thông tin'),
                         onTap: () {
+                          Navigator.pop(context);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -484,6 +485,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         leading: Icon(Icons.lock),
                         title: Text('Thay đổi mật khẩu'),
                         onTap: () {
+                          Navigator.pop(context);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -500,6 +502,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         leading: Icon(Icons.local_police),
                         title: Text('Yêu cầu làm chuyên gia cây cảnh'),
                         onTap: () {
+                          Navigator.pop(context);
                           Navigator.push(
                             context,
                             MaterialPageRoute(

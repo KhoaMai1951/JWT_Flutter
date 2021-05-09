@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class NoPostScreen extends StatefulWidget {
   @override
@@ -8,8 +9,15 @@ class NoPostScreen extends StatefulWidget {
 class _NoPostScreenState extends State<NoPostScreen> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Text('Không có bài viết nào :<'),
+    return Scaffold(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: Text('Không tìm được bài viết'),
+          ),
+        ],
+      ),
     );
   }
 }

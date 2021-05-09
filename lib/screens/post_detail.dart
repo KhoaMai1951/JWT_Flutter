@@ -18,6 +18,7 @@ import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:flutter_login_test_2/widgets/label/expert_label.dart';
 import 'package:flutter_login_test_2/widgets/post_mini/post_mini.dart';
+import 'package:flutter_login_test_2/widgets/snack_bar/snack_bar.dart';
 import 'package:flutter_login_test_2/widgets/text_form_field/text_form_field_universal.dart';
 
 import 'package:intl/intl.dart';
@@ -456,23 +457,51 @@ class _PostDetailState extends State<PostDetail> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        commentModel.userModel.roleId == 2
-                            ? expertLabelBuild()
-                            : SizedBox(),
-                        // USERNAME
-                        InkWell(
-                          child: Text(
-                            commentModel.userModel.username,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 19.0,
-                              fontWeight: FontWeight.bold,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            // EXPERT LABEL + USERNAME
+                            Column(
+                              children: [
+                                // EXPERT LABEL
+                                commentModel.userModel.roleId == 2
+                                    ? expertLabelBuild()
+                                    : SizedBox(),
+                                // USERNAME
+                                InkWell(
+                                  child: Text(
+                                    commentModel.userModel.username,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 19.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () {
+                                    navigateToUserProfile(
+                                        userId: commentModel.userModel.id);
+                                  },
+                                ),
+                              ],
                             ),
-                          ),
-                          onTap: () {
-                            navigateToUserProfile(
-                                userId: commentModel.userModel.id);
-                          },
+                            // MENU FOR COMMENT
+                            commentModel.userModel.id == UserGlobal.user['id']
+                                ? Container(
+                                    margin: EdgeInsets.only(left: 12.0),
+                                    child: InkWell(
+                                      child: Icon(Icons.more_vert),
+                                      onTap: () async {
+                                        // show popup menu
+                                        _showPopupMenu(
+                                          commentIndex: commentIndex,
+                                          commentModel: commentModel,
+                                        );
+                                      },
+                                    ),
+                                  )
+                                : SizedBox(),
+                          ],
                         ),
                         SizedBox(height: 5.0),
                         // CONTENT
@@ -799,6 +828,76 @@ class _PostDetailState extends State<PostDetail> {
         ),
       ),
       validator: validateFunction,
+    );
+  }
+
+  //POPUP MENU
+  _showPopupMenu({
+    int commentIndex,
+    CommentModel commentModel,
+  }) async {
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      context: context,
+      builder: (context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.3,
+          decoration: new BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: new BorderRadius.only(
+              topLeft: const Radius.circular(25.0),
+              topRight: const Radius.circular(25.0),
+            ),
+          ),
+          child: ListView(
+            children: [
+              // CHỈNH SỬA BÌNH LUẬN
+              Ink(
+                color: Colors.white,
+                child: ListTile(
+                  leading: Icon(Icons.edit),
+                  title: Text('Chỉnh sửa bình luận'),
+                  onTap: () {
+                    // Navigator.pop(context);
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => EditPostScreen(
+                    //       postId: widget.post.id,
+                    //     ),
+                    //   ),
+                    // );
+                  },
+                ),
+              ),
+              // XÓA BÌNH LUẬN
+              Ink(
+                color: Colors.white,
+                child: ListTile(
+                  leading: Icon(Icons.delete),
+                  title: Text('Xóa bình luận'),
+                  onTap: () async {
+                    // delete comment in array
+                    setState(() {
+                      this.comments.removeAt(commentIndex);
+                    });
+                    // Close popup menu
+                    Navigator.pop(context);
+                    // Show snack bar
+                    buildSnackBar(
+                        context: context, message: 'Đã xóa bình luận');
+                    // call api
+                    var res = await Network().getData(
+                        '/comment/delete_comment?id=' +
+                            commentModel.id.toString());
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

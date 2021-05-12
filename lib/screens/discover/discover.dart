@@ -207,7 +207,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           isLiked: post['is_liked'],
           isSuggested: post['is_suggested'],
         );
-
         fetchedPosts.add(postModel);
       }
       setState(() {

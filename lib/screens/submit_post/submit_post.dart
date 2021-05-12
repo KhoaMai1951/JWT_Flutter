@@ -50,6 +50,22 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
   TextEditingController titleController = TextEditingController();
   var userId;
 
+  //audience target
+  int audience = 1;
+
+  void _handleRadioValueChange(int value) {
+    setState(() {
+      audience = value;
+      print(audience);
+      switch (audience) {
+        case 1:
+          break;
+        case 2:
+          break;
+      }
+    });
+  }
+
   @override
   void initState() {
     _loadUserData();
@@ -176,6 +192,51 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
                   ),
                   // DANH SÁCH CHIP NỘI DUNG BÀI VIẾT
                   BuildContentTagChip(),
+                  // ĐỐI TƯỢNG XEM BÀI
+                  SizedBox(
+                    height: 30.0,
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      child: Text(
+                        "Đối tượng bài viết",
+                      ),
+                    ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          new Radio(
+                            value: 1,
+                            groupValue: audience,
+                            onChanged: _handleRadioValueChange,
+                          ),
+                          new Text(
+                            'Tất cả mọi người',
+                            style: new TextStyle(fontSize: 16.0),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          new Radio(
+                            value: 2,
+                            groupValue: audience,
+                            onChanged: _handleRadioValueChange,
+                          ),
+                          new Text(
+                            'Chỉ chuyên gia',
+                            style: new TextStyle(
+                              fontSize: 16.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                   // SUBMIT POST BUTTON
                   Padding(
                     padding: const EdgeInsets.all(10.0),
@@ -229,6 +290,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
       "files": listFiles,
       'title': titleController.text,
       'content': contentController.text,
+      'audience': audience,
       'user_id': userId,
       'tag_ids': tagIds,
     });
@@ -326,7 +388,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
         cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
         materialOptions: MaterialOptions(
           actionBarColor: "#abcdef",
-          actionBarTitle: "Example App",
+          actionBarTitle: "Chọn ảnh",
           allViewTitle: "All Photos",
           useDetailsView: false,
           selectCircleStrokeColor: "#000000",

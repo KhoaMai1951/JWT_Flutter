@@ -56,6 +56,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   ScrollController _scrollController = new ScrollController();
   // TAB
   TabController _tabController;
+  // Radio button
+  int _radioValue1 = -1;
 
   //1C HÀM GỌI API LẤY DS USER THEO CỤM
   fetchUsers() async {
@@ -203,6 +205,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           user: userModel,
           currentImageIndicator: 0,
           isLiked: post['is_liked'],
+          isSuggested: post['is_suggested'],
         );
 
         fetchedPosts.add(postModel);
@@ -308,27 +311,31 @@ class _DiscoverScreenState extends State<DiscoverScreen>
             pinned: true,
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(0.0),
-              child: TabBar(
-                onTap: (index) {
-                  setState(() {
-                    currentTabIndex = index;
-                  });
-                },
-                controller: _tabController,
-                labelColor: Colors.teal,
-                isScrollable: false,
-                tabs: [
-                  Tab(
-                    icon: Icon(Icons.home),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.all(3.0),
-                    child: Tab(
-                      icon: Icon(Icons.public),
-                    ),
-                  ),
-                  Tab(
-                    icon: Icon(Icons.people),
+              child: Column(
+                children: [
+                  TabBar(
+                    onTap: (index) {
+                      setState(() {
+                        currentTabIndex = index;
+                      });
+                    },
+                    controller: _tabController,
+                    labelColor: Colors.teal,
+                    isScrollable: false,
+                    tabs: [
+                      Tab(
+                        icon: Icon(Icons.home),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.all(3.0),
+                        child: Tab(
+                          icon: Icon(Icons.public),
+                        ),
+                      ),
+                      Tab(
+                        icon: Icon(Icons.people),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -353,6 +360,32 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   infiniteHomeListView() {
     return Column(
       children: [
+        // FILTER
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new Radio(
+              value: 0,
+              groupValue: _radioValue1,
+              onChanged: _handleRadioValueChange1,
+            ),
+            new Text(
+              'Carnivore',
+              style: new TextStyle(fontSize: 16.0),
+            ),
+            new Radio(
+              value: 1,
+              groupValue: _radioValue1,
+              onChanged: _handleRadioValueChange1,
+            ),
+            new Text(
+              'Herbivore',
+              style: new TextStyle(
+                fontSize: 16.0,
+              ),
+            ),
+          ],
+        ),
         // NEWSFEED
         Expanded(
           child: ListView.builder(
@@ -595,18 +628,37 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     );
   }
 
+  void _handleRadioValueChange1(int value) {
+    setState(() {
+      _radioValue1 = value;
+
+      switch (_radioValue1) {
+        case 0:
+          break;
+        case 1:
+          break;
+        case 2:
+          break;
+      }
+    });
+  }
+
   Widget _buildSearchField() {
-    return TextField(
-      cursorColor: Colors.white,
-      controller: _searchQueryController,
-      autofocus: true,
-      decoration: InputDecoration(
-        hintText: "Tìm kiếm",
-        border: InputBorder.none,
-        hintStyle: TextStyle(color: Colors.white70),
-      ),
-      style: TextStyle(color: Colors.white, fontSize: 16.0),
-      onChanged: (query) => updateSearchQuery(query),
+    return Column(
+      children: [
+        TextField(
+          cursorColor: Colors.white,
+          controller: _searchQueryController,
+          autofocus: true,
+          decoration: InputDecoration(
+            hintText: "Tìm kiếm",
+            border: InputBorder.none,
+            hintStyle: TextStyle(color: Colors.white70),
+          ),
+          style: TextStyle(color: Colors.white, fontSize: 16.0),
+          onChanged: (query) => updateSearchQuery(query),
+        ),
+      ],
     );
   }
 

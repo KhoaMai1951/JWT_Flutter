@@ -74,7 +74,9 @@ class _ExpertRequestScreenState extends State<ExpertRequestScreen> {
         break;
       //pending expert
       case 1:
-        return Text('đang chờ admin duyệt');
+        return Center(
+          child: Text('Đang chờ duyệt'),
+        );
         break;
       //đã là expert
       case 2:

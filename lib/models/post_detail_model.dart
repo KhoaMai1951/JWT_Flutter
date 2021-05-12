@@ -16,6 +16,7 @@ class PostDetailModel {
     this.user,
     this.currentImageIndicator,
     this.isLiked,
+    this.isSuggested,
   });
 
   int id;
@@ -30,4 +31,5 @@ class PostDetailModel {
   UserModel user;
   int currentImageIndicator = 0;
   bool isLiked;
+  bool isSuggested;
 }

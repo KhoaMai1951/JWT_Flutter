@@ -91,10 +91,14 @@ class _PostMiniState extends State<PostMini> {
                             SizedBox(
                               width: 10.0,
                             ),
-                            // USERNAME + NGÀY
+                            // USERNAME + NGÀY + LABEL CHUYÊN GIA
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                widget.post.isSuggested == true
+                                    ? Text('Được gợi ý')
+                                    : SizedBox(),
+                                // LABEL CHUYÊN GIA
                                 widget.post.user.roleId == 2
                                     ? expertLabelBuild()
                                     : SizedBox(),

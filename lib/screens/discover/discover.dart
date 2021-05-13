@@ -56,8 +56,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   ScrollController _scrollController = new ScrollController();
   // TAB
   TabController _tabController;
-  // Radio button
-  int _radioValue1 = -1;
 
   //1C HÀM GỌI API LẤY DS USER THEO CỤM
   fetchUsers() async {
@@ -113,7 +111,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       'keyword': keyword,
       'user_id': UserGlobal.user['id'],
     };
-    var res = await Network().postData(data, '/post/test_search');
+    var res = await Network().postData(data, '/post/global_newsfeed');
     var body = json.decode(res.body);
     // Nếu có kết quả trả về
     if (body['posts'].isEmpty == false) {
@@ -359,32 +357,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   infiniteHomeListView() {
     return Column(
       children: [
-        // FILTER
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            new Radio(
-              value: 0,
-              groupValue: _radioValue1,
-              onChanged: _handleRadioValueChange1,
-            ),
-            new Text(
-              'Carnivore',
-              style: new TextStyle(fontSize: 16.0),
-            ),
-            new Radio(
-              value: 1,
-              groupValue: _radioValue1,
-              onChanged: _handleRadioValueChange1,
-            ),
-            new Text(
-              'Herbivore',
-              style: new TextStyle(
-                fontSize: 16.0,
-              ),
-            ),
-          ],
-        ),
         // NEWSFEED
         Expanded(
           child: ListView.builder(
@@ -625,21 +597,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
             : SizedBox(),
       ],
     );
-  }
-
-  void _handleRadioValueChange1(int value) {
-    setState(() {
-      _radioValue1 = value;
-
-      switch (_radioValue1) {
-        case 0:
-          break;
-        case 1:
-          break;
-        case 2:
-          break;
-      }
-    });
   }
 
   Widget _buildSearchField() {

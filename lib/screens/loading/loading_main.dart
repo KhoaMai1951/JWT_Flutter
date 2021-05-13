@@ -38,7 +38,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       try {
         var response = await Network()
             .getData(kApiGetDataWithToken)
-            .timeout(const Duration(seconds: 10));
+            .timeout(const Duration(seconds: 20));
         // token still valid
         if (response.statusCode == 200) {
           print('token valid');

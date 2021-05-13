@@ -171,8 +171,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       'take': takePostHome,
       'keyword': keyword,
     };
-    var res = await Network().postData(
-        data, '/post/get_all_posts_of_following_users_by_chunk_by_user_id');
+    var res = await Network().postData(data, '/post/home_newsfeed');
 
     var body = json.decode(res.body);
     // Nếu có kết quả trả về

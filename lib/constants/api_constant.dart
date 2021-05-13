@@ -4,16 +4,16 @@
 //const String kApiUrl = 'http://192.168.43.165:8000/api/v1';
 import 'package:flutter_login_test_2/screens/post_detail.dart';
 
-// // NHÀ
-// const String kApiUrl = 'http://192.168.1.2:8000/api/v1';
+// NHÀ
+const String kApiUrl = 'http://192.168.1.2:8000/api/v1';
 // // DIGITAL OCEAN
 // const String kApiUrl = 'http://143.198.200.30/api/v1';
 // // UIT
 // const String kApiUrl = 'http://10.45.176.82:8000/api/v1';
 // // 3G
 // const String kApiUrl = 'http://192.168.224.165:8000/api/v1';
-// CAFE
-const String kApiUrl = 'http://192.168.222.111:8000/api/v1';
+// // CAFE
+// const String kApiUrl = 'http://192.168.222.111:8000/api/v1';
 
 // AUTHENTICATION SYSTEM
 const String kApiRegister = '/register';

@@ -196,6 +196,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
                   SizedBox(
                     height: 30.0,
                   ),
+                  // LỰA CHỌN ĐỐI TƯỢNG BÀI VIẾT
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Container(

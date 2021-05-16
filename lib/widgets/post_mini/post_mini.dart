@@ -343,6 +343,12 @@ class _PostMiniState extends State<PostMini> {
 
   // LIKE FUNCTION
   Future<void> likePost({int postId, int userId}) async {
+    /*setState(() {
+      widget.post.isLiked == true
+          ? widget.post.isLiked = false
+          : widget.post.isLiked = true;
+    });*/
+
     var res = await Network().getData('/post/like_post?post_id=' +
         postId.toString() +
         '&user_id=' +

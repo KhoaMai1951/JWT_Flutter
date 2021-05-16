@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_login_test_2/screens/discover/discover.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_main.dart';
 
 void main() => runApp(MyApp());
@@ -67,5 +68,6 @@ class _CheckAuthState extends State<CheckAuth> {
     // );
 
     return LoadingScreen();
+    //return DiscoverScreen();
   }
 }

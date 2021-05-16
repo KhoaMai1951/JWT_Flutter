@@ -5,9 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
+import 'package:flutter_login_test_2/screens/discover/discover.dart';
 import 'package:flutter_login_test_2/screens/fail/cannot_connect_server_screen.dart';
-import 'package:flutter_login_test_2/screens/home.dart';
-import 'package:flutter_login_test_2/screens/news_feed.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -35,33 +34,32 @@ class _LoadingScreenState extends State<LoadingScreen> {
     if (token != null) {
       print('there is token');
       // check if token is still valid
-      try {
-        var response = await Network()
-            .getData(kApiGetDataWithToken)
-            .timeout(const Duration(seconds: 20));
-        // token still valid
-        if (response.statusCode == 200) {
-          print('token valid');
-          // init user global variable
-          UserGlobal.fetchUserFromLocal();
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) {
-              return NewsFeedScreen();
-            }),
-          );
-        }
-        // token invalid
-        else {
-          localStorage.remove('token');
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) {
-              return Login();
-            }),
-          );
-        }
-      } on TimeoutException catch (e) {
+      var response = await Network()
+          .getData(kApiGetDataWithToken)
+          .timeout(const Duration(seconds: 20));
+      // token still valid
+      if (response.statusCode == 200) {
+        print('token valid');
+        // init user global variable
+        UserGlobal.fetchUserFromLocal();
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) {
+            return DiscoverScreen();
+          }),
+        );
+      }
+      // token invalid
+      else {
+        localStorage.remove('token');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) {
+            return Login();
+          }),
+        );
+      }
+      try {} on TimeoutException catch (e) {
         Navigator.pop(context);
         Navigator.push(
           context,

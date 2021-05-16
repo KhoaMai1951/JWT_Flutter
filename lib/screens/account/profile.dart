@@ -55,12 +55,12 @@ class _ProfileScreenState extends State<ProfileScreen>
       isLoading = true;
     });
     var data = {
+      'current_user_id': UserGlobal.user['id'],
       'user_id': widget.user.id,
       'skip': this.skip,
       'take': take,
     };
-    var res = await Network()
-        .postData(data, '/post/get_all_posts_by_chunk_by_user_id');
+    var res = await Network().postData(data, '/post/user_posts');
     var body = json.decode(res.body);
 
     // Nếu có kết quả trả về
@@ -128,11 +128,11 @@ class _ProfileScreenState extends State<ProfileScreen>
     });
     var data = {
       'user_id': widget.user.id,
+      'current_user_id': UserGlobal.user['id'],
       'skip': this.skip,
       'take': take,
     };
-    var res = await Network()
-        .postData(data, '/post/get_all_saved_posts_by_chunk_by_user_id');
+    var res = await Network().postData(data, '/post/get_saved_posts');
     var body = json.decode(res.body);
 
     // Nếu có kết quả trả về
@@ -179,7 +179,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: kAppBarColor,
-        title: Text(UserGlobal.user['username']),
+        title: Text(widget.user.username),
       ),
       body: bodyLayout(),
       bottomNavigationBar: buildBottomNavigationBar(
@@ -767,7 +767,6 @@ class _ProfileScreenState extends State<ProfileScreen>
     };
 
     var res = await Network().postData(data, '/user/check_follow');
-
     var body = json.decode(res.body);
 
     if (body['result'] == false) {

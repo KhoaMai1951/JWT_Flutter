@@ -4,6 +4,8 @@ import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_login_test_2/components/MultiSelectChip.dart';
+import 'package:flutter_login_test_2/components/MultiSelectChipFilter.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/globals/user_global.dart';
@@ -12,6 +14,7 @@ import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_post_detail.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
+import 'package:flutter_login_test_2/services/TagService.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:flutter_login_test_2/widgets/label/expert_label.dart';
 import 'package:flutter_login_test_2/widgets/post_mini/post_mini.dart';
@@ -28,12 +31,28 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   //current tab
   int currentTabIndex = 0;
-
   // SEARCH
   TextEditingController _searchQueryController = TextEditingController();
   bool _isSearching = false;
   String searchQuery = "Search query";
   String keyword = '';
+  // FILTER
+  bool _plantTagListIsLoading = true;
+  bool _contentTagListIsLoading = true;
+  //var plantTagList;
+  var plantTagList;
+  var selectedPlantTagList = [];
+  //var contentTagList;
+  var contentTagList;
+  var selectedContentTagList = [];
+  var tagIds = [];
+  //COUNTER TAGS
+  int maxPlantTagCounter = 0;
+  int maxContentTagCounter = 0;
+  //audience target
+  int audienceRadioValue = 1;
+  int titleOrContent = 1;
+
   // Biến phục vụ cho comment infinite scroll của global
   int skipPostGlobal = 0;
   int takePostGlobal = 10;
@@ -57,7 +76,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   // TAB
   TabController _tabController;
 
-  //1C HÀM GỌI API LẤY DS USER THEO CỤM
+//1C HÀM GỌI API LẤY DS USER THEO CỤM
   fetchUsers() async {
     setState(() {
       isLoadingUser = true;
@@ -170,7 +189,9 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       'skip': this.skipPostHome,
       'take': takePostHome,
       'keyword': keyword,
+      'tag_ids': tagIds,
     };
+    print(data);
     var res = await Network().postData(data, '/post/home_newsfeed');
 
     var body = json.decode(res.body);
@@ -225,6 +246,22 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   @override
   void initState() {
     super.initState();
+    // FETCH TAGS
+    // Load plant tag list
+    TagService.getTagsByTypeId(1).then((data) {
+      setState(() {
+        _plantTagListIsLoading = false;
+        plantTagList = data;
+      });
+    });
+
+    // Load content tag list
+    TagService.getTagsByTypeId(2).then((data) {
+      setState(() {
+        _contentTagListIsLoading = false;
+        contentTagList = data;
+      });
+    });
     // TAB CONTROLLER
     _tabController = TabController(length: 3, vsync: this);
     // get post
@@ -652,12 +689,146 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     }
   }
 
+  void showPostFilterDialog() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        //context: _scaffoldKey.currentContext,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              contentPadding: EdgeInsets.only(left: 25, right: 25),
+              title: Center(child: Text("Lọc bài viết")),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0))),
+              content: Container(
+                height: 600,
+                width: 300,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      // LABEL PLANT TAG
+                      Text('danh mục loại cây'),
+                      // BUILD CHIP PLANT
+                      BuildPlantTagChip(),
+                      // LABEL CONTENT TAG
+                      Text('danh mục nội dung'),
+                      // BUILD CHIP PLANT
+                      BuildContentTagChip(),
+                    ],
+                  ),
+                ),
+              ),
+              actions: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.01,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 70.0),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.20,
+                        child: RaisedButton(
+                          child: new Text(
+                            'Ok',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          color: Color(0xFF121A21),
+                          shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(30.0),
+                          ),
+                          onPressed: () {
+                            saveFilter();
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.02,
+                    ),
+                  ],
+                )
+              ],
+            );
+          });
+        });
+  }
+
+  saveFilter() {
+    selectedPlantTagList.forEach((element) {
+      setState(() {
+        tagIds.add(element['id']);
+      });
+    });
+
+    selectedContentTagList.forEach((element) {
+      setState(() {
+        tagIds.add(element['id']);
+      });
+    });
+
+    setState(() {
+      this.skipPostHome = 0;
+      postsHome.clear();
+    });
+    fetchPostsHome();
+  }
+
+  // BUILD CHIP PLANT
+  BuildPlantTagChip() {
+    if (_plantTagListIsLoading) return Text('đang tải...');
+    return MultiSelectChipFilter(
+        selectLimit: 200,
+        list: this.plantTagList,
+        selectedChoices: this.selectedPlantTagList,
+        onSelectionChanged: (selectedList, maxCounter) {
+          setState(() {
+            selectedPlantTagList = selectedList;
+            this.maxPlantTagCounter = maxCounter;
+          });
+        });
+  }
+
+  // BUILD CHIP CONTENT
+  BuildContentTagChip() {
+    if (_contentTagListIsLoading) return Text('đang tải...');
+    return MultiSelectChipFilter(
+        selectLimit: 200,
+        list: this.contentTagList,
+        selectedChoices: this.selectedContentTagList,
+        onSelectionChanged: (selectedList, maxCounter) {
+          setState(() {
+            selectedContentTagList = selectedList;
+            this.maxContentTagCounter = maxCounter;
+          });
+        });
+  }
+
   // A. LIST WIDGET TRÊN APP BAR
   List<Widget> _buildActions() {
     if (_isSearching) {
       return <Widget>[
+        //FILTER BUTTON
         IconButton(
-          icon: const Icon(Icons.clear),
+          icon: const Icon(
+            Icons.filter_alt,
+          ),
+          onPressed: () {
+            showPostFilterDialog();
+          },
+        ),
+        IconButton(
+          icon: const Icon(
+            Icons.clear,
+          ),
           onPressed: () {
             if (_searchQueryController == null ||
                 _searchQueryController.text.isEmpty) {
@@ -670,6 +841,17 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       ];
     }
     return <Widget>[
+      //FILTER BUTTON
+      IconButton(
+        icon: const Icon(
+          Icons.filter_alt,
+          //color: (this.selectedContentTagList != null) ? Colors.white38,
+          color: Colors.white38,
+        ),
+        onPressed: () {
+          showPostFilterDialog();
+        },
+      ),
       IconButton(
         icon: const Icon(Icons.search),
         onPressed: _startSearch,

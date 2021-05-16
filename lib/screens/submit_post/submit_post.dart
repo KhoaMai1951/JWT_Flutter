@@ -205,6 +205,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
                       ),
                     ),
                   ),
+                  // CHỌN ĐỐI TƯỢNG
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

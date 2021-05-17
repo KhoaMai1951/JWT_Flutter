@@ -4,12 +4,13 @@ import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_login_test_2/components/MultiSelectChip.dart';
+import 'package:flutter_login_test_2/components/MultiSelectChipForSubmitPost.dart';
 import 'package:flutter_login_test_2/components/MultiSelectChipFilter.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/models/post_detail_model.dart';
+import 'package:flutter_login_test_2/models/tag_model.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_post_detail.dart';
@@ -199,6 +200,12 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     if (body['posts'].isEmpty == false) {
       List<PostDetailModel> fetchedPosts = [];
       for (var post in body['posts']) {
+        // tag model
+        List<TagModel> tags = [];
+        // for (var tag in post['tags']) {
+        //   TagModel tagModel = new TagModel(id: tag['id'], name: tag['name']);
+        //   tags.add(tagModel);
+        // }
         // user handle
         UserModel userModel = new UserModel(
           id: post['user']['id'],
@@ -224,6 +231,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           currentImageIndicator: 0,
           isLiked: post['is_liked'],
           isSuggested: post['is_suggested'],
+          tags: tags,
         );
         fetchedPosts.add(postModel);
       }
@@ -320,8 +328,13 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: kAppBarColor,
-        leading: _isSearching ? const BackButton() : Container(),
-        title: _isSearching ? _buildSearchField() : Text('🌿  Don\'t Leaf Me '),
+        leading: _isSearching ? const BackButton() : SizedBox(),
+        title: _isSearching
+            ? _buildSearchField()
+            : Text(
+                '🌿 Don\'t Leaf Me ',
+                style: TextStyle(fontFamily: 'Parisienne'),
+              ),
         actions: _buildActions(),
       ),
       body: buildBody(),

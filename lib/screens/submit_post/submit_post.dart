@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_login_test_2/components/MultiSelectChip.dart';
+import 'package:flutter_login_test_2/components/MultiSelectChipForSubmitPost.dart';
 import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
@@ -56,7 +56,6 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
   void _handleRadioValueChange(int value) {
     setState(() {
       audience = value;
-      print(audience);
       switch (audience) {
         case 1:
           break;
@@ -116,37 +115,42 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      child: Text(
-                        "Tiêu đề",
-                      ),
-                    ),
-                  ),
                   // TIÊU ĐỀ BÀI VIẾT
-                  TextFormFieldMethod(
-                      validateOption: kValidatePostContentInput,
-                      maxLines: 1,
-                      hintText: 'Nhập tiêu đề',
-                      textEditingController: titleController),
+                  textFormFieldBuilder(
+                    maxLines: 4,
+                    label: 'Nhập tiêu đề',
+                    hintText: 'Nhập tiêu đề',
+                    validateFunction: (value) {
+                      if (value.length == 0) {
+                        return 'Xin nhập tiêu đề';
+                      }
+                      if (value.length > 1000) {
+                        return 'Tiêu đề phải 1000 kí tự';
+                      }
+                      setState(() {
+                        this.title = value;
+                      });
+                      return null;
+                    },
+                  ),
                   SizedBox(
                     height: 30.0,
                   ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      child: Text(
-                        "Nội dung bài viết",
-                      ),
-                    ),
-                  ),
                   // NỘI DUNG BÀI VIẾT
-                  TextFormFieldMethod(
-                      validateOption: kValidatePostContentInput,
-                      maxLines: 5,
-                      hintText: 'Nhập nội dung',
-                      textEditingController: contentController),
+                  textFormFieldBuilder(
+                    maxLines: 4,
+                    label: 'Nhập nội dung bài viết',
+                    hintText: 'Nhập nội dung bài viết',
+                    validateFunction: (value) {
+                      if (value.length > 1000) {
+                        return 'Nội dung bài viết phải nhỏ hơn 1000 kí tự';
+                      }
+                      setState(() {
+                        this.content = value;
+                      });
+                      return null;
+                    },
+                  ),
                   SizedBox(
                     height: 40.0,
                   ),
@@ -290,12 +294,13 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
 
     FormData formData = new FormData.fromMap({
       "files": listFiles,
-      'title': titleController.text,
-      'content': contentController.text,
+      'title': title,
+      'content': content,
       'audience': audience,
       'user_id': userId,
       'tag_ids': tagIds,
     });
+    print(content);
 
     Dio dio = new Dio();
     SharedPreferences localStorage = await SharedPreferences.getInstance();
@@ -467,5 +472,34 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
             }),
           )
         : SizedBox();
+  }
+
+  // TEXT FORM FIELD
+  textFormFieldBuilder(
+      {String label,
+      int maxLines,
+      String hintText,
+      Function validateFunction}) {
+    return TextFormField(
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        labelStyle: TextStyle(
+          color: Colors.blueGrey,
+        ),
+        labelText: label,
+        hintText: hintText,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+      ),
+      validator: validateFunction,
+    );
   }
 }

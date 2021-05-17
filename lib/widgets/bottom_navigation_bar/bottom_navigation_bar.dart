@@ -34,10 +34,10 @@ BottomNavigationBar buildBottomNavigationBar(
     items: const <BottomNavigationBarItem>[
       BottomNavigationBarItem(
         icon: Icon(
-          Icons.people,
+          Icons.shopping_cart,
           size: 25,
         ),
-        label: 'Trang chính',
+        label: 'Trao đổi',
       ),
       BottomNavigationBarItem(
         icon: Icon(

@@ -29,9 +29,6 @@ class ValidateService {
 
   // validate post content input
   validatePostContentInput({@required var value}) {
-    if (value.isEmpty) {
-      return 'Không được bỏ trống';
-    }
     if (value.length > 200) {
       return 'Không được quá 200 kí tự';
     }

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_login_test_2/models/tag_model.dart';
 
 class MultiSelectChipFilter extends StatefulWidget {
   MultiSelectChipFilter({
@@ -9,7 +10,7 @@ class MultiSelectChipFilter extends StatefulWidget {
     this.selectLimit,
   });
   final selectedChoices;
-  final List list;
+  final List<TagModel> list;
   final Function(List, int) onSelectionChanged;
   final selectLimit;
   @override
@@ -24,32 +25,7 @@ class _MultiSelectChipFilterState extends State<MultiSelectChipFilter> {
     widget.list.forEach((item) {
       choices.add(Container(
         padding: const EdgeInsets.all(2.0),
-        child: ChoiceChip(
-          label: Text(item['name']),
-          labelStyle: TextStyle(color: Colors.black),
-          selected: widget.selectedChoices.contains(item),
-          selectedColor: Colors.lightGreen,
-          onSelected: (selected) {
-            setState(() {
-              // if array of choices < 3 parameters, then allow add more or delete already existing ones
-              if (widget.selectedChoices.length < widget.selectLimit) {
-                widget.selectedChoices.contains(item)
-                    ? widget.selectedChoices.remove(item)
-                    : widget.selectedChoices.add(item);
-                maxCounter = widget.selectedChoices.length;
-                widget.onSelectionChanged(widget.selectedChoices, maxCounter);
-              }
-              // if array of choices >= 3 parameters, then allow only delete already existing ones
-              else {
-                if (widget.selectedChoices.contains(item)) {
-                  widget.selectedChoices.remove(item);
-                  maxCounter = widget.selectedChoices.length;
-                  widget.onSelectionChanged(widget.selectedChoices, maxCounter);
-                }
-              }
-            });
-          },
-        ),
+        child: Text(item.name),
       ));
     });
     return choices;

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_login_test_2/components/MultiChipForPostMiniTags.dart';
+import 'package:flutter_login_test_2/components/MultiSelectChipForSubmitPost.dart';
 import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/models/post_detail_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
@@ -149,6 +151,12 @@ class _PostMiniState extends State<PostMini> {
               SizedBox(
                 height: 5.0,
               ),
+              // TAG
+              /*widget.post.tags.isEmpty
+                  ? Container()
+                  : MultiChipForPostMiniTags(
+                      list: widget.post.tags,
+                    ),*/
               // TIÊU ĐỀ BÀI VIẾT
               InkWell(
                 onTap: () {
@@ -168,7 +176,7 @@ class _PostMiniState extends State<PostMini> {
                   navigateToPostDetail(postId: widget.post.id);
                 },
                 child: Text(
-                  widget.post.content,
+                  widget.post.content != null ? widget.post.content : '',
                   style: TextStyle(fontSize: 17.0),
                 ),
               ),
@@ -241,40 +249,43 @@ class _PostMiniState extends State<PostMini> {
   ImageCarouselBuilder({PostDetailModel postDetailModel}) {
     return Row(
       children: [
-        Expanded(
-          child: CarouselSlider(
-            options: CarouselOptions(
-              height: 300,
-              aspectRatio: 4 / 3,
-              viewportFraction: 1,
-              initialPage: 0,
-              enableInfiniteScroll: true,
-              reverse: false,
-              autoPlayInterval: Duration(seconds: 3),
-              autoPlayAnimationDuration: Duration(milliseconds: 800),
-              autoPlayCurve: Curves.fastOutSlowIn,
-              enlargeCenterPage: true,
-              onPageChanged: (index, reason) {
-                setState(() {
-                  //posts[indexInPostsArray].currentImageIndicator = index;
-                  widget.onImageChange(index);
-                });
-              },
-              scrollDirection: Axis.horizontal,
-            ),
-            items: postDetailModel.imagesForPost.map((i) {
-              return Builder(
-                builder: (BuildContext context) {
-                  return Container(
-                    child: Center(
-                      child: Image.network(i, fit: BoxFit.cover, width: 1000),
-                    ),
-                  );
-                },
-              );
-            }).toList(),
-          ),
-        ),
+        postDetailModel.imagesForPost.length > 0
+            ? Expanded(
+                child: CarouselSlider(
+                  options: CarouselOptions(
+                    height: 300,
+                    aspectRatio: 4 / 3,
+                    viewportFraction: 1,
+                    initialPage: 0,
+                    enableInfiniteScroll: true,
+                    reverse: false,
+                    autoPlayInterval: Duration(seconds: 3),
+                    autoPlayAnimationDuration: Duration(milliseconds: 800),
+                    autoPlayCurve: Curves.fastOutSlowIn,
+                    enlargeCenterPage: true,
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        //posts[indexInPostsArray].currentImageIndicator = index;
+                        widget.onImageChange(index);
+                      });
+                    },
+                    scrollDirection: Axis.horizontal,
+                  ),
+                  items: postDetailModel.imagesForPost.map((i) {
+                    return Builder(
+                      builder: (BuildContext context) {
+                        return Container(
+                          child: Center(
+                            child: Image.network(i,
+                                fit: BoxFit.cover, width: 1000),
+                          ),
+                        );
+                      },
+                    );
+                  }).toList(),
+                ),
+              )
+            : SizedBox(),
       ],
     );
   }

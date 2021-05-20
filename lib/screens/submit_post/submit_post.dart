@@ -30,6 +30,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
 
   bool _plantTagListIsLoading = true;
   bool _contentTagListIsLoading = true;
+  bool _exchangeTagListIsLoading = true;
 
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
@@ -37,6 +38,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
   var content;
   int maxPlantTagCounter = 0;
   int maxContentTagCounter = 0;
+  int maxExchangeTagCounter = 0;
 
   //var plantTagList;
   var plantTagList;
@@ -44,6 +46,9 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
   //var contentTagList;
   var contentTagList;
   var selectedContentTagList = [];
+  //var exchangeTagList;
+  var exchangeTagList;
+  var selectedExchangeTagList = [];
   var tagIds = [];
 
   TextEditingController contentController = TextEditingController();
@@ -82,6 +87,14 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
       setState(() {
         _contentTagListIsLoading = false;
         contentTagList = data;
+      });
+    });
+
+    // Load content tag list
+    TagService.getTagsByTypeId(4).then((data) {
+      setState(() {
+        _exchangeTagListIsLoading = false;
+        exchangeTagList = data;
       });
     });
   }
@@ -196,6 +209,17 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
                   ),
                   // DANH SÁCH CHIP NỘI DUNG BÀI VIẾT
                   BuildContentTagChip(),
+                  //TÊN TAG TRAO ĐỔI
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      child: Text(
+                        "Tag trao đổi cây cảnh ($maxExchangeTagCounter/1)",
+                      ),
+                    ),
+                  ),
+                  // DANH SÁCH CHIP TRAO ĐỔI
+                  BuildExchangeTagChip(),
                   // ĐỐI TƯỢNG XEM BÀI
                   SizedBox(
                     height: 30.0,
@@ -288,6 +312,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
 
     selectedPlantTagList.forEach((element) => {tagIds.add(element['id'])});
     selectedContentTagList.forEach((element) => {tagIds.add(element['id'])});
+    selectedExchangeTagList.forEach((element) => {tagIds.add(element['id'])});
 
     // DIO
     List<MultipartFile> listFiles = await assetToFile() as List<MultipartFile>;
@@ -377,6 +402,20 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
           setState(() {
             selectedContentTagList = selectedList;
             this.maxContentTagCounter = maxCounter;
+          });
+        });
+  }
+
+  // BUILD CHIP EXCHANGE
+  BuildExchangeTagChip() {
+    if (_exchangeTagListIsLoading) return Text('đang tải...');
+    return MultiSelectChip(
+        selectLimit: 1,
+        list: this.exchangeTagList,
+        onSelectionChanged: (selectedList, maxCounter) {
+          setState(() {
+            selectedExchangeTagList = selectedList;
+            this.maxExchangeTagCounter = maxCounter;
           });
         });
   }

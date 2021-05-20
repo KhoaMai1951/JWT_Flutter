@@ -12,6 +12,7 @@ import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
 import 'package:flutter_login_test_2/screens/news_feed.dart';
 import 'package:flutter_login_test_2/screens/plant_care/plant_discover.dart';
 import 'package:flutter_login_test_2/screens/submit_post/submit_post.dart';
+import 'package:flutter_login_test_2/screens/user_plant/user_plant_news_feed.dart';
 
 BottomNavigationBar buildBottomNavigationBar(
     {int index, BuildContext context}) {
@@ -37,7 +38,7 @@ BottomNavigationBar buildBottomNavigationBar(
           Icons.shopping_cart,
           size: 25,
         ),
-        label: 'Trao đổi',
+        label: 'Cây của tôi',
       ),
       BottomNavigationBarItem(
         icon: Icon(
@@ -73,11 +74,11 @@ BottomNavigationBar buildBottomNavigationBar(
     unselectedItemColor: Colors.white60,
     onTap: (navigationIndex) async {
       switch (navigationIndex) {
-        case kBottomBarIndexNewsFeed:
+        case kBottomBarIndexUserPlant:
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => NewsFeedScreen(),
+              builder: (context) => UserPlantNewsFeedScreen(),
             ),
           );
           break;

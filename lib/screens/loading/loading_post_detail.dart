@@ -63,10 +63,14 @@ class _LoadingPostDetailScreenState extends State<LoadingPostDetailScreen> {
   // HANDLE TAG MODEL
   handleTagObject(var body) {
     List<TagModel> tags = [];
-    for (var tag in body['tags']) {
-      TagModel tagModel = new TagModel(id: tag['id'], name: tag['name']);
-      tags.add(tagModel);
-    }
+    if (body['tags'] != null)
+      for (var tag in body['tags']) {
+        if (tag['id'] != -1) {
+          TagModel tagModel = new TagModel(
+              id: tag['id'], name: tag['name'], tagTypeId: tag['tag_type_id']);
+          tags.add(tagModel);
+        }
+      }
     return tags;
   }
 

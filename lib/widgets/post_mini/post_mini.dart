@@ -4,14 +4,14 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/components/MultiChipForPostMiniTags.dart';
-import 'package:flutter_login_test_2/components/MultiSelectChipForSubmitPost.dart';
 import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/models/post_detail_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
-import 'package:flutter_login_test_2/screens/account/profile_edit.dart';
 import 'package:flutter_login_test_2/screens/edit_post/edit_post.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_post_detail.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
+import 'package:flutter_login_test_2/screens/user_plant/user_plant_news_feed.dart';
+import 'package:flutter_login_test_2/screens/user_plant/user_plant_news_feed_for_exchange.dart';
 import 'package:flutter_login_test_2/widgets/label/expert_label.dart';
 import 'package:flutter_login_test_2/widgets/snack_bar/snack_bar.dart';
 import 'package:http/http.dart';
@@ -35,6 +35,7 @@ class PostMini extends StatefulWidget {
 
 class _PostMiniState extends State<PostMini> {
   bool savedPost;
+  bool exchangeable = false;
   PersistentBottomSheetController bottomSheetController;
 
   @override
@@ -42,6 +43,17 @@ class _PostMiniState extends State<PostMini> {
     // TODO: implement initState
     super.initState();
     checkSavedPost();
+    checkExchangeable();
+  }
+
+  // CHECK CÓ CHO TRAO ĐỔI CÂY HAY KHÔNG
+  checkExchangeable() {
+    for (final element in widget.post.tags) {
+      if (element.tagTypeId == 4) {
+        exchangeable = true;
+        break;
+      }
+    }
   }
 
   @override
@@ -98,7 +110,18 @@ class _PostMiniState extends State<PostMini> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 widget.post.isSuggested == true
-                                    ? Text('Được gợi ý')
+                                    ? Container(
+                                        padding: const EdgeInsets.all(3.0),
+                                        decoration: BoxDecoration(
+                                          color: Colors.yellow,
+                                          border:
+                                              Border.all(color: Colors.yellow),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(5.0),
+                                          ),
+                                        ),
+                                        child: Text("Được gợi ý"),
+                                      )
                                     : SizedBox(),
                                 // LABEL CHUYÊN GIA
                                 widget.post.user.roleId == 2
@@ -140,7 +163,7 @@ class _PostMiniState extends State<PostMini> {
                       onTap: () async {
                         //check saved post or not
                         checkSavedPost();
-                        // // show popup menu
+                        //show popup menu
                         _showPopupMenu(widget.post.user.id);
                       },
                     ),
@@ -152,11 +175,15 @@ class _PostMiniState extends State<PostMini> {
                 height: 5.0,
               ),
               // TAG
-              /*widget.post.tags.isEmpty
+              widget.post.tags.isEmpty || widget.post.tags == null
                   ? Container()
-                  : MultiChipForPostMiniTags(
-                      list: widget.post.tags,
-                    ),*/
+                  : Container(
+                      margin: const EdgeInsets.only(
+                          bottom: 6.0, left: 6.0, right: 6.0),
+                      child: MultiChipForPostMiniTags(
+                        list: widget.post.tags,
+                      ),
+                    ),
               // TIÊU ĐỀ BÀI VIẾT
               InkWell(
                 onTap: () {
@@ -407,7 +434,7 @@ class _PostMiniState extends State<PostMini> {
       context: context,
       builder: (context) {
         return Container(
-          height: MediaQuery.of(context).size.height * 0.3,
+          height: MediaQuery.of(context).size.height * 0.4,
           decoration: new BoxDecoration(
             color: Colors.transparent,
             borderRadius: new BorderRadius.only(
@@ -417,6 +444,29 @@ class _PostMiniState extends State<PostMini> {
           ),
           child: ListView(
             children: [
+              // EXCHANGE PLANT
+              this.exchangeable == true &&
+                      widget.post.user.id != UserGlobal.user['id']
+                  ? Ink(
+                      color: Colors.white,
+                      child: ListTile(
+                        leading: Icon(Icons.shopping_cart),
+                        title: Text('Trao đổi'),
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  UserPlantNewsfeedForExchangeScreen(
+                                plantIdYouWantToExchange: widget.post.id,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                  : SizedBox(),
               // EDIT POST
               (widget.currentUserId == widget.post.user.id)
                   ? Ink(

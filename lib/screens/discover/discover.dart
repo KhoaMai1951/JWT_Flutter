@@ -46,10 +46,14 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   //var contentTagList;
   var contentTagList;
   var selectedContentTagList = [];
+  //var exchangeTagList;
+  var exchangeTagList;
+  var selectedExchangeTagList = [];
   var tagIds = [];
   //COUNTER TAGS
   int maxPlantTagCounter = 0;
   int maxContentTagCounter = 0;
+  int maxExchangeTagCounter = 0;
   //audience target
   int audienceRadioValue = 1;
   int titleOrContent = 1;
@@ -77,7 +81,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   // TAB
   TabController _tabController;
 
-//1C HÀM GỌI API LẤY DS USER THEO CỤM
+  //1C HÀM GỌI API LẤY DS USER THEO CỤM
   fetchUsers() async {
     setState(() {
       isLoadingUser = true;
@@ -137,6 +141,18 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     if (body['posts'].isEmpty == false) {
       List<PostDetailModel> fetchedPosts = [];
       for (var post in body['posts']) {
+        // tag model
+        List<TagModel> tags = [];
+        if (post['tags'] != null) {
+          for (var tag in post['tags']) {
+            TagModel tagModel = new TagModel(
+              id: tag['id'],
+              name: tag['name'],
+              tagTypeId: tag['tag_type_id'],
+            );
+            tags.add(tagModel);
+          }
+        }
         // user handle
         UserModel userModel = new UserModel(
           id: post['user']['id'],
@@ -161,10 +177,11 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           user: userModel,
           currentImageIndicator: 0,
           isLiked: post['is_liked'],
+          tags: tags,
         );
-
         fetchedPosts.add(postModel);
       }
+
       setState(() {
         this.skipPostGlobal += takePostGlobal;
         this.postsGlobal.addAll(fetchedPosts);
@@ -192,7 +209,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       'keyword': keyword,
       'tag_ids': tagIds,
     };
-    print(data);
     var res = await Network().postData(data, '/post/home_newsfeed');
 
     var body = json.decode(res.body);
@@ -202,10 +218,16 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       for (var post in body['posts']) {
         // tag model
         List<TagModel> tags = [];
-        // for (var tag in post['tags']) {
-        //   TagModel tagModel = new TagModel(id: tag['id'], name: tag['name']);
-        //   tags.add(tagModel);
-        // }
+        if (post['tags'] != null) {
+          for (var tag in post['tags']) {
+            TagModel tagModel = new TagModel(
+              id: tag['id'],
+              name: tag['name'],
+              tagTypeId: tag['tag_type_id'],
+            );
+            tags.add(tagModel);
+          }
+        }
         // user handle
         UserModel userModel = new UserModel(
           id: post['user']['id'],
@@ -372,11 +394,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                       Tab(
                         icon: Icon(Icons.home),
                       ),
-                      Container(
-                        margin: const EdgeInsets.all(3.0),
-                        child: Tab(
-                          icon: Icon(Icons.public),
-                        ),
+                      Tab(
+                        icon: Icon(Icons.public),
                       ),
                       Tab(
                         icon: Icon(Icons.people),
@@ -406,7 +425,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   infiniteHomeListView() {
     return Column(
       children: [
-        // NEWSFEED
+        //NEWSFEED
         Expanded(
           child: ListView.builder(
             shrinkWrap: true,
@@ -450,7 +469,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
             },
           ),
         ),
-        // SPINNING
+        //SPINNING
         isLoadingPostGlobal == true ? Text('đang tải...') : SizedBox(),
       ],
     );
@@ -458,7 +477,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
   // LIST DS BÀI VIẾT GLOBAL
   infiniteGlobalListView() {
-    return Column(
+    /*return Column(
       children: [
         SizedBox(height: 20.0),
         // LABEL
@@ -519,6 +538,55 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           ),
         ),
         // SPINNING
+        isLoadingPostGlobal == true ? Text('đang tải...') : SizedBox(),
+      ],
+    );*/
+    return Column(
+      children: [
+        //NEWSFEED
+        Expanded(
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: postsGlobal.length,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              return Column(
+                children: [
+                  ListView(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    children: [
+                      // BÀI VIẾT MINI
+                      PostMini(
+                        currentUserId: UserGlobal.user['id'],
+                        post: postsGlobal[index],
+                        onImageChange: (int currentImageIndexIndicator) {
+                          setState(() {
+                            postsGlobal[index].currentImageIndicator =
+                                currentImageIndexIndicator;
+                          });
+                        },
+                        onLikePost: (int numberOfLikes, bool isLiked) {
+                          setState(() {
+                            postsGlobal[index].like = numberOfLikes;
+                            postsGlobal[index].isLiked = isLiked;
+                          });
+                        },
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Divider(
+                        thickness: 1,
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        //SPINNING
         isLoadingPostGlobal == true ? Text('đang tải...') : SizedBox(),
       ],
     );
@@ -776,18 +844,22 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   }
 
   saveFilter() {
+    //clear toàn bộ tag ids cũ
+    setState(() {
+      tagIds.clear();
+    });
+    //add plant tag mới vào tag ids
     selectedPlantTagList.forEach((element) {
       setState(() {
         tagIds.add(element['id']);
       });
     });
-
+    //add content tag mới vào tag ids
     selectedContentTagList.forEach((element) {
       setState(() {
         tagIds.add(element['id']);
       });
     });
-
     setState(() {
       this.skipPostHome = 0;
       postsHome.clear();
@@ -838,6 +910,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
             showPostFilterDialog();
           },
         ),
+        //CANCEL SEARCH BUTTON
         IconButton(
           icon: const Icon(
             Icons.clear,
@@ -865,6 +938,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           showPostFilterDialog();
         },
       ),
+      //SEARCH BUTTON
       IconButton(
         icon: const Icon(Icons.search),
         onPressed: _startSearch,

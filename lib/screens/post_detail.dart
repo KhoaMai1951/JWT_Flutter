@@ -168,7 +168,7 @@ class _PostDetailState extends State<PostDetail> {
             children: [
               // BÀI VIẾT
               PostMini(
-                currentUserId: widget.userOfPost.id,
+                currentUserId: UserGlobal.user['id'],
                 post: widget.post,
                 onLikePost: (int numberOfLikes, bool isLiked) {
                   setState(() {

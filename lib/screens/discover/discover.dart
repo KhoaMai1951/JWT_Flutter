@@ -705,7 +705,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           ),
         ),
         // SPINNING
-        isLoadingPostGlobal == true
+        isLoadingUser == true
             ? SpinKitRing(
                 color: Colors.teal,
                 lineWidth: 3.0,

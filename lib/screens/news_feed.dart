@@ -133,7 +133,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
       ),
       body: bodyLayout(),
       bottomNavigationBar: buildBottomNavigationBar(
-          context: context, index: kBottomBarIndexUserPlant),
+          context: context, index: kBottomBarIndexChat),
     );
   }
 

@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/constants/container_decoration.dart';
 import 'package:flutter_login_test_2/constants/text_field.dart';
 import 'package:flutter_login_test_2/constants/text_style.dart';
+import 'package:flutter_login_test_2/globals/user_global.dart';
+import 'package:flutter_login_test_2/models/user_model.dart';
 
 final _firestore = FirebaseFirestore.instance;
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen_test';
+  UserModel userToChat;
+  ChatScreen({Key key, this.userToChat}) : super(key: key);
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -29,15 +34,17 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         leading: null,
         actions: <Widget>[],
-        title: Text('chronicle1951@gmail.com'),
-        backgroundColor: Colors.lightBlueAccent,
+        title: Text(widget.userToChat.username),
+        backgroundColor: kAppBarColor,
       ),
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            MessagesStream(),
+            MessagesStream(
+              chatId: generateChatId(userToChatId: widget.userToChat.id),
+            ),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
@@ -57,10 +64,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       messageTextController.clear();
                       _firestore.collection('messages').add({
                         'text': messageText,
-                        'sender': 'khoa@gmail.com',
+                        'sender': UserGlobal.user['email'],
                         'timestamp': DateTime.now().millisecondsSinceEpoch,
                         'chat_id':
-                            'khoa@gmail.com' + '-' + 'chronicle@gmail.com'
+                            generateChatId(userToChatId: widget.userToChat.id),
                       });
                     },
                     child: Text(
@@ -79,12 +86,15 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 
 class MessagesStream extends StatelessWidget {
+  MessagesStream({this.chatId});
+  String chatId;
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
       stream: _firestore
           .collection('messages')
-          .where('sender', whereIn: ['chronicle@gmail.com', 'khoa@gmail.com'])
+          .where('chat_id', whereIn: [chatId])
           .orderBy('timestamp', descending: true)
           .limit(5)
           .snapshots(),
@@ -103,7 +113,7 @@ class MessagesStream extends StatelessWidget {
           final messageText = message['text'];
           final messageSender = message['sender'];
 
-          final currentUser = 'khoa@gmail.com';
+          final currentUser = UserGlobal.user['email'];
 
           final messageBubble = MessageBubble(
             sender: messageSender,
@@ -159,7 +169,8 @@ class MessageBubble extends StatelessWidget {
                     topRight: Radius.circular(30.0),
                   ),
             elevation: 5.0,
-            color: isMe ? Colors.lightBlueAccent : Colors.white,
+            //color: isMe ? Colors.lightBlueAccent : Colors.white,
+            color: isMe ? Colors.green : Colors.white,
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
               child: Text(
@@ -175,4 +186,10 @@ class MessageBubble extends StatelessWidget {
       ),
     );
   }
+}
+
+generateChatId({int userToChatId}) {
+  return userToChatId < UserGlobal.user['id']
+      ? userToChatId.toString() + '-' + UserGlobal.user['id'].toString()
+      : UserGlobal.user['id'].toString() + '-' + userToChatId.toString();
 }

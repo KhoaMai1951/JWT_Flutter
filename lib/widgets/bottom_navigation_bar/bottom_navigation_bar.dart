@@ -6,6 +6,7 @@ import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/chat/chat.dart';
+import 'package:flutter_login_test_2/screens/chat/users_list_chat.dart';
 import 'package:flutter_login_test_2/screens/discover/discover.dart';
 import 'package:flutter_login_test_2/screens/home.dart';
 
@@ -75,12 +76,13 @@ BottomNavigationBar buildBottomNavigationBar(
     unselectedItemColor: Colors.white60,
     onTap: (navigationIndex) async {
       switch (navigationIndex) {
-        case kBottomBarIndexUserPlant:
+        case kBottomBarIndexChat:
           Navigator.push(
             context,
             MaterialPageRoute(
               //builder: (context) => UserPlantNewsFeedScreen(),
-              builder: (context) => ChatScreen(),
+              //builder: (context) => ChatScreen(),
+              builder: (context) => UsersListChatScreen(),
             ),
           );
           break;

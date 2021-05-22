@@ -40,7 +40,7 @@ class _SubmitUserPlantScreenState extends State<SubmitUserPlantScreen> {
         ),
         body: bodyLayout(),
         bottomNavigationBar: buildBottomNavigationBar(
-            context: context, index: kBottomBarIndexUserPlant),
+            context: context, index: kBottomBarIndexChat),
       ),
     );
   }

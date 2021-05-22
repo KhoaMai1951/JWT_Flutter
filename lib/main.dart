@@ -1,10 +1,17 @@
 import 'dart:convert';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/screens/discover/discover.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_main.dart';
 
-void main() => runApp(MyApp());
+//void main() => runApp(MyApp());
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.

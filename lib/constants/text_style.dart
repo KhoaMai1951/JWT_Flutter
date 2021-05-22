@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 // PLANT INFO LABEL
 const TextStyle kPlantInfoLabel = TextStyle(
@@ -21,4 +22,11 @@ const TextStyle kPlantDetailLabel = TextStyle(
 const TextStyle kContributeLabel = TextStyle(
   fontWeight: FontWeight.w500,
   fontSize: 20.0,
+);
+
+// SEND CHAT BUTTON
+const kSendButtonTextStyle = TextStyle(
+  color: Colors.lightBlueAccent,
+  fontWeight: FontWeight.bold,
+  fontSize: 18.0,
 );

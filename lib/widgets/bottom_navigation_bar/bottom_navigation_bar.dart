@@ -5,6 +5,7 @@ import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 
 import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
+import 'package:flutter_login_test_2/screens/chat/chat.dart';
 import 'package:flutter_login_test_2/screens/discover/discover.dart';
 import 'package:flutter_login_test_2/screens/home.dart';
 
@@ -35,10 +36,10 @@ BottomNavigationBar buildBottomNavigationBar(
     items: const <BottomNavigationBarItem>[
       BottomNavigationBarItem(
         icon: Icon(
-          Icons.shopping_cart,
+          Icons.chat,
           size: 25,
         ),
-        label: 'Cây của tôi',
+        label: 'Chat',
       ),
       BottomNavigationBarItem(
         icon: Icon(
@@ -78,7 +79,8 @@ BottomNavigationBar buildBottomNavigationBar(
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => UserPlantNewsFeedScreen(),
+              //builder: (context) => UserPlantNewsFeedScreen(),
+              builder: (context) => ChatScreen(),
             ),
           );
           break;

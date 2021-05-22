@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "657619794496",
+    "project_id": "chat-cay-canh",
+    "storage_bucket": "chat-cay-canh.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:657619794496:android:6f5d02ae2b6223d661bda5",
+        "android_client_info": {
+          "package_name": "maidangkhoa.flutter_login_test_2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "657619794496-697va6ocip30c3fpkqhi94qdkua36mp5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_kNcqcR4jpEs-OwVZd_R-byRNEYDzKOE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "657619794496-697va6ocip30c3fpkqhi94qdkua36mp5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

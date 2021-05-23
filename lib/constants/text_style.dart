@@ -26,7 +26,7 @@ const TextStyle kContributeLabel = TextStyle(
 
 // SEND CHAT BUTTON
 const kSendButtonTextStyle = TextStyle(
-  color: Colors.lightBlueAccent,
+  color: Colors.green,
   fontWeight: FontWeight.bold,
   fontSize: 18.0,
 );

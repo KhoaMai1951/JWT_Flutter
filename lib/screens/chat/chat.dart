@@ -34,7 +34,27 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         leading: null,
         actions: <Widget>[],
-        title: Text(widget.userToChat.username),
+        title: Row(
+          children: [
+            //AVATAR
+            Container(
+              margin: EdgeInsets.only(right: 10.0),
+              alignment: Alignment.center,
+              child: Container(
+                width: 40.0,
+                height: 40.0,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(90.0),
+                    image: DecorationImage(
+                        image: (widget.userToChat.avatarUrl != '')
+                            ? NetworkImage(widget.userToChat.avatarUrl)
+                            : AssetImage('images/no-avatar.png'),
+                        fit: BoxFit.cover)),
+              ),
+            ),
+            Text(widget.userToChat.username),
+          ],
+        ),
         backgroundColor: kAppBarColor,
       ),
       body: SafeArea(
@@ -42,6 +62,7 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            // MESSAGE STREAM
             MessagesStream(
               chatId: generateChatId(userToChatId: widget.userToChat.id),
             ),

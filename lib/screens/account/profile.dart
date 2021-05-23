@@ -14,6 +14,7 @@ import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/account/avatar_preview.dart';
 import 'package:flutter_login_test_2/screens/account/change_password.dart';
 import 'package:flutter_login_test_2/screens/account/profile_edit.dart';
+import 'package:flutter_login_test_2/screens/chat/chat.dart';
 import 'package:flutter_login_test_2/screens/expert/expert_request.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:flutter_login_test_2/widgets/label/expert_label.dart';
@@ -342,13 +343,40 @@ class _ProfileScreenState extends State<ProfileScreen>
                         SizedBox(
                           height: 12,
                         ),
-                        // FOLLOW BUTTON
-                        widget.currentUserId != widget.user.id
-                            ? ElevatedButton(
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // FOLLOW BUTTON
+                            widget.currentUserId != widget.user.id
+                                ? Container(
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        primary: isFollow == true
+                                            ? Colors.grey
+                                            : Colors.teal,
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 15, vertical: 10),
+                                        textStyle: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      onPressed: () {
+                                        followOrUnfollow();
+                                      },
+                                      child: isFollow == true
+                                          ? Text('Đang theo dõi')
+                                          : Text('Theo dõi'),
+                                    ),
+                                    margin:
+                                        EdgeInsets.only(right: 2.0, left: 2.0),
+                                  )
+                                : SizedBox(),
+                            // CHAT BUTTON
+                            Container(
+                              margin: EdgeInsets.only(right: 2.0, left: 2.0),
+                              child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  primary: isFollow == true
-                                      ? Colors.grey
-                                      : Colors.teal,
+                                  primary: Colors.teal,
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 15, vertical: 10),
                                   textStyle: TextStyle(
@@ -356,13 +384,20 @@ class _ProfileScreenState extends State<ProfileScreen>
                                       fontWeight: FontWeight.bold),
                                 ),
                                 onPressed: () {
-                                  followOrUnfollow();
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ChatScreen(
+                                        userToChat: widget.user,
+                                      ),
+                                    ),
+                                  );
                                 },
-                                child: isFollow == true
-                                    ? Text('Đang theo dõi')
-                                    : Text('Theo dõi'),
-                              )
-                            : SizedBox(),
+                                child: Text('Chat'),
+                              ),
+                            )
+                          ],
+                        ),
                       ],
                     ),
                   ),

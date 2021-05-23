@@ -4,6 +4,7 @@ import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/authentication/register.dart';
+import 'package:flutter_login_test_2/screens/discover/discover.dart';
 import 'package:flutter_login_test_2/screens/news_feed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -179,12 +180,11 @@ class _LoginState extends State<Login> {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       localStorage.setString('token', json.encode(body['token']));
       localStorage.setString('user', json.encode(body['user']));
-      print(body['user']);
       // init user global variable
       UserGlobal.fetchUserFromLocal();
       Navigator.push(
         context,
-        new MaterialPageRoute(builder: (context) => NewsFeedScreen()),
+        new MaterialPageRoute(builder: (context) => DiscoverScreen()),
       );
     } else {
       _showMsg(body['message']);

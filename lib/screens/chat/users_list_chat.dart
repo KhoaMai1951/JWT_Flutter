@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
+import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
@@ -40,9 +41,9 @@ class _UsersListChatScreenState extends State<UsersListChatScreen> {
       'skip': this.skipUser,
       'take': takeUser,
       'keyword': keyword,
-      'role_id_array': [1, 2],
+      'user_id': UserGlobal.user['id'],
     };
-    var res = await Network().postData(data, '/user/search_user');
+    var res = await Network().postData(data, '/chat/get_chatting_list');
     var body = json.decode(res.body);
     // Nếu có kết quả trả về
     if (body['users'].isEmpty == false) {
@@ -141,71 +142,74 @@ class _UsersListChatScreenState extends State<UsersListChatScreen> {
                     ),
                   );
                 },
-                child: Column(
-                  children: [
-                    ListView(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      children: [
-                        // THÔNG TIN USER
-                        Row(
-                          children: [
-                            // AVATAR
-                            Container(
-                              alignment: Alignment.center,
-                              child: Container(
-                                width: 50.0,
-                                height: 50.0,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(90.0),
-                                    image: DecorationImage(
-                                        image: (users[index].avatarUrl != '')
-                                            ? NetworkImage(
-                                                users[index].avatarUrl)
-                                            : AssetImage(
-                                                'images/no-avatar.png'),
-                                        fit: BoxFit.cover)),
+                child: Container(
+                  margin: EdgeInsets.only(left: 10.0),
+                  child: Column(
+                    children: [
+                      ListView(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        children: [
+                          // THÔNG TIN USER
+                          Row(
+                            children: [
+                              // AVATAR
+                              Container(
+                                alignment: Alignment.center,
+                                child: Container(
+                                  width: 50.0,
+                                  height: 50.0,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(90.0),
+                                      image: DecorationImage(
+                                          image: (users[index].avatarUrl != '')
+                                              ? NetworkImage(
+                                                  users[index].avatarUrl)
+                                              : AssetImage(
+                                                  'images/no-avatar.png'),
+                                          fit: BoxFit.cover)),
+                                ),
                               ),
-                            ),
-                            SizedBox(
-                              width: 10.0,
-                            ),
-                            // USERNAME + LABEL
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                users[index].roleId == 2
-                                    ? expertLabelBuild()
-                                    : SizedBox(),
-                                // USERNAME
-                                Text(
-                                  users[index].username,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15),
-                                ),
-                                // NAME
-                                Text(
-                                  users[index].name,
-                                  style: TextStyle(fontSize: 15),
-                                ),
-                                SizedBox(
-                                  height: 5.0,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Divider(
-                          thickness: 1,
-                        ),
-                      ],
-                    ),
-                    //isLoading == true ? Text('loading...') : SizedBox(),
-                  ],
+                              SizedBox(
+                                width: 10.0,
+                              ),
+                              // USERNAME + LABEL
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  users[index].roleId == 2
+                                      ? expertLabelBuild()
+                                      : SizedBox(),
+                                  // USERNAME
+                                  Text(
+                                    users[index].username,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15),
+                                  ),
+                                  // NAME
+                                  Text(
+                                    users[index].name,
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                  SizedBox(
+                                    height: 5.0,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Divider(
+                            thickness: 1,
+                          ),
+                        ],
+                      ),
+                      //isLoading == true ? Text('loading...') : SizedBox(),
+                    ],
+                  ),
                 ),
               );
             },

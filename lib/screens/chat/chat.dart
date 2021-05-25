@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,6 +9,7 @@ import 'package:flutter_login_test_2/constants/text_field.dart';
 import 'package:flutter_login_test_2/constants/text_style.dart';
 import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
+import 'package:flutter_login_test_2/network_utils/api.dart';
 
 final _firestore = FirebaseFirestore.instance;
 
@@ -22,10 +25,28 @@ class _ChatScreenState extends State<ChatScreen> {
   final messageTextController = TextEditingController();
 
   String messageText;
+  bool firstMessageHasBeenSent =
+      false; //đã gửi tin nhắn đầu khi vào màn hình chat
 
   @override
   void initState() {
     super.initState();
+  }
+
+  createRecordForBothUsers() async {
+    if (firstMessageHasBeenSent == false) {
+      var data = {
+        'chat_id': generateChatId(userToChatId: widget.userToChat.id),
+        'current_user_id': UserGlobal.user['id'],
+        'user_to_chat_with_id': widget.userToChat.id,
+      };
+      var res = await Network().postData(data, '/chat/create');
+      var body = json.decode(res.body);
+      print(body);
+      setState(() {
+        firstMessageHasBeenSent = true;
+      });
+    }
   }
 
   @override
@@ -82,6 +103,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   FlatButton(
                     onPressed: () {
+                      createRecordForBothUsers();
                       messageTextController.clear();
                       _firestore.collection('messages').add({
                         'text': messageText,

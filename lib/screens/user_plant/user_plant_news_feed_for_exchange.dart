@@ -8,6 +8,7 @@ import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/models/user_plant_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
+import 'package:flutter_login_test_2/widgets/snack_bar/snack_bar.dart';
 
 class UserPlantNewsfeedForExchangeScreen extends StatefulWidget {
   UserPlantNewsfeedForExchangeScreen({
@@ -128,12 +129,20 @@ class _UserPlantNewsfeedForExchangeScreenState
             ? new FloatingActionButton(
                 elevation: 0.0,
                 child: new Icon(Icons.check),
-                //backgroundColor: new Color(0xFFE57373),
-                onPressed: () {
-                  print("id bài viết muốn trao đổi cây : " +
-                      widget.plantIdYouWantToExchange.toString());
-                  print("id cây cảnh của mình muốn trao đổi : " +
-                      selectedPlantId.toString());
+                onPressed: () async {
+                  var data = {
+                    'post_id': widget.plantIdYouWantToExchange,
+                    'user_plant_id': selectedPlantId,
+                  };
+
+                  var res = await Network()
+                      .postData(data, '/user_plant/request_exchange');
+                  var body = json.decode(res.body);
+                  Navigator.pop(context);
+                  buildSnackBar(
+                    message: 'Đã yêu cầu trao đổi',
+                    context: context,
+                  );
                 })
             : SizedBox());
   }

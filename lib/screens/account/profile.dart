@@ -16,6 +16,7 @@ import 'package:flutter_login_test_2/screens/account/change_password.dart';
 import 'package:flutter_login_test_2/screens/account/profile_edit.dart';
 import 'package:flutter_login_test_2/screens/chat/chat.dart';
 import 'package:flutter_login_test_2/screens/expert/expert_request.dart';
+import 'package:flutter_login_test_2/screens/user_plant/user_plant_news_feed.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:flutter_login_test_2/widgets/label/expert_label.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
@@ -36,13 +37,18 @@ class _ProfileScreenState extends State<ProfileScreen>
   UserModel user;
   TabController _tabController;
   //list bài viết của user
-  int skip = 0;
-  int take = 6;
+  int skipUserPosts = 0;
+  int takeUserPosts = 6;
+  int skipExchangePosts = 0;
+  int takeExchangePosts = 6;
   //bool noMoreDataToFetch = false;
-  bool isLoading = false;
-  bool stillSendApi = true;
+  bool isLoadingUserPosts = false;
+  bool isLoadingExchangePosts = false;
+  bool stillSendApiUserPosts = true;
+  bool stillSendApiExchangePosts = true;
   List<PostDetailModel> postsOfUser = []; //post của user
   List<PostDetailModel> savedPostsOfUser = []; //post được user save
+  List<PostDetailModel> postsForExchange = []; //post có tag trao đổi
   //theo dõi user
   bool isFollow;
   //image picker
@@ -53,13 +59,13 @@ class _ProfileScreenState extends State<ProfileScreen>
   // 1. HÀM GỌI API LẤY DS POST CỦA USER
   fetchPosts() async {
     setState(() {
-      isLoading = true;
+      isLoadingUserPosts = true;
     });
     var data = {
       'current_user_id': UserGlobal.user['id'],
       'user_id': widget.user.id,
-      'skip': this.skip,
-      'take': take,
+      'skip': this.skipUserPosts,
+      'take': takeUserPosts,
     };
     var res = await Network().postData(data, '/post/user_posts');
     var body = json.decode(res.body);
@@ -80,17 +86,17 @@ class _ProfileScreenState extends State<ProfileScreen>
         fetchedPosts.add(postDetailModel);
       }
       setState(() {
-        this.skip += take;
+        this.skipUserPosts += takeUserPosts;
         this.postsOfUser.addAll(fetchedPosts);
-        isLoading = false;
-        print(skip);
+        isLoadingUserPosts = false;
+        print(skipUserPosts);
       });
     }
     // Nếu kết trả không còn
     else {
       setState(() {
-        isLoading = false;
-        stillSendApi = false;
+        isLoadingUserPosts = false;
+        stillSendApiUserPosts = false;
       });
     }
   }
@@ -99,23 +105,28 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
 
     // check follow
     checkFollow();
     // get post
     fetchPosts();
     fetchSavedPosts();
+    fetchExchangePosts();
 
     _scrollController.addListener(() {
       //nếu cuộn cuối màn hình
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
         //nếu không còn đang load api
-        if (isLoading == false) {
+        if (isLoadingUserPosts == false) {
           //nếu còn data để gọi
-          if (stillSendApi == true) {
+          if (stillSendApiUserPosts == true) {
             fetchPosts();
+          }
+          //nếu còn data để gọi
+          if (stillSendApiExchangePosts == true) {
+            fetchExchangePosts();
           }
         }
       }
@@ -125,13 +136,13 @@ class _ProfileScreenState extends State<ProfileScreen>
   // get saved posts
   fetchSavedPosts() async {
     setState(() {
-      isLoading = true;
+      isLoadingUserPosts = true;
     });
     var data = {
       'user_id': widget.user.id,
       'current_user_id': UserGlobal.user['id'],
-      'skip': this.skip,
-      'take': take,
+      'skip': this.skipUserPosts,
+      'take': takeUserPosts,
     };
     var res = await Network().postData(data, '/post/get_saved_posts');
     var body = json.decode(res.body);
@@ -152,17 +163,60 @@ class _ProfileScreenState extends State<ProfileScreen>
         fetchedPosts.add(postDetailModel);
       }
       setState(() {
-        this.skip += take;
+        this.skipUserPosts += takeUserPosts;
         this.savedPostsOfUser.addAll(fetchedPosts);
-        isLoading = false;
-        print(skip);
+        isLoadingUserPosts = false;
+        print(skipUserPosts);
       });
     }
     // Nếu kết trả không còn
     else {
       setState(() {
-        isLoading = false;
-        stillSendApi = false;
+        isLoadingUserPosts = false;
+        stillSendApiUserPosts = false;
+      });
+    }
+  }
+
+  // get posts for exchange
+  fetchExchangePosts() async {
+    setState(() {
+      isLoadingExchangePosts = true;
+    });
+    var data = {
+      'user_id': widget.user.id,
+      'skip': this.skipExchangePosts,
+      'take': takeExchangePosts,
+    };
+    var res = await Network().postData(data, '/post/get_exchange_posts');
+    var body = json.decode(res.body);
+
+    // Nếu có kết quả trả về
+    if (body['posts'].isEmpty == false) {
+      List<PostDetailModel> fetchedPosts = [];
+      for (var post in body['posts']) {
+        PostDetailModel postDetailModel = new PostDetailModel(
+            id: post['id'],
+            createdAt: post['created_at'],
+            thumbNailUrl: post['image_url'],
+            title: post['title'],
+            content: post['short_content'],
+            like: post['like'],
+            commentsNumber: post['comments_number']);
+
+        fetchedPosts.add(postDetailModel);
+      }
+      setState(() {
+        this.skipExchangePosts += takeExchangePosts;
+        this.postsForExchange.addAll(fetchedPosts);
+        isLoadingExchangePosts = false;
+      });
+    }
+    // Nếu kết trả không còn
+    else {
+      setState(() {
+        isLoadingExchangePosts = false;
+        stillSendApiExchangePosts = false;
       });
     }
   }
@@ -431,6 +485,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                   Tab(
                     text: 'Bài viết \nđã lưu',
                   ),
+                  Tab(
+                    text: 'Bài viết \ntrao đổi cây',
+                  ),
                 ],
               ),
             ),
@@ -465,6 +522,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           children: [
             infiniteUserPostsListView(), //LIST DANH SÁCH BÀI POST CỦA USER
             infiniteSavedPostsListView(), //LIST DANH SÁCH BÀI ĐƯỢC SAVE POST CỦA USER
+            infiniteExchangePostsListView(), //LIST DANH SÁCH BÀI CÓ TAG TRAO ĐÔI
           ],
         ),
       ),
@@ -494,6 +552,23 @@ class _ProfileScreenState extends State<ProfileScreen>
                 ),
                 child: ListView(
                   children: [
+                    // PLANTS FOR EXCHANGE
+                    Ink(
+                      color: Colors.white,
+                      child: ListTile(
+                        leading: Icon(Icons.edit),
+                        title: Text('Cây để trao đổi'),
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UserPlantNewsFeedScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                     // EDIT INFO BUTTON
                     Ink(
                       color: Colors.white,
@@ -775,6 +850,119 @@ class _ProfileScreenState extends State<ProfileScreen>
                         MaterialPageRoute(
                           builder: (context) => LoadingPostDetailScreen(
                             id: savedPostsOfUser[index].id,
+                          ),
+                          //builder: (context) => PostDetail(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+              ],
+            ),
+            //isLoading == true ? Text('loading...') : SizedBox(),
+          ],
+        );
+      },
+    );
+  }
+
+  //LIST DANH SÁCH BÀI POST CÓ TAG TRAO ĐỔI
+  infiniteExchangePostsListView() {
+    return ListView.builder(
+      //controller: this._scrollController,
+      itemCount: postsForExchange.length,
+      physics: const NeverScrollableScrollPhysics(), // new
+      itemBuilder: (context, index) {
+        return Column(
+          children: [
+            ListView(
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              children: [
+                // BÀI VIẾT MINI
+                Card(
+                  margin: EdgeInsets.all(1),
+                  color: Colors.white,
+                  shadowColor: Colors.blueGrey,
+                  elevation: 1,
+                  child: InkWell(
+                    child: Row(
+                      children: [
+                        // THUMBNAIL
+                        Container(
+                          width: 100.0,
+                          height: 100.0,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image:
+                                  (postsForExchange[index].thumbNailUrl != null)
+                                      ? NetworkImage(
+                                          postsForExchange[index].thumbNailUrl,
+                                        )
+                                      : AssetImage('images/no-image.png'),
+                              fit: BoxFit.cover,
+                              alignment: AlignmentDirectional.center,
+                            ),
+                          ),
+                        ),
+                        // CONTENT
+                        Expanded(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // TITLE + CONTENT
+                              ListTile(
+                                title: Text(
+                                  postsForExchange[index].title,
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                                subtitle: Text(postsForExchange[index].content),
+                              ),
+                              // LIKE + COMMENT
+                              Row(
+                                children: [
+                                  SizedBox(width: 15),
+                                  // LIKE
+                                  Icon(
+                                    Icons.thumb_up,
+                                    color: Colors.grey,
+                                    size: 17,
+                                  ),
+                                  SizedBox(width: 3),
+                                  Text(
+                                    postsForExchange[index].like.toString(),
+                                    style: TextStyle(fontSize: 17),
+                                  ),
+                                  SizedBox(width: 20),
+                                  // COMMENT
+                                  Icon(
+                                    Icons.message,
+                                    color: Colors.grey,
+                                    size: 17,
+                                  ),
+                                  SizedBox(width: 3),
+                                  Text(
+                                    postsForExchange[index]
+                                        .commentsNumber
+                                        .toString(),
+                                    style: TextStyle(fontSize: 17),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LoadingPostDetailScreen(
+                            id: postsForExchange[index].id,
                           ),
                           //builder: (context) => PostDetail(),
                         ),

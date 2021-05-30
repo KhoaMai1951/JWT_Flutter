@@ -10,10 +10,6 @@ import 'package:flutter_login_test_2/screens/user_plant/submit_user_plant.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 
 class UserPlantNewsFeedScreen extends StatefulWidget {
-  UserPlantNewsFeedScreen({
-    this.plantIdYouWantToExchange,
-  });
-  int plantIdYouWantToExchange;
   @override
   _UserPlantNewsFeedScreenState createState() =>
       _UserPlantNewsFeedScreenState();

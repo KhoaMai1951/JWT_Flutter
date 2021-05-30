@@ -40,6 +40,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   // FILTER
   bool _plantTagListIsLoading = true;
   bool _contentTagListIsLoading = true;
+  bool _exchangeTagListIsLoading = true;
   //var plantTagList;
   var plantTagList;
   var selectedPlantTagList = [];
@@ -292,6 +293,15 @@ class _DiscoverScreenState extends State<DiscoverScreen>
         contentTagList = data;
       });
     });
+
+    // Load exchange plant tag list
+    TagService.getTagsByTypeId(4).then((data) {
+      setState(() {
+        _exchangeTagListIsLoading = false;
+        exchangeTagList = data;
+      });
+    });
+
     // TAB CONTROLLER
     _tabController = TabController(length: 3, vsync: this);
     // get post
@@ -801,6 +811,10 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                       Text('danh mục nội dung'),
                       // BUILD CHIP PLANT
                       BuildContentTagChip(),
+                      // LABEL EXCHANGE TAG
+                      Text('danh mục trao đổi'),
+                      // BUILD CHIP PLANT
+                      BuildExchangeTagChip(),
                     ],
                   ),
                 ),
@@ -860,6 +874,12 @@ class _DiscoverScreenState extends State<DiscoverScreen>
         tagIds.add(element['id']);
       });
     });
+    //add exchange tag mới vào tag ids
+    selectedExchangeTagList.forEach((element) {
+      setState(() {
+        tagIds.add(element['id']);
+      });
+    });
     setState(() {
       this.skipPostHome = 0;
       postsHome.clear();
@@ -892,6 +912,21 @@ class _DiscoverScreenState extends State<DiscoverScreen>
         onSelectionChanged: (selectedList, maxCounter) {
           setState(() {
             selectedContentTagList = selectedList;
+            this.maxContentTagCounter = maxCounter;
+          });
+        });
+  }
+
+  // BUILD CHIP EXCHANGE
+  BuildExchangeTagChip() {
+    if (_exchangeTagListIsLoading) return Text('đang tải...');
+    return MultiSelectChipFilter(
+        selectLimit: 200,
+        list: this.exchangeTagList,
+        selectedChoices: this.selectedExchangeTagList,
+        onSelectionChanged: (selectedList, maxCounter) {
+          setState(() {
+            selectedExchangeTagList = selectedList;
             this.maxContentTagCounter = maxCounter;
           });
         });

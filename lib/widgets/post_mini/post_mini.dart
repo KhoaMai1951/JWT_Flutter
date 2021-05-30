@@ -444,6 +444,30 @@ class _PostMiniState extends State<PostMini> {
           ),
           child: ListView(
             children: [
+              // LIST OF PLANTS REQUEST EXCHANGE
+              // user id trùng user id hiện tại + tag type id = 4
+              widget.post.user.id == UserGlobal.user['id'] &&
+                      exchangeable == true
+                  ? Ink(
+                      color: Colors.white,
+                      child: ListTile(
+                        leading: Icon(Icons.park),
+                        title: Text('DS cây muốn trao đổi'),
+                        onTap: () {
+                          Navigator.pop(context);
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) =>
+                          //         UserPlantNewsfeedForExchangeScreen(
+                          //           plantIdYouWantToExchange: widget.post.id,
+                          //         ),
+                          //   ),
+                          // );
+                        },
+                      ),
+                    )
+                  : SizedBox(),
               // EXCHANGE PLANT
               this.exchangeable == true &&
                       widget.post.user.id != UserGlobal.user['id']

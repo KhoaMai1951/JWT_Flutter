@@ -225,7 +225,7 @@ class _SubmitUserPlantScreenState extends State<SubmitUserPlantScreen> {
         ? GridView.count(
             physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
-            crossAxisCount: 3,
+            crossAxisCount: 1,
             children: List.generate(images.length, (index) {
               Asset asset = images[index];
               return Container(

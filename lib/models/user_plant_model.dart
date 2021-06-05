@@ -10,6 +10,7 @@ class UserPlantModel {
     this.description,
     this.imagesForUserPlant,
     this.thumbnailImage,
+    this.accepted,
   });
 
   String commonName;
@@ -22,4 +23,5 @@ class UserPlantModel {
   int like;
   int commentsNumber;
   int currentImageIndicator = 0;
+  int accepted = 0;
 }

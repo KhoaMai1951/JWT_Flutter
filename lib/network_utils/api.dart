@@ -16,23 +16,30 @@ class Network {
 
   authData(data, apiUrl) async {
     var fullUrl = kApiUrl + apiUrl;
+    Uri myUri = Uri.parse(fullUrl);
     //await _getToken();
-    return await http.post(fullUrl,
+    //return await http.post(fullUrl, body: jsonEncode(data), headers: _setHeaders());
+    return await http.post(myUri,
         body: jsonEncode(data), headers: _setHeaders());
   }
 
   postData(data, apiUrl) async {
     //print(kApiUrl + apiUrl);
     var fullUrl = kApiUrl + apiUrl;
+    Uri myUri = Uri.parse(fullUrl);
     await _getToken();
-    return await http.post(fullUrl,
+    //return await http.post(fullUrl, body: jsonEncode(data), headers: _setHeaders());
+    return await http.post(myUri,
         body: jsonEncode(data), headers: _setHeaders());
   }
 
   getData(apiUrl) async {
     var fullUrl = kApiUrl + apiUrl;
+    Uri myUri = Uri.parse(fullUrl);
+
     await _getToken();
-    return await http.get(fullUrl, headers: _setHeaders());
+    //return await http.get(fullUrl, headers: _setHeaders());
+    return await http.get(myUri, headers: _setHeaders());
   }
 
   _setHeaders() => {

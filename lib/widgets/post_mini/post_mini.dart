@@ -12,6 +12,7 @@ import 'package:flutter_login_test_2/screens/loading/loading_post_detail.dart';
 import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
 import 'package:flutter_login_test_2/screens/user_plant/user_plant_news_feed.dart';
 import 'package:flutter_login_test_2/screens/user_plant/user_plant_news_feed_for_exchange.dart';
+import 'package:flutter_login_test_2/screens/user_plant/user_plant_want_to_exchange.dart';
 import 'package:flutter_login_test_2/widgets/label/expert_label.dart';
 import 'package:flutter_login_test_2/widgets/snack_bar/snack_bar.dart';
 import 'package:http/http.dart';
@@ -64,8 +65,9 @@ class _PostMiniState extends State<PostMini> {
       children: [
         // BÀI VIẾT
         Container(
-          margin: const EdgeInsets.only(right: 2, left: 2),
+          margin: const EdgeInsets.only(right: 7, left: 7),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // THÔNG TIN USER + MENU
               Container(
@@ -174,6 +176,7 @@ class _PostMiniState extends State<PostMini> {
               SizedBox(
                 height: 5.0,
               ),
+              Text('Có 5 cây muốn trao đổi'),
               // TAG
               widget.post.tags.isEmpty || widget.post.tags == null
                   ? Container()
@@ -455,15 +458,15 @@ class _PostMiniState extends State<PostMini> {
                         title: Text('DS cây muốn trao đổi'),
                         onTap: () {
                           Navigator.pop(context);
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) =>
-                          //         UserPlantNewsfeedForExchangeScreen(
-                          //           plantIdYouWantToExchange: widget.post.id,
-                          //         ),
-                          //   ),
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  UserPlantWantToExchangeScreen(
+                                postId: widget.post.id,
+                              ),
+                            ),
+                          );
                         },
                       ),
                     )

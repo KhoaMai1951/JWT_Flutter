@@ -10,8 +10,10 @@ import 'package:flutter_login_test_2/constants/text_style.dart';
 import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
+import 'package:image_picker/image_picker.dart';
 
 final _firestore = FirebaseFirestore.instance;
+//final storage =  FirebaseStorage.instance;
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen_test';
@@ -31,6 +33,14 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
+  }
+
+  Future pickImage() async {
+    //final pickedFile = await picker.getImage(source: ImageSource.camera);
+
+    setState(() {
+      //_imageFile = File(pickedFile.path);
+    });
   }
 
   createRecordForBothUsers() async {
@@ -101,6 +111,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       decoration: kMessageTextFieldDecoration,
                     ),
                   ),
+
+                  // SEND BUTTON
                   FlatButton(
                     onPressed: () {
                       createRecordForBothUsers();
@@ -216,12 +228,21 @@ class MessageBubble extends StatelessWidget {
             color: isMe ? Colors.green : Colors.white,
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-              child: Text(
-                text,
-                style: TextStyle(
-                  color: isMe ? Colors.white : Colors.black54,
-                  fontSize: 15.0,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    text,
+                    style: TextStyle(
+                      color: isMe ? Colors.white : Colors.black54,
+                      fontSize: 15.0,
+                    ),
+                  ),
+                  // Image.network(
+                  //   "https://images.unsplash.com/photo-1547721064-da6cfb341d50",
+                  //   width: 200.0,
+                  // ),
+                ],
               ),
             ),
           ),

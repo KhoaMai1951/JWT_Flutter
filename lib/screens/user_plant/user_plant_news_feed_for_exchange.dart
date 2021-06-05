@@ -90,9 +90,11 @@ class _UserPlantNewsfeedForExchangeScreenState
       for (var plant in body['user_plants']) {
         UserPlantModel userPlantModel = new UserPlantModel(
           id: plant['id'],
+          userId: plant['user_id'],
           commonName: plant['common_name'],
           scientificName: plant['scientific_name'],
           thumbnailImage: plant['image_url'],
+          description: plant['description'],
         );
         fetchedPlants.add(userPlantModel);
       }

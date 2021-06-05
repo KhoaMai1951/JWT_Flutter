@@ -1,23 +1,24 @@
-import 'package:flutter/cupertino.dart';
 import 'dart:convert';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/models/user_plant_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
 import 'package:flutter_login_test_2/screens/user_plant/submit_user_plant.dart';
 import 'package:flutter_login_test_2/screens/user_plant/user_plant_detail.dart';
-import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 
-class UserPlantNewsFeedScreen extends StatefulWidget {
+class UserPlantWantToExchangeScreen extends StatefulWidget {
+  UserPlantWantToExchangeScreen({this.postId});
+  int postId;
   @override
-  _UserPlantNewsFeedScreenState createState() =>
-      _UserPlantNewsFeedScreenState();
+  _UserPlantWantToExchangeScreenState createState() =>
+      _UserPlantWantToExchangeScreenState();
 }
 
-class _UserPlantNewsFeedScreenState extends State<UserPlantNewsFeedScreen>
-    with TickerProviderStateMixin {
+class _UserPlantWantToExchangeScreenState
+    extends State<UserPlantWantToExchangeScreen> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<PopupMenuButtonState<int>> _key = GlobalKey();
 
@@ -63,16 +64,15 @@ class _UserPlantNewsFeedScreenState extends State<UserPlantNewsFeedScreen>
     var data = {
       'skip': this.skipPlant,
       'take': takePlant,
-      'user_id': UserGlobal.user['id'],
-      'keyword': keyword,
+      'post_id': widget.postId,
     };
-    var res = await Network().postData(data, '/user_plant/get_all_user_plants');
+    var res = await Network().postData(data, '/post/get_exchange_plants');
     var body = json.decode(res.body);
 
     // Nếu có kết quả trả về
-    if (body['user_plants'].isEmpty == false) {
+    if (body['plants'].isEmpty == false) {
       List<UserPlantModel> fetchedPlants = [];
-      for (var plant in body['user_plants']) {
+      for (var plant in body['plants']) {
         UserPlantModel userPlantModel = new UserPlantModel(
           id: plant['id'],
           userId: plant['user_id'],
@@ -80,6 +80,7 @@ class _UserPlantNewsFeedScreenState extends State<UserPlantNewsFeedScreen>
           scientificName: plant['scientific_name'],
           thumbnailImage: plant['image_url'],
           description: plant['description'],
+          accepted: plant['accepted'],
         );
         fetchedPlants.add(userPlantModel);
       }
@@ -104,12 +105,10 @@ class _UserPlantNewsFeedScreenState extends State<UserPlantNewsFeedScreen>
       appBar: AppBar(
         backgroundColor: kAppBarColor,
         leading: _isSearching ? const BackButton() : Container(),
-        title: _isSearching ? _buildSearchField() : Text('Cây của bạn'),
+        title: _isSearching ? _buildSearchField() : Text('Cây muốn \ntrao đổi'),
         actions: _buildActions(),
       ),
       body: bodyLayout(),
-      bottomNavigationBar: buildBottomNavigationBar(
-          context: context, index: kBottomBarIndexChat),
     );
   }
 
@@ -133,6 +132,7 @@ class _UserPlantNewsFeedScreenState extends State<UserPlantNewsFeedScreen>
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
+                    // IMAGE
                     Expanded(
                       child: Card(
                           clipBehavior: Clip.antiAlias,
@@ -147,16 +147,29 @@ class _UserPlantNewsFeedScreenState extends State<UserPlantNewsFeedScreen>
                             ),
                           )),
                     ),
+                    // INFO
                     Container(
                       padding: const EdgeInsets.all(5.0),
                       child: Column(
                         children: [
+                          // LABEL ĐÃ TRAO ĐỔI
+                          userPlants[index].accepted == 1
+                              ? Text(
+                                  'ĐÃ TRAO ĐỔI',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                  ),
+                                )
+                              : SizedBox(),
+                          // LABEL TÊN KHOA HỌC
                           Text(
                             userPlants[index].scientificName,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+                          // LABEL TÊN THƯỜNG GỌI
                           Text(userPlants[index].commonName),
                         ],
                       ),
@@ -169,6 +182,8 @@ class _UserPlantNewsFeedScreenState extends State<UserPlantNewsFeedScreen>
                 MaterialPageRoute(
                   builder: (context) => UserPlantDetailScreen(
                     userPlantModel: userPlants[index],
+                    isExchange: true,
+                    postId: widget.postId,
                   ),
                 ),
               );

@@ -9,6 +9,7 @@ import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/constants/bottom_bar_index_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/constants/validate_name_constant.dart';
+import 'package:flutter_login_test_2/globals/user_global.dart';
 
 import 'package:flutter_login_test_2/services/TagService.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
@@ -316,16 +317,14 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
 
     // DIO
     List<MultipartFile> listFiles = await assetToFile() as List<MultipartFile>;
-
     FormData formData = new FormData.fromMap({
       "files": listFiles,
       'title': title,
       'content': content,
       'audience': audience,
-      'user_id': userId,
+      'user_id': UserGlobal.user['id'],
       'tag_ids': tagIds,
     });
-    print(content);
 
     Dio dio = new Dio();
     SharedPreferences localStorage = await SharedPreferences.getInstance();
@@ -333,36 +332,36 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
     if (token == null) {
       token = 1;
     }
-    try {
-      var response = await dio.post(
-        kApiUrl + "/post/submit_post",
-        data: formData,
-        options: Options(
-          headers: {
-            'Accept': 'application/json',
-            'Authorization': 'Bearer $token',
-          },
+
+    var response = await dio.post(
+      kApiUrl + "/post/submit_post",
+      data: formData,
+      options: Options(
+        contentType: 'multipart/form-data',
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      ),
+    );
+
+    var jsonData = json.decode(response.toString());
+    print(jsonData);
+    if (jsonData['status'] == true) {
+      // Redirect to post detail
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoadingPostDetailScreen(
+            id: jsonData['post_id'],
+          ),
         ),
       );
-
-      var jsonData = json.decode(response.toString());
-      if (jsonData['status'] == true) {
-        // Redirect to post detail
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => LoadingPostDetailScreen(
-              id: jsonData['post_id'],
-            ),
-          ),
-        );
-      } else
-        print('Failed');
-    } catch (e) {
+    } else
+      print('Failed');
+    try {} catch (e) {
       print('exception: ' + e.toString());
       Future.error(e.toString());
     }
-
     setState(() {
       _isLoading = false;
     });

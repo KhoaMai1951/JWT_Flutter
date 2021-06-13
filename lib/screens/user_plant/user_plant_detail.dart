@@ -2,11 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_test_2/constants/api_constant.dart';
 import 'package:flutter_login_test_2/constants/color_constant.dart';
+import 'package:flutter_login_test_2/models/user_model.dart';
 import 'package:flutter_login_test_2/models/user_plant_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
+import 'package:flutter_login_test_2/screens/chat/chat.dart';
 import 'dart:convert';
 
 import 'package:flutter_login_test_2/screens/loading/loading_user_profile.dart';
+import 'package:flutter_login_test_2/screens/user_plant/user_plant_want_to_exchange.dart';
 
 class UserPlantDetailScreen extends StatefulWidget {
   UserPlantModel userPlantModel;
@@ -23,27 +26,33 @@ class UserPlantDetailScreen extends StatefulWidget {
 }
 
 class _UserPlantDetailScreenState extends State<UserPlantDetailScreen> {
-  String username = 'loading...';
   bool didExchange = false; //đã trao đổi chưa
+  bool loadingUser = false;
+  UserModel userModel;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    fetchUsername();
+    fetchUser();
     checkExchanged();
   }
 
-  fetchUsername() async {
-    // get username
+  fetchUser() async {
     var data = {
-      'user_id': widget.userPlantModel.userId,
+      'id': widget.userPlantModel.userId,
     };
 
-    var res = await Network().postData(data, '/user/get_username');
+    var res = await Network().postData(data, '/user/get_user_info_by_id');
     var body = json.decode(res.body);
-    print(body);
+
+    UserModel fetchedUser = new UserModel(
+      id: body['user'][0]['id'],
+      username: body['user'][0]['username'],
+      avatarUrl: body['avatar_link'],
+    );
     setState(() {
-      username = body['username'];
+      this.userModel = fetchedUser;
+      loadingUser = true;
     });
   }
 
@@ -78,6 +87,27 @@ class _UserPlantDetailScreenState extends State<UserPlantDetailScreen> {
             ),
             // EXCHANGE BUTTON
             widget.isExchange == true ? exchangeButtonBuilder() : SizedBox(),
+            // CHAT BUTTON
+            widget.isExchange == true
+                ? Center(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.green,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatScreen(
+                              userToChat: this.userModel,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Text("Nhắn tin"),
+                    ),
+                  )
+                : SizedBox(),
             // INFO
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -90,7 +120,9 @@ class _UserPlantDetailScreenState extends State<UserPlantDetailScreen> {
                       Text('bởi: '),
                       InkWell(
                         child: Text(
-                          username,
+                          this.loadingUser != false
+                              ? this.userModel.username
+                              : 'loading...',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         onTap: () {
@@ -147,6 +179,16 @@ class _UserPlantDetailScreenState extends State<UserPlantDetailScreen> {
                 setState(() {
                   didExchange = true;
                 });
+                Navigator.pop(context);
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UserPlantWantToExchangeScreen(
+                      postId: widget.postId,
+                    ),
+                  ),
+                );
               },
               child: Text("Trao đổi"),
             ),

@@ -83,6 +83,8 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
                           ),
                         ),
                         onTap: () {
+                          // call api check edited or not
+                          // if hasn't edit before, navigate to
                           Navigator.push(
                             context,
                             MaterialPageRoute(

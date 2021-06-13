@@ -9,13 +9,17 @@ import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/constants/text_style.dart';
 import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/models/plant_detail_model.dart';
+import 'package:flutter_login_test_2/screens/plant_care/plant_discover.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 class PlantEditScreen extends StatefulWidget {
   PlantDetailModel plantDetailModel;
-  PlantEditScreen({Key key, @required this.plantDetailModel}) : super(key: key);
+  bool hasRequestEdit;
+  PlantEditScreen(
+      {Key key, @required this.plantDetailModel, @required this.hasRequestEdit})
+      : super(key: key);
   @override
   _PlantEditScreenState createState() => _PlantEditScreenState();
 }
@@ -88,6 +92,12 @@ class _PlantEditScreenState extends State<PlantEditScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // STATUS
+                  widget.hasRequestEdit == true
+                      ? labelBuilder(
+                          label: 'Đang chờ duyệt',
+                        )
+                      : SizedBox(),
                   // CONTRIBUTOR NAME LABEL ====================================
                   labelBuilder(
                     label: 'Thông tin người đóng góp',
@@ -102,10 +112,10 @@ class _PlantEditScreenState extends State<PlantEditScreen> {
                         focusContributorName.requestFocus();
                         return 'Tên phải nhỏ hơn 100 kí tự';
                       }
-                      if (value.length == 0) {
-                        focusContributorName.requestFocus();
-                        return 'Phải nhập tên';
-                      }
+                      // if (value.length == 0) {
+                      //   focusContributorName.requestFocus();
+                      //   return 'Phải nhập tên';
+                      // }
                       setState(() {
                         this.contributorName = value;
                       });
@@ -386,15 +396,15 @@ class _PlantEditScreenState extends State<PlantEditScreen> {
             ),
             onPressed: () async {
               if (_formKey.currentState.validate() == true) {
-                print('here');
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Processing Data'),
-                  ),
+                      content: Text('Đang gửi'),
+                      duration: const Duration(seconds: 1)),
                 );
                 //SUBMIT TO SERVER
                 // DIO
                 FormData formData = new FormData.fromMap({
+                  'user_name': contributorName,
                   'user_id': UserGlobal.user['id'],
                   'server_plant_id': widget.plantDetailModel.id,
                   'common_name': widget.plantDetailModel.commonName,
@@ -405,9 +415,9 @@ class _PlantEditScreenState extends State<PlantEditScreen> {
                   'information': widget.plantDetailModel.information,
                   'feed_information': widget.plantDetailModel.feedInformation,
                   'common_issue': widget.plantDetailModel.commonIssue,
-                  'max_temperature':
-                      widget.plantDetailModel.temperatureRange[0],
                   'min_temperature':
+                      widget.plantDetailModel.temperatureRange[0],
+                  'max_temperature':
                       widget.plantDetailModel.temperatureRange[1],
                 });
                 // BEGIN CALL API
@@ -431,14 +441,18 @@ class _PlantEditScreenState extends State<PlantEditScreen> {
                   var jsonData = json.decode(response.toString());
                   if (jsonData['status'] == true) {
                     // Redirect to post detail
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => LoadingPostDetailScreen(
-                    //       id: jsonData['post_id'],
-                    //     ),
-                    //   ),
-                    // );
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PlantDiscoverScreen(),
+                      ),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Đã gửi'),
+                      ),
+                    );
                   } else
                     print('Failed');
                 } catch (e) {
@@ -446,11 +460,6 @@ class _PlantEditScreenState extends State<PlantEditScreen> {
                   Future.error(e.toString());
                 }
               }
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Thông tin còn thiếu'),
-                ),
-              );
             },
             child: Text('Đóng góp'),
           ),

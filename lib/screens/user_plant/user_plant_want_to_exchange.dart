@@ -232,32 +232,32 @@ class _UserPlantWantToExchangeScreenState
         onPressed: _startSearch,
       ),
       // POPUP MENU
-      PopupMenuButton<int>(
-        offset: const Offset(0, -380),
-        key: _key,
-        itemBuilder: (context) {
-          return <PopupMenuEntry<int>>[
-            PopupMenuItem(
-              child: Text('+ Thêm cây cảnh'),
-              value: 0,
-            ),
-            PopupMenuItem(child: Text('✿ Cây muốn trao đổi với tôi'), value: 1),
-            PopupMenuItem(child: Text('✿ Cây tôi muốn trao đổi'), value: 2),
-          ];
-        },
-        onSelected: (value) {
-          switch (value) {
-            case 0:
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SubmitUserPlantScreen(),
-                ),
-              );
-              break;
-          }
-        },
-      ),
+      // PopupMenuButton<int>(
+      //   offset: const Offset(0, -380),
+      //   key: _key,
+      //   itemBuilder: (context) {
+      //     return <PopupMenuEntry<int>>[
+      //       PopupMenuItem(
+      //         child: Text('+ Thêm cây cảnh'),
+      //         value: 0,
+      //       ),
+      //       PopupMenuItem(child: Text('✿ Cây muốn trao đổi với tôi'), value: 1),
+      //       PopupMenuItem(child: Text('✿ Cây tôi muốn trao đổi'), value: 2),
+      //     ];
+      //   },
+      //   onSelected: (value) {
+      //     switch (value) {
+      //       case 0:
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(
+      //             builder: (context) => SubmitUserPlantScreen(),
+      //           ),
+      //         );
+      //         break;
+      //     }
+      //   },
+      // ),
     ];
   }
 

@@ -136,7 +136,6 @@ class _UserPlantNewsfeedForExchangeScreenState
                     'post_id': widget.plantIdYouWantToExchange,
                     'user_plant_id': selectedPlantId,
                   };
-
                   var res = await Network()
                       .postData(data, '/user_plant/request_exchange');
                   var body = json.decode(res.body);

@@ -176,7 +176,7 @@ class _PostMiniState extends State<PostMini> {
               SizedBox(
                 height: 5.0,
               ),
-              Text('Có 5 cây muốn trao đổi'),
+              //Text('Có 5 cây muốn trao đổi'),
               // TAG
               widget.post.tags.isEmpty || widget.post.tags == null
                   ? Container()

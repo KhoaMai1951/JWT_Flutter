@@ -227,7 +227,7 @@ class _UserPlantNewsFeedScreenState extends State<UserPlantNewsFeedScreen>
               value: 0,
             ),
             PopupMenuItem(child: Text('✿ Cây muốn trao đổi với tôi'), value: 1),
-            PopupMenuItem(child: Text('✿ Cây tôi muốn trao đổi'), value: 2),
+            // PopupMenuItem(child: Text('✿ Cây tôi muốn trao đổi'), value: 2),
           ];
         },
         onSelected: (value) {

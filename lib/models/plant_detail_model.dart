@@ -13,6 +13,7 @@ class PlantDetailModel {
   String commonIssue;
   List<dynamic> temperatureRange = [];
   List<int> pHRange = [];
+  bool hasViewed;
 
   PlantDetailModel({
     this.id,
@@ -29,5 +30,6 @@ class PlantDetailModel {
     this.commonIssue,
     this.temperatureRange,
     this.pHRange,
+    this.hasViewed,
   });
 }

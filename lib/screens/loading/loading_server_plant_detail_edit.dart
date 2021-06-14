@@ -49,6 +49,7 @@ class _LoadingServerPlantDetailEditScreenState
     var body = json.decode(res.body);
 
     PlantDetailModel plantDetailModel = new PlantDetailModel(
+      hasViewed: body['plant']['has_viewed'],
       imageUrl: body['plant']['image_url'],
       commonName: body['plant']['common_name'],
       id: body['plant']['server_plant_id'],

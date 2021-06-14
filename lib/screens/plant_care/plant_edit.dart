@@ -94,9 +94,13 @@ class _PlantEditScreenState extends State<PlantEditScreen> {
                 children: [
                   // STATUS
                   widget.hasRequestEdit == true
-                      ? labelBuilder(
-                          label: 'Đang chờ duyệt',
-                        )
+                      ? (widget.plantDetailModel.hasViewed == true
+                          ? labelBuilder(
+                              label: 'Đã duyệt, mời bạn đóng góp tiếp',
+                            )
+                          : labelBuilder(
+                              label: 'Đang chờ duyệt',
+                            ))
                       : SizedBox(),
                   // CONTRIBUTOR NAME LABEL ====================================
                   labelBuilder(

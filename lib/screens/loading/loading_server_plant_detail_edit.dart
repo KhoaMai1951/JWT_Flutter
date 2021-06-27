@@ -45,7 +45,7 @@ class _LoadingServerPlantDetailEditScreenState
       'user_id': UserGlobal.user['id'],
     };
     var res = await Network()
-        .postData(data, '/server_plant/get_plant_detail_for_edit/');
+        .postData(data, '/server_plant/get_plant_detail_for_edit');
     var body = json.decode(res.body);
 
     PlantDetailModel plantDetailModel = new PlantDetailModel(

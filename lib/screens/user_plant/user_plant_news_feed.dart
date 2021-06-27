@@ -109,7 +109,7 @@ class _UserPlantNewsFeedScreenState extends State<UserPlantNewsFeedScreen>
       ),
       body: bodyLayout(),
       bottomNavigationBar: buildBottomNavigationBar(
-          context: context, index: kBottomBarIndexChat),
+          context: context, index: kBottomBarIndexProfile),
     );
   }
 

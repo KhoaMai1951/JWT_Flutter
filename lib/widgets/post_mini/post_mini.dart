@@ -283,8 +283,10 @@ class _PostMiniState extends State<PostMini> {
             ? Expanded(
                 child: CarouselSlider(
                   options: CarouselOptions(
-                    height: 300,
-                    aspectRatio: 4 / 3,
+                    //height: 300,
+                    //height: 100,
+                    //aspectRatio: 4 / 3,
+                    aspectRatio: 21 / 9,
                     viewportFraction: 1,
                     initialPage: 0,
                     enableInfiniteScroll: true,
@@ -306,8 +308,7 @@ class _PostMiniState extends State<PostMini> {
                       builder: (BuildContext context) {
                         return Container(
                           child: Center(
-                            child: Image.network(i,
-                                fit: BoxFit.cover, width: 1000),
+                            child: Image.network(i, fit: BoxFit.cover),
                           ),
                         );
                       },

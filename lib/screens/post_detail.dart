@@ -402,6 +402,7 @@ class _PostDetailState extends State<PostDetail> {
           },
         ),
       );
+      print(response);
       //clear hình ảnh + comment
       setState(() {
         this.commentContent = '';

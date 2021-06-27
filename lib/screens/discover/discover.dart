@@ -135,6 +135,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       'take': takePostGlobal,
       'keyword': keyword,
       'user_id': UserGlobal.user['id'],
+      'tag_ids': tagIds,
     };
     var res = await Network().postData(data, '/post/global_newsfeed');
     var body = json.decode(res.body);

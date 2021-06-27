@@ -9,6 +9,7 @@ import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:flutter_login_test_2/widgets/image_preview/image_preview.dart';
+import 'package:flutter_login_test_2/widgets/snack_bar/snack_bar.dart';
 import 'package:flutter_login_test_2/widgets/upload_image/upload_image_button.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,6 +22,8 @@ class ExpertRequestScreen extends StatefulWidget {
 class _ExpertRequestScreenState extends State<ExpertRequestScreen> {
   //screen status
   int screenStatus = -1;
+  //pending id for edit
+  int pendingId;
   //fields varibles
   String bio;
   String experienceIn;
@@ -74,9 +77,10 @@ class _ExpertRequestScreenState extends State<ExpertRequestScreen> {
         break;
       //pending expert
       case 1:
-        return Center(
-          child: Text('Đang chờ duyệt'),
-        );
+        // return Center(
+        //   child: Text('Đang chờ duyệt'),
+        // );
+        return editRequestExpertBodyLayout();
         break;
       //đã là expert
       case 2:
@@ -106,12 +110,120 @@ class _ExpertRequestScreenState extends State<ExpertRequestScreen> {
     var jsonData = json.decode(
       response.toString(),
     );
+
+    if (jsonData['status'].toInt() == 1) {
+      setState(() {
+        bio = jsonData['pending_info'][0]['bio'];
+        experienceIn = jsonData['pending_info'][0]['experience_in'];
+        pendingId = jsonData['pending_info'][0]['id'];
+      });
+    }
     setState(() {
       screenStatus = jsonData['status'].toInt();
     });
   }
 
-  // BODY
+  // BODY EDIT REQUEST
+  editRequestExpertBodyLayout() {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(10.0),
+      physics: AlwaysScrollableScrollPhysics(),
+      child: Column(
+        children: [
+          //LABEL PENDING
+          Text(
+            'đang chờ duyệt',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 22.0,
+            ),
+          ),
+          //FORM
+          Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                // BIO
+                textFormFieldBuilder(
+                    hintText: 'tóm tắt bản thân',
+                    label: 'tóm tắt bản thân',
+                    initialValue: bio,
+                    maxLines: 5,
+                    validateFunction: (value) {
+                      if (value.length > 2000) {
+                        return 'Thông tin phải nhỏ hơn 2000 kí tự';
+                      }
+                      if (value.length == 0) {
+                        return 'Phải nhập thông tin';
+                      }
+                      setState(() {
+                        this.bio = value;
+                      });
+                      return null;
+                    }),
+                SizedBox(height: 30.0),
+                // EXPERIENCE IN
+                textFormFieldBuilder(
+                    hintText: 'Chuyên về',
+                    label: 'Chuyên về',
+                    initialValue: experienceIn,
+                    maxLines: 5,
+                    validateFunction: (value) {
+                      if (value.length > 2000) {
+                        return 'Thông tin phải nhỏ hơn 2000 kí tự';
+                      }
+                      if (value.length == 0) {
+                        return 'Phải nhập thông tin';
+                      }
+                      setState(() {
+                        this.experienceIn = value;
+                      });
+                      return null;
+                    }),
+                SizedBox(
+                  height: 30.0,
+                ),
+                Divider(
+                  thickness: 4.0,
+                ),
+                // SUBMIT BUTTON
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: FlatButton(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          top: 8, bottom: 8, left: 10, right: 10),
+                      child: Text(
+                        _isLoading ? 'Đang xử lý...' : 'Chỉnh sửa',
+                        textDirection: TextDirection.ltr,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20.0,
+                          decoration: TextDecoration.none,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                    ),
+                    color: kButtonColor,
+                    disabledColor: Colors.grey,
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(20.0)),
+                    onPressed: () {
+                      if (_formKey.currentState.validate()) {
+                        _postSubmitEdit();
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // BODY REQUEST
   requestExpertBodyLayout() {
     return SingleChildScrollView(
       padding: EdgeInsets.all(10.0),
@@ -247,12 +359,15 @@ class _ExpertRequestScreenState extends State<ExpertRequestScreen> {
   }
 
   // TEXT FORM FIELD
-  textFormFieldBuilder(
-      {String label,
-      int maxLines,
-      String hintText,
-      Function validateFunction}) {
+  textFormFieldBuilder({
+    String label,
+    int maxLines,
+    String hintText,
+    Function validateFunction,
+    String initialValue,
+  }) {
     return TextFormField(
+      initialValue: initialValue == null ? '' : initialValue,
       maxLines: maxLines,
       decoration: InputDecoration(
         floatingLabelBehavior: FloatingLabelBehavior.always,
@@ -314,6 +429,51 @@ class _ExpertRequestScreenState extends State<ExpertRequestScreen> {
       Future.error(e.toString());
     }
 
+    buildSnackBar(context: context, message: 'Đã gửi');
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  void _postSubmitEdit() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    FormData formData = new FormData.fromMap({
+      'bio': bio,
+      'experience_in': experienceIn,
+      'id': pendingId,
+    });
+
+    Dio dio = new Dio();
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    var token = jsonDecode(localStorage.getString('token'))['token'];
+
+    try {
+      var response = await dio.post(
+        kApiUrl + "/expert_pending/edit_request",
+        data: formData,
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      var jsonData = json.decode(response.toString());
+      if (jsonData['status'] == true) {
+        // Redirect to profile
+        Navigator.pop(context);
+      } else
+        print('Failed');
+    } catch (e) {
+      print('exception: ' + e.toString());
+      Future.error(e.toString());
+    }
+
+    buildSnackBar(context: context, message: 'Đã chỉnh sửa');
     setState(() {
       _isLoading = false;
     });

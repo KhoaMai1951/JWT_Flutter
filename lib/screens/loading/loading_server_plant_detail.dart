@@ -42,22 +42,24 @@ class _LoadingServerPlantDetailScreenState
     var data = {
       'id': widget.id,
     };
-    var res = await Network().postData(data, '/server_plant/get_plant_detail/');
+    var res = await Network().postData(data, '/server_plant/get_plant_detail');
     var body = json.decode(res.body);
-
+    //var body = await json.decode(json.encode(res.body));
+    print(body);
     PlantDetailModel plantDetailModel = new PlantDetailModel(
-        imageUrl: body['plant']['image_url'],
-        commonName: body['plant']['common_name'],
-        id: body['plant']['id'],
-        commonIssue: body['plant']['common_issue'],
-        petFriendly: body['plant']['pet_friendly'],
-        difficulty: body['plant']['difficulty'],
-        feedInformation: body['plant']['feed_information'],
-        information: body['plant']['information'],
-        scientificName: body['plant']['scientific_name'],
-        sunLight: body['plant']['sunlight'],
-        temperatureRange: body['plant']['temperature_range'],
-        waterLevel: body['plant']['water_level']);
+      imageUrl: body['plant']['image_url'],
+      commonName: body['plant']['common_name'],
+      id: body['plant']['id'],
+      commonIssue: body['plant']['common_issue'],
+      petFriendly: body['plant']['pet_friendly'],
+      difficulty: body['plant']['difficulty'],
+      feedInformation: body['plant']['feed_information'],
+      information: body['plant']['information'],
+      scientificName: body['plant']['scientific_name'],
+      sunLight: body['plant']['sunlight'],
+      temperatureRange: body['plant']['temperature_range'],
+      waterLevel: body['plant']['water_level'],
+    );
 
     // pop trang loading ra khỏi stack
     Navigator.pop(context);

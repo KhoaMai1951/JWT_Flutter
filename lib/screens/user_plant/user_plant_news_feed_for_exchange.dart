@@ -7,6 +7,7 @@ import 'package:flutter_login_test_2/constants/color_constant.dart';
 import 'package:flutter_login_test_2/globals/user_global.dart';
 import 'package:flutter_login_test_2/models/user_plant_model.dart';
 import 'package:flutter_login_test_2/network_utils/api.dart';
+import 'package:flutter_login_test_2/screens/user_plant/submit_user_plant.dart';
 import 'package:flutter_login_test_2/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
 import 'package:flutter_login_test_2/widgets/snack_bar/snack_bar.dart';
 
@@ -126,7 +127,7 @@ class _UserPlantNewsfeedForExchangeScreenState
         ),
         body: bodyLayout(),
         bottomNavigationBar: buildBottomNavigationBar(
-            context: context, index: kBottomBarIndexDiscover),
+            context: context, index: kBottomBarIndexProfile),
         floatingActionButton: selectedPlantId != -1
             ? new FloatingActionButton(
                 elevation: 0.0,
@@ -149,78 +150,143 @@ class _UserPlantNewsfeedForExchangeScreenState
   }
 
   bodyLayout() {
-    if (this.noPlants == true) {
-      return Center(
-        child:
-            Text('Bạn không có cây nào để trao đổi \nHãy thêm cây để trao đổi'),
-      );
-    } else {
-      return GridView.builder(
-          controller: _scrollController,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 15.0,
-            crossAxisSpacing: 15.0,
-          ),
-          physics: ScrollPhysics(),
-          itemCount: userPlants.length,
-          itemBuilder: (BuildContext context, int index) {
-            return InkWell(
-              child: Container(
-                decoration: new BoxDecoration(
-                  borderRadius: new BorderRadius.circular(16.0),
-                  color: userPlants[index].id == selectedPlantId
-                      ? Colors.green
-                      : Colors.grey[300],
-                ),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      Expanded(
-                        child: Card(
-                            clipBehavior: Clip.antiAlias,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10.0),
-                              child: Image.network(
-                                userPlants[index].thumbnailImage,
-                                fit: BoxFit.cover,
-                              ),
-                            )),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Column(
-                          children: [
-                            Text(
-                              userPlants[index].scientificName,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(userPlants[index].commonName),
-                          ],
-                        ),
-                      ),
-                    ]),
+    // if (this.noPlants == true) {
+    //   return Center(
+    //     child:
+    //         Text('Bạn không có cây nào để trao đổi \nHãy thêm cây để trao đổi'),
+    //   );
+    // } else {
+    //   return GridView.builder(
+    //       controller: _scrollController,
+    //       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+    //         crossAxisCount: 2,
+    //         mainAxisSpacing: 15.0,
+    //         crossAxisSpacing: 15.0,
+    //       ),
+    //       physics: ScrollPhysics(),
+    //       itemCount: userPlants.length,
+    //       itemBuilder: (BuildContext context, int index) {
+    //         return InkWell(
+    //           child: Container(
+    //             decoration: new BoxDecoration(
+    //               borderRadius: new BorderRadius.circular(16.0),
+    //               color: userPlants[index].id == selectedPlantId
+    //                   ? Colors.green
+    //                   : Colors.grey[300],
+    //             ),
+    //             child: Column(
+    //                 crossAxisAlignment: CrossAxisAlignment.stretch,
+    //                 children: <Widget>[
+    //                   Expanded(
+    //                     child: Card(
+    //                         clipBehavior: Clip.antiAlias,
+    //                         shape: RoundedRectangleBorder(
+    //                           borderRadius: BorderRadius.circular(10.0),
+    //                         ),
+    //                         child: ClipRRect(
+    //                           borderRadius: BorderRadius.circular(10.0),
+    //                           child: Image.network(
+    //                             userPlants[index].thumbnailImage,
+    //                             fit: BoxFit.cover,
+    //                           ),
+    //                         )),
+    //                   ),
+    //                   Container(
+    //                     padding: const EdgeInsets.all(5.0),
+    //                     child: Column(
+    //                       children: [
+    //                         Text(
+    //                           userPlants[index].scientificName,
+    //                           style: TextStyle(
+    //                             fontWeight: FontWeight.bold,
+    //                           ),
+    //                         ),
+    //                         Text(userPlants[index].commonName),
+    //                       ],
+    //                     ),
+    //                   ),
+    //                 ]),
+    //           ),
+    //           onTap: () {
+    //             setState(() {
+    //               selectedPlantId = userPlants[index].id;
+    //             });
+    //             // Navigator.push(
+    //             //   context,
+    //             //   MaterialPageRoute(
+    //             //     builder: (context) =>
+    //             //         LoadingServerPlantDetailScreen(id: plants[index].id),
+    //             //   ),
+    //             // );
+    //           },
+    //         );
+    //       });
+    // }
+    return GridView.builder(
+        controller: _scrollController,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 15.0,
+          crossAxisSpacing: 15.0,
+        ),
+        physics: ScrollPhysics(),
+        itemCount: userPlants.length,
+        itemBuilder: (BuildContext context, int index) {
+          return InkWell(
+            child: Container(
+              decoration: new BoxDecoration(
+                borderRadius: new BorderRadius.circular(16.0),
+                color: userPlants[index].id == selectedPlantId
+                    ? Colors.green
+                    : Colors.grey[300],
               ),
-              onTap: () {
-                setState(() {
-                  selectedPlantId = userPlants[index].id;
-                });
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) =>
-                //         LoadingServerPlantDetailScreen(id: plants[index].id),
-                //   ),
-                // );
-              },
-            );
-          });
-    }
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Expanded(
+                      child: Card(
+                          clipBehavior: Clip.antiAlias,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10.0),
+                            child: Image.network(
+                              userPlants[index].thumbnailImage,
+                              fit: BoxFit.cover,
+                            ),
+                          )),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            userPlants[index].scientificName,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(userPlants[index].commonName),
+                        ],
+                      ),
+                    ),
+                  ]),
+            ),
+            onTap: () {
+              setState(() {
+                selectedPlantId = userPlants[index].id;
+              });
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) =>
+              //         LoadingServerPlantDetailScreen(id: plants[index].id),
+              //   ),
+              // );
+            },
+          );
+        });
   }
 
   // BUILD SEARCH FIELD
@@ -278,7 +344,12 @@ class _UserPlantNewsfeedForExchangeScreenState
         onSelected: (value) {
           switch (value) {
             case 0:
-              // do something
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SubmitUserPlantScreen(),
+                ),
+              );
               break;
           }
         },
@@ -314,11 +385,11 @@ class _UserPlantNewsfeedForExchangeScreenState
 
   void updateSearchQuery(String newQuery) {
     setState(() {
+      isLoadingPlant = true;
       keyword = newQuery;
       // FOR PLANTS
       userPlants.clear();
       skipPlant = 0;
-
       searchQuery = newQuery;
     });
     fetchPlants();

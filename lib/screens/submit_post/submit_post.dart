@@ -519,6 +519,7 @@ class _SubmitPostScreenState extends State<SubmitPostScreen> {
       String hintText,
       Function validateFunction}) {
     return TextFormField(
+      keyboardType: TextInputType.multiline,
       maxLines: maxLines,
       decoration: InputDecoration(
         floatingLabelBehavior: FloatingLabelBehavior.always,

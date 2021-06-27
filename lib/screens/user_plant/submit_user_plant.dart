@@ -40,7 +40,7 @@ class _SubmitUserPlantScreenState extends State<SubmitUserPlantScreen> {
         ),
         body: bodyLayout(),
         bottomNavigationBar: buildBottomNavigationBar(
-            context: context, index: kBottomBarIndexChat),
+            context: context, index: kBottomBarIndexProfile),
       ),
     );
   }
@@ -83,6 +83,9 @@ class _SubmitUserPlantScreenState extends State<SubmitUserPlantScreen> {
                     label: 'Nhập tên khoa học',
                     hintText: 'Nhập tên khoa học',
                     validateFunction: (value) {
+                      if (value.length == 0) {
+                        return 'Xin nhập tên khoa học';
+                      }
                       if (value.length > 1000) {
                         return 'Tên khoa học phải < 1000 kí tự';
                       }
@@ -101,6 +104,9 @@ class _SubmitUserPlantScreenState extends State<SubmitUserPlantScreen> {
                     label: 'Nhập mô tả',
                     hintText: 'Nhập mô tả',
                     validateFunction: (value) {
+                      if (value.length == 0) {
+                        return 'Xin nhập mô tả';
+                      }
                       if (value.length > 1000) {
                         return 'Mô tả phải < 1000 kí tự';
                       }

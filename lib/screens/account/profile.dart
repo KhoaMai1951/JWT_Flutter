@@ -556,7 +556,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     Ink(
                       color: Colors.white,
                       child: ListTile(
-                        leading: Icon(Icons.edit),
+                        leading: Icon(Icons.grass),
                         title: Text('Cây để trao đổi'),
                         onTap: () {
                           Navigator.pop(context);

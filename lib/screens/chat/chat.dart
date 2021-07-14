@@ -205,13 +205,13 @@ class MessageBubble extends StatelessWidget {
         crossAxisAlignment:
             isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
+          /*Text(
             sender,
             style: TextStyle(
               fontSize: 12.0,
               color: Colors.black54,
             ),
-          ),
+          ),*/
           Material(
             borderRadius: isMe
                 ? BorderRadius.only(

@@ -59,7 +59,7 @@ class _ConfirmEmailState extends State<ConfirmEmail> {
                                     Icons.email,
                                     color: Colors.grey,
                                   ),
-                                  hintText: "Verification code",
+                                  hintText: "Mã xác nhận",
                                   hintStyle: TextStyle(
                                       color: Color(0xFF9b9b9b),
                                       fontSize: 15,
@@ -67,7 +67,7 @@ class _ConfirmEmailState extends State<ConfirmEmail> {
                                 ),
                                 validator: (verificationCode) {
                                   if (verificationCode.isEmpty) {
-                                    return 'Please enter verification code';
+                                    return 'Xin nhập mã xác nhận';
                                   }
                                   this.verificationCode = verificationCode;
                                   return null;
@@ -80,7 +80,7 @@ class _ConfirmEmailState extends State<ConfirmEmail> {
                                     padding: EdgeInsets.only(
                                         top: 8, bottom: 8, left: 10, right: 10),
                                     child: Text(
-                                      _isLoading ? 'Proccessing...' : 'Verify',
+                                      _isLoading ? 'Đang xử lý...' : 'Xác nhận',
                                       textDirection: TextDirection.ltr,
                                       style: TextStyle(
                                         color: Colors.white,
@@ -137,7 +137,9 @@ class _ConfirmEmailState extends State<ConfirmEmail> {
       Navigator.push(
         context,
         new MaterialPageRoute(
-          builder: (context) => Login(),
+          builder: (context) => Login(
+            message: 'a',
+          ),
         ),
       );
     }

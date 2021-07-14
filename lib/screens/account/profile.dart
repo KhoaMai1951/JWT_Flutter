@@ -482,9 +482,11 @@ class _ProfileScreenState extends State<ProfileScreen>
                       text: 'Danh sách \nbài viết',
                     ),
                   ),
-                  Tab(
-                    text: 'Bài viết \nđã lưu',
-                  ),
+                  widget.user.id == UserGlobal.user['id']
+                      ? Tab(
+                          text: 'Bài viết \nđã lưu',
+                        )
+                      : SizedBox(),
                   Tab(
                     text: 'Bài viết \ntrao đổi cây',
                   ),
@@ -521,7 +523,9 @@ class _ProfileScreenState extends State<ProfileScreen>
           controller: _tabController,
           children: [
             infiniteUserPostsListView(), //LIST DANH SÁCH BÀI POST CỦA USER
-            infiniteSavedPostsListView(), //LIST DANH SÁCH BÀI ĐƯỢC SAVE POST CỦA USER
+            widget.user.id == UserGlobal.user['id']
+                ? infiniteSavedPostsListView()
+                : SizedBox(), //LIST DANH SÁCH BÀI ĐƯỢC SAVE POST CỦA USER
             infiniteExchangePostsListView(), //LIST DANH SÁCH BÀI CÓ TAG TRAO ĐÔI
           ],
         ),

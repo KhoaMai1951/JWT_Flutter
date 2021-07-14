@@ -231,12 +231,16 @@ class _PlantEditScreenState extends State<PlantEditScreen> {
                   ),
                   // SLIDER LABEL
                   sliderLabelBuilder(
-                      currentLevel: widget.plantDetailModel.sunLight.toDouble(),
+                      currentLevel: widget.plantDetailModel.sunLight != null
+                          ? widget.plantDetailModel.sunLight.toDouble()
+                          : 1,
                       labelList: sunlightLevelString,
                       length: 5),
                   // SUNLIGHT LEVEL SLIDER
                   sliderBuilder(
-                      currentLevel: widget.plantDetailModel.sunLight.toDouble(),
+                      currentLevel: widget.plantDetailModel.sunLight != null
+                          ? widget.plantDetailModel.sunLight.toDouble()
+                          : 1,
                       divisions: 4,
                       max: 5,
                       min: 1,
@@ -424,6 +428,7 @@ class _PlantEditScreenState extends State<PlantEditScreen> {
                   'max_temperature':
                       widget.plantDetailModel.temperatureRange[1],
                 });
+                print(formData.fields);
                 // BEGIN CALL API
                 Dio dio = new Dio();
                 SharedPreferences localStorage =

@@ -12,7 +12,8 @@ import '../home.dart';
 
 class Login extends StatefulWidget {
   static const String id = 'login_screen';
-
+  String message;
+  Login({Key key, this.message}) : super(key: key);
   @override
   _LoginState createState() => _LoginState();
 }
@@ -101,6 +102,9 @@ class _LoginState extends State<Login> {
                                   return null;
                                 },
                               ),
+                              Text(widget.message != null
+                                  ? 'xác nhận email thành công, xin hãy đăng nhập'
+                                  : ''),
                               Padding(
                                 padding: const EdgeInsets.all(10.0),
                                 child: FlatButton(

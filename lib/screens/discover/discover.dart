@@ -884,8 +884,11 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     setState(() {
       this.skipPostHome = 0;
       postsHome.clear();
+      this.skipPostGlobal = 0;
+      postsGlobal.clear();
     });
     fetchPostsHome();
+    fetchPostsGlobal();
   }
 
   // BUILD CHIP PLANT

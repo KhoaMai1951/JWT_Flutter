@@ -7,9 +7,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
+    <!--android:label="flutter_login_test_2"-->
     <application
-        android:label="flutter_login_test_2"
+        android:label="Don't Leaf Me"
         android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher">

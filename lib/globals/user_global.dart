@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UserGlobal {
   static var user;
+  static var test;
 
   static fetchUserFromLocal() async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
